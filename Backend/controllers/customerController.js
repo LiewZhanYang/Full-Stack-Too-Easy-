@@ -13,12 +13,14 @@ exports.addCustomer = (req, res) => {
     PfpPath,
     Password,
   } = req.body;
-  const query = `INSERT INTO Customer (AccountID, Name, EmailAddr, ContactNo, MemberStatus, MembershipExpiry, DateJoined, PfpPath, Password)
-                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`;
 
-  db.query(
-    query,
-    [
+  let query, values;
+
+  if (AccountID) {
+    // If AccountID is provided, include it in the query
+    query = `INSERT INTO Customer (AccountID, Name, EmailAddr, ContactNo, MemberStatus, MembershipExpiry, DateJoined, PfpPath, Password)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+    values = [
       AccountID,
       Name,
       EmailAddr,
@@ -28,16 +30,31 @@ exports.addCustomer = (req, res) => {
       DateJoined,
       PfpPath,
       Password,
-    ],
-    (err, result) => {
-      if (err) {
-        return res.status(500).json({ error: err.message });
-      }
-      res
-        .status(201)
-        .json({ message: "Customer added successfully", data: result });
+    ];
+  } else {
+    // If AccountID is not provided, let the database auto-increment it
+    query = `INSERT INTO Customer (Name, EmailAddr, ContactNo, MemberStatus, MembershipExpiry, DateJoined, PfpPath, Password)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?)`;
+    values = [
+      Name,
+      EmailAddr,
+      ContactNo,
+      MemberStatus,
+      MembershipExpiry,
+      DateJoined,
+      PfpPath,
+      Password,
+    ];
+  }
+
+  db.query(query, values, (err, result) => {
+    if (err) {
+      return res.status(500).json({ error: err.message });
     }
-  );
+    res
+      .status(201)
+      .json({ message: "Customer added successfully", data: result });
+  });
 };
 
 // Read (Get) a specific customer by ID
@@ -56,39 +73,30 @@ exports.getCustomerById = (req, res) => {
 // Update an existing customer
 exports.updateCustomer = (req, res) => {
   const { id } = req.params;
-  const {
-    Name,
-    EmailAddr,
-    ContactNo,
-    MemberStatus,
-    MembershipExpiry,
-    PfpPath,
-    Password,
-  } = req.body;
-  const query = `UPDATE Customer SET Name = ?, EmailAddr = ?, ContactNo = ?, MemberStatus = ?, MembershipExpiry = ?, PfpPath = ?, Password = ? WHERE AccountID = ?`;
+  const fields = req.body;
+  
 
-  db.query(
-    query,
-    [
-      Name,
-      EmailAddr,
-      ContactNo,
-      MemberStatus,
-      MembershipExpiry,
-      PfpPath,
-      Password,
-      id,
-    ],
-    (err, result) => {
-      if (err) {
-        return res.status(500).json({ error: err.message });
-      }
-      res
-        .status(200)
-        .json({ message: "Customer updated successfully", data: result });
+  const querySegments = [];
+  const values = [];
+
+
+  for (const field in fields) {
+    querySegments.push(`${field} = ?`);
+    values.push(fields[field]);
+  }
+
+  values.push(id);
+
+  const query = `UPDATE Customer SET ${querySegments.join(', ')} WHERE AccountID = ?`;
+
+  db.query(query, values, (err, result) => {
+    if (err) {
+      return res.status(500).json({ error: err.message });
     }
-  );
+    res.status(200).json({ message: "Customer updated successfully", data: result });
+  });
 };
+
 
 // Delete a customer
 exports.deleteCustomer = (req, res) => {
