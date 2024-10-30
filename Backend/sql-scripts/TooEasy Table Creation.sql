@@ -89,9 +89,11 @@ CREATE TABLE Payment (
 	CreatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP, 
     ApprovedStatus BOOL NOT NULL, 
     InvoicePath VARCHAR(100) NOT NULL,
-    PaidBy INT, 
-    ApprovedBy INT,
+    SessionID INT NOT NULL,
+    PaidBy INT NOT NULL, 
+    ApprovedBy INT NULL,
     
+    FOREIGN KEY(SessionID) REFERENCES Session(SessionID),
     FOREIGN KEY (PaidBy) REFERENCES Customer (AccountID),
     FOREIGN KEY (ApprovedBy) REFERENCES Admin (AdminID)
 );
@@ -165,10 +167,9 @@ VALUES
 (4, '15:00:00', '2025-01-18', 4),
 (5, '17:00:00', '2025-01-19', 5);
 
-INSERT INTO Payment (InvoiceID, Amount, CreatedAt, ApprovedStatus, InvoicePath, PaidBy, ApprovedBy)
+INSERT INTO Payment (InvoiceID, Amount, CreatedAt, ApprovedStatus, InvoicePath, SessionID, PaidBy, ApprovedBy)
 VALUES
-(1, 788, '2024-10-02 12:00:00', TRUE, 'path/to/invoice1.pdf', 1, 1),
-(2, 988, '2024-10-10 12:00:00', TRUE, 'path/to/invoice2.pdf', 2, 1),
-(3, 1388, '2024-10-15 12:00:00', TRUE, 'path/to/invoice3.pdf', 3, 1), 
-(4, 388, '2024-10-20 12:00:00', TRUE, 'path/to/invoice4.pdf', 4, 2),  
-(5, 488, '2024-10-25 12:00:00', TRUE, 'path/to/invoice5.pdf', 5, 2);
+(1, 788, '2024-10-02 12:00:00', TRUE, 'path/to/invoice1.pdf', 1, 1, NULL),
+(2, 988, '2024-10-10 12:00:00', TRUE, 'path/to/invoice2.pdf', 2, 2, NULL),
+(3, 1388, '2024-10-15 12:00:00', TRUE, 'path/to/invoice3.pdf', 3, 3, NULL), 
+(4, 388, '2024-10-20 12:00:00', TRUE, 'path/to/invoice4.pdf', 4, 4, NULL);
