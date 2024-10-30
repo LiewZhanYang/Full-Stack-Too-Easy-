@@ -1,8 +1,11 @@
 const express = require("express");
 const db = require("./dbConfig");
+const customerRoutes = require('./routes/customerRoutes');
 const app = express();
 
 app.use(express.json());
+
+app.use('/api',customerRoutes);
 
 app.get("/", (req, res) => {
   res.send("Backend is up and running!");
