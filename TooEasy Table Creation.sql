@@ -23,19 +23,19 @@ CREATE TABLE Admin(
 );
 
 CREATE TABLE Child (
-	AccountID INT NOT NULL,
 	ChildID INT NOT NULL,
     Name VARCHAR(50),
     Strength VARCHAR(100),
     DOB DATE NOT NULL,
+    AccountID INT NOT NULL,
 
-    PRIMARY KEY (AccountID, ChildID),
+    PRIMARY KEY (ChildID),
     FOREIGN KEY (AccountID) REFERENCES Customer(AccountID)
 );
 
 CREATE TABLE ProgramType (
-    TypeID INT PRIMARY KEY AUTO_INCREMENT,
-    TypeDesc VARCHAR(50) NOT NULL
+  TypeID INT PRIMARY KEY AUTO_INCREMENT,
+  TypeDesc VARCHAR(50) NOT NULL
 );
 
 CREATE TABLE Program (
@@ -65,11 +65,13 @@ CREATE TABLE SignUp (
 	AccountID INT, 
     SessionID INT, 
     LunchOptionID INT NOT NULL,
+    ChildID INT,
     
     PRIMARY KEY (AccountID, SessionID),
     FOREIGN KEY (AccountID) REFERENCES Customer(AccountID),
     FOREIGN KEY (SessionID) REFERENCES Session(SessionID),
-    FOREIGN KEY (LunchOptionID) REFERENCES Lunch(LunchOptionID)
+    FOREIGN KEY (LunchOptionID) REFERENCES Lunch(LunchOptionID),
+    FOREIGN KEY(ChildID) REFERENCES Child(ChildID)
 );
 
 CREATE TABLE Booking (
@@ -110,13 +112,13 @@ VALUES
 (1, 'admin1', 'adminpassword1'),
 (2, 'admin2', 'adminpassword2');
 
-INSERT INTO Child (AccountID, ChildID, Name, Strength, DOB)
+INSERT INTO Child (ChildID, Name, Strength, DOB, AccountID)
 VALUES
-(1, 1, 'Emily Doe', 'Swimming', '2012-08-15'),
-(1, 2, 'Max Doe', 'Basketball', '2015-02-20'),
-(2, 1, 'Sophia Smith', 'Tennis', '2010-11-01'),
-(3, 1, 'Oliver Johnson', 'Soccer', '2013-04-10'),
-(4, 1, 'Ava Brown', 'Dancing', '2011-06-25');
+(1, 'Emily Doe', 'Swimming', '2012-08-15', 1),
+(2, 'Max Doe', 'Basketball', '2015-02-20', 1),
+(3, 'Sophia Smith', 'Tennis', '2010-11-01', 2),
+(4, 'Oliver Johnson', 'Soccer', '2013-04-10', 2),
+(5, 'Ava Brown', 'Dancing', '2011-06-25', 1);
 
 INSERT INTO ProgramType (TypeID, TypeDesc)
 VALUES
