@@ -101,12 +101,23 @@ exports.updateCustomer = (req, res) => {
 // Delete a customer
 exports.deleteCustomer = (req, res) => {
   const { id } = req.params;
-  const query = `DELETE FROM Customer WHERE AccountID = ?`;
 
-  db.query(query, [id], (err, result) => {
+  const deleteBookingsQuery = `DELETE FROM Booking WHERE AccountID = ?`;
+
+  db.query(deleteBookingsQuery, [id], (err, bookingResult) => {
     if (err) {
       return res.status(500).json({ error: err.message });
     }
-    res.status(200).json({ message: "Customer deleted successfully" });
+
+    const deleteCustomerQuery = `DELETE FROM Customer WHERE AccountID = ?`;
+
+    db.query(deleteCustomerQuery, [id], (err, customerResult) => {
+      if (err) {
+        return res.status(500).json({ error: err.message });
+      }
+
+      res.status(200).json({ message: "Customer and related bookings deleted successfully" });
+    });
   });
 };
+
