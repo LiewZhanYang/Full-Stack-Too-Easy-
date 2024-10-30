@@ -40,7 +40,7 @@ CREATE TABLE ProgramType (
 
 CREATE TABLE Program (
 	ProgramID INT PRIMARY KEY AUTO_INCREMENT,
-    ProgramDesc  VARCHAR(50) NOT NULL NOT NULL,
+    ProgramName  VARCHAR(50) NOT NULL NOT NULL,
     Cost INT NOT NULL,
     TypeID INT NOT NULL,
     
@@ -127,11 +127,13 @@ VALUES
 (3, 'Labs'),
 (4, 'Professional');
 
-INSERT INTO Program (ProgramID, ProgramDesc, Cost, TypeID)
+INSERT INTO Program (ProgramID, ProgramName, Cost, TypeID)
 VALUES
-(1, 'Public Speaking Workshop', 799, 1),
-(2, 'PSLE Power Up Camp', 899, 1),
-(3, 'Future Entrepreneurs Labs', 799, 1);
+(1, 'Public Speaking Workshop - Beginner', 788, 1),
+(2, 'Public Speaking Workshop - Intermediate', 988, 1),
+(3, 'Public Speaking Workshop - Advanced', 1388, 1),
+(4, 'PSLE Power Up Camp - PSLE Power Up', 388, 1),
+(5, 'PSLE Power Up Camp - PSLE Chinese Oral Booster', 488, 1);
 
 INSERT INTO Session (SessionID, Date, Time, ProgramID)
 VALUES
@@ -148,13 +150,12 @@ VALUES
 (4, 'Turkey Burger'),
 (5, 'Pasta Bowl');
 
-INSERT INTO SignUp (AccountID, SessionID, LunchOptionID)
+INSERT INTO SignUp (AccountID, SessionID, LunchOptionID, ChildID)
 VALUES
-(1, 1, 1),
-(2, 1, 2),
-(3, 2, 3),
-(4, 2, 4),
-(5, 3, 5);
+(1, 1, 1, 1),  -- John Doe, Public Speaking Workshop - Beginner, Veggie Wrap
+(2, 2, 2, 3),  -- Jane Smith, Public Speaking Workshop - Intermediate, Chicken Sandwich
+(3, 3, 3, 4),  -- Bob Johnson, Public Speaking Workshop - Advanced, Fruit Salad
+(4, 4, 4, 2);  -- Alice Brown, PSLE Power Up Camp - PSLE Power Up, Turkey Burger
 
 INSERT INTO Booking (BookingID, Time, Date, AccountID)
 VALUES
@@ -166,8 +167,8 @@ VALUES
 
 INSERT INTO Payment (InvoiceID, Amount, CreatedAt, ApprovedStatus, InvoicePath, PaidBy, ApprovedBy)
 VALUES
-(1, 799, '2024-10-02 12:00:00', TRUE, 'path/to/invoice1.pdf', 1, 1),
-(2, 799, '2024-10-10 12:00:00', TRUE, 'path/to/invoice2.pdf', 2, 1),
-(3, 899, '2024-10-15 12:00:00', TRUE, 'path/to/invoice3.pdf', 3, 1),
-(4, 899, '2024-10-20 12:00:00', TRUE, 'path/to/invoice4.pdf', 4, 2),
-(5, 799, '2024-10-25 12:00:00', TRUE, 'path/to/invoice5.pdf', 5, 2);
+(1, 788, '2024-10-02 12:00:00', TRUE, 'path/to/invoice1.pdf', 1, 1),
+(2, 988, '2024-10-10 12:00:00', TRUE, 'path/to/invoice2.pdf', 2, 1),
+(3, 1388, '2024-10-15 12:00:00', TRUE, 'path/to/invoice3.pdf', 3, 1), 
+(4, 388, '2024-10-20 12:00:00', TRUE, 'path/to/invoice4.pdf', 4, 2),  
+(5, 488, '2024-10-25 12:00:00', TRUE, 'path/to/invoice5.pdf', 5, 2);
