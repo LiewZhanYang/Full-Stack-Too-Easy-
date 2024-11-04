@@ -156,7 +156,7 @@ VALUES
 (4, 'Turkey Burger'),
 (5, 'Pasta Bowl');
 
-INSERT INTO SignUp (AccountID, SessionID, LunchOptionID, ChildID)
+INSERT INTO SignUp (SignUpID, AccountID, SessionID, LunchOptionID, ChildID)
 VALUES
 (1, 1, 1, 1, 1),  -- John Doe, Public Speaking Workshop - Beginner, Veggie Wrap
 (2, 2, 2, 2, 3),  -- Jane Smith, Public Speaking Workshop - Intermediate, Chicken Sandwich
