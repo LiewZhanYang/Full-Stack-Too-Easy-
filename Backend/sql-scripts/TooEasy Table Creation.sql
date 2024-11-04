@@ -5,11 +5,11 @@ USE TooEasyDB;
 
 -- Table Creation
 CREATE TABLE Customer(
-	AccountID INT PRIMARY KEY,
+	AccountID INT PRIMARY KEY AUTO_INCREMENT,
     Name VARCHAR(50) NOT NULL,
 	EmailAddr VARCHAR(50) UNIQUE NOT NULL,
     ContactNo VARCHAR(8) UNIQUE NOT NULL CHECK (ContactNo NOT LIKE '%[^0-9]%'),
-    MemberStatus BOOL DEFAULT FALSE, 
+    MemberStatus BOOLEAN DEFAULT FALSE, 
     MembershipExpiry DATE,
     DateJoined TIMESTAMP DEFAULT CURRENT_TIMESTAMP, 
     PfpPath VARCHAR(50),
@@ -48,9 +48,10 @@ CREATE TABLE Program (
 );
 
 CREATE TABLE Session (
-	SessionID INT PRIMARY KEY AUTO_INCREMENT,
+	SessionID INT PRIMARY KEY,
     Date DATE NOT NULL,
     Time TIME NOT NULL,
+    Location VARCHAR(100) NOT NULL,
     ProgramID INT, 
     
     FOREIGN KEY (ProgramID) REFERENCES Program(ProgramID)
@@ -62,12 +63,12 @@ CREATE TABLE Lunch (
 );
 
 CREATE TABLE SignUp (
+	SignUpID INT PRIMARY KEY AUTO_INCREMENT,
 	AccountID INT, 
     SessionID INT, 
     LunchOptionID INT NOT NULL,
     ChildID INT,
     
-    PRIMARY KEY (AccountID, SessionID),
     FOREIGN KEY (AccountID) REFERENCES Customer(AccountID),
     FOREIGN KEY (SessionID) REFERENCES Session(SessionID),
     FOREIGN KEY (LunchOptionID) REFERENCES Lunch(LunchOptionID),
@@ -84,13 +85,15 @@ CREATE TABLE Booking (
 );
 
 CREATE TABLE Payment (
-	InvoiceID INT PRIMARY KEY AUTO_INCREMENT,
+	OrderID INT PRIMARY KEY AUTO_INCREMENT,
+	InvoiceID INT NOT NULL,
     Amount INT NOT NULL,
 	CreatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP, 
     ApprovedStatus BOOL NOT NULL, 
     InvoicePath VARCHAR(100) NOT NULL,
     SessionID INT NOT NULL,
     PaidBy INT NOT NULL, 
+    Reason VARCHAR(100) NULL,
     ApprovedBy INT NULL,
     
     FOREIGN KEY(SessionID) REFERENCES Session(SessionID),
@@ -127,7 +130,8 @@ VALUES
 (1, 'Workshop'),
 (2, 'Camps'),
 (3, 'Labs'),
-(4, 'Professional');
+(4, 'Professional'),
+(5, 'Webinar');
 
 INSERT INTO Program (ProgramID, ProgramName, Cost, TypeID)
 VALUES
@@ -137,12 +141,12 @@ VALUES
 (4, 'PSLE Power Up Camp - PSLE Power Up', 388, 1),
 (5, 'PSLE Power Up Camp - PSLE Chinese Oral Booster', 488, 1);
 
-INSERT INTO Session (SessionID, Date, Time, ProgramID)
+INSERT INTO Session (SessionID, Date, Time, Location, ProgramID)
 VALUES
-(1, '2025-01-4', '10:00:00', 1),
-(2, '2025-07-11', '14:00:00', 1),
-(3, '2025-07-18', '10:00:00', 1),
-(4, '2025-07-25', '14:00:00', 1);
+(1, '2025-01-04', '10:00:00', 'Auditorium A', 1),
+(2, '2025-07-11', '14:00:00', 'Classroom B', 1),
+(3, '2025-07-18', '10:00:00', 'Auditorium C', 1),
+(4, '2025-07-25', '14:00:00', 'Classroom B', 1);
 
 INSERT INTO Lunch (LunchOptionID, LunchDesc)
 VALUES
@@ -154,10 +158,10 @@ VALUES
 
 INSERT INTO SignUp (AccountID, SessionID, LunchOptionID, ChildID)
 VALUES
-(1, 1, 1, 1),  -- John Doe, Public Speaking Workshop - Beginner, Veggie Wrap
-(2, 2, 2, 3),  -- Jane Smith, Public Speaking Workshop - Intermediate, Chicken Sandwich
-(3, 3, 3, 4),  -- Bob Johnson, Public Speaking Workshop - Advanced, Fruit Salad
-(4, 4, 4, 2);  -- Alice Brown, PSLE Power Up Camp - PSLE Power Up, Turkey Burger
+(1, 1, 1, 1, 1),  -- John Doe, Public Speaking Workshop - Beginner, Veggie Wrap
+(2, 2, 2, 2, 3),  -- Jane Smith, Public Speaking Workshop - Intermediate, Chicken Sandwich
+(3, 3, 3, 3, 4),  -- Bob Johnson, Public Speaking Workshop - Advanced, Fruit Salad
+(4, 4, 4, 4, 2);  -- Alice Brown, PSLE Power Up Camp - PSLE Power Up, Turkey Burger
 
 INSERT INTO Booking (BookingID, Time, Date, AccountID)
 VALUES
@@ -167,9 +171,9 @@ VALUES
 (4, '15:00:00', '2025-01-18', 4),
 (5, '17:00:00', '2025-01-19', 5);
 
-INSERT INTO Payment (InvoiceID, Amount, CreatedAt, ApprovedStatus, InvoicePath, SessionID, PaidBy, ApprovedBy)
+INSERT INTO Payment (OrderID, InvoiceID, Amount, CreatedAt, ApprovedStatus, InvoicePath, SessionID, PaidBy, ApprovedBy, Reason)
 VALUES
-(1, 788, '2024-10-02 12:00:00', TRUE, 'path/to/invoice1.pdf', 1, 1, NULL),
-(2, 988, '2024-10-10 12:00:00', TRUE, 'path/to/invoice2.pdf', 2, 2, NULL),
-(3, 1388, '2024-10-15 12:00:00', TRUE, 'path/to/invoice3.pdf', 3, 3, NULL), 
-(4, 388, '2024-10-20 12:00:00', TRUE, 'path/to/invoice4.pdf', 4, 4, NULL);
+(1, 46382751, 788, '2024-10-02 12:00:00', TRUE, 'path/to/invoice-46382751.pdf', 1, 1, NULL, NULL),
+(2, 93157026, 988, '2024-10-10 12:00:00', TRUE, 'path/to/invoice-93157026.pdf', 2, 2, NULL, NULL),
+(3, 67491350, 1388, '2024-10-15 12:00:00', TRUE, 'path/to/invoice-67491350.pdf', 3, 3, NULL, NULL),
+(4, 28653104, 388, '2024-10-20 12:00:00', TRUE, 'path/to/invoice-28653104.pdf', 4, 4, NULL, NULL);
