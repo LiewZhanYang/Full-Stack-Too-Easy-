@@ -1,6 +1,3 @@
-// models/Customer.js
-const db = require("../dbConfig");
-
 // class Customer {
 //   static async addCustomer(customerData) {
 //     try {
@@ -95,6 +92,8 @@ const db = require("../dbConfig");
 //     return result;
 //   }
 // }
+const dbConfig = require('../dbConfig');
+const mysql = require('mysql2/promise');
 
 class Customer {
   constructor(AccountID, Name, EmailAddr, ContactNo, Password, MemberStatus, MembershipExpiry, DateJoined, PfpPath) {
@@ -110,81 +109,77 @@ class Customer {
   }
 
   static async getCustomerByEmail(email){
-    const connection = await sql.connect(dbConfig);
+    const connection = await mysql.createConnection(dbConfig);
 
     const sqlQuery = `
-      SELECT * FROM Customer WHERE EmailAddr = @email
+      SELECT * FROM Customer WHERE EmailAddr = ?
     `;
+    const [result] = await connection.execute(sqlQuery, [email]);
 
-    const request = connection.request();
-    request.input("email", email);
-    const result = await request.query(sqlQuery);
-
-    connection.close();
-    return result.recordset.map(
-      (row) =>
-        new Customer(
-          row.AccountID,
-          row.Name,
-          row.EmailAddr,
-          row.ContactNo,
-          row.Password,
-          row.MemberStatus,
-          row.MembershipExpiry,
-          row.DateJoined, 
-          row.PfpPath
-        )
-    );
+    connection.end();
+    return result.map(row => {
+        return new Customer(
+        row.AccountID,
+        row.Name,
+        row.EmailAddr,
+        row.ContactNo,
+        row.Password,
+        row.MemberStatus,
+        row.MembershipExpiry,
+        row.DateJoined,
+        row.PfpPath
+      );
+    });
   }
 
-  static async getCustomerByID(id) {
-    const connection = await sql.connect(dbConfig);
+  // static async getCustomerByID(id) {
+  //   const connection = await sql.connect(dbConfig);
 
-    const sqlQuery = `
-      SELECT * FROM Customer WHERE AccountID = @id
-    `;
+  //   const sqlQuery = `
+  //     SELECT * FROM Customer WHERE AccountID = @id
+  //   `;
 
-    const request = connection.request();
-    request.input("id", id);
-    const result = await request.query(sqlQuery);
+  //   const request = connection.request();
+  //   request.input("id", id);
+  //   const result = await request.query(sqlQuery);
 
-    connection.close();
-    return result.recordset.map(
-      (row) =>
-        new Customer(
-          row.AccountID,
-          row.Name,
-          row.EmailAddr,
-          row.ContactNo,
-          row.Password,
-          row.MemberStatus,
-          row.MembershipExpiry,
-          row.DateJoined, 
-          row.PfpPath
-        )
-    );
-  }
+  //   connection.close();
+  //   return result.recordset.map(
+  //     (row) =>
+  //       new Customer(
+  //         row.AccountID,
+  //         row.Name,
+  //         row.EmailAddr,
+  //         row.ContactNo,
+  //         row.Password,
+  //         row.MemberStatus,
+  //         row.MembershipExpiry,
+  //         row.DateJoined, 
+  //         row.PfpPath
+  //       )
+  //   );
+  // }
 
-  static async postCustomer(postCustomer){
-    const connection = await sql.connect(dbConfig);
-    const sqlQuery = `
-      INSERT INTO Customer (Name, EmailAddr, ContactNo, MemberStatus, MembershipExpiry, PfpPath, Password)
-      VALUES
-      (@name, @emailAddr, @contactNo, @memberStatus, @memberExpiry, @pfpPath, @password);
-    `;
+  // static async postCustomer(postCustomer){
+  //   const connection = await sql.connect(dbConfig);
+  //   const sqlQuery = `
+  //     INSERT INTO Customer (Name, EmailAddr, ContactNo, MemberStatus, MembershipExpiry, PfpPath, Password)
+  //     VALUES
+  //     (@name, @emailAddr, @contactNo, @memberStatus, @memberExpiry, @pfpPath, @password);
+  //   `;
 
-    const request = connection.request();
-    request.input("name", postCustomer.name);
-    request.input("contactNo", postCustomer.contactNo);
-    request.input("memberStatus", postCustomer.memberStatus);
-    request.input("memberExpiry", postCustomer.memberExpiry);
-    request.input("pfpPath", postCustomer.pfpPath);
-    request.input("password", postCustomer.password);
+  //   const request = connection.request();
+  //   request.input("name", postCustomer.name);
+  //   request.input("contactNo", postCustomer.contactNo);
+  //   request.input("memberStatus", postCustomer.memberStatus);
+  //   request.input("memberExpiry", postCustomer.memberExpiry);
+  //   request.input("pfpPath", postCustomer.pfpPath);
+  //   request.input("password", postCustomer.password);
 
-    const result = await request.query(sqlQuery);
+  //   const result = await request.query(sqlQuery);
 
-    connection.close();
-  }
+  //   connection.close();
+  // }
 }
 
 module.exports = Customer;

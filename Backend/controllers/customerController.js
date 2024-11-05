@@ -1,41 +1,23 @@
 const Customer = require("../models/customer");
 
-exports.addCustomer = async (req, res) => {
+const getCustomerByEmail = async (req, res) => {
+  const email = req.params.email;
   try {
-    const result = await Customer.addCustomer(req.body);
-    res.status(201).json({ message: "Customer added successfully", result });
-  } catch (error) {
-    console.error("Error in controller:", error);
-    res.status(500).json({ error: error.message });
-  }
-};
-
-exports.getCustomerById = async (req, res) => {
-  try {
-    const [customer] = await Customer.getCustomerById(req.params.id);
-    if (!customer) return res.status(404).json({ error: "Customer not found" });
+    //fetch Customer with given id
+    const customer = await Customer.getCustomerByEmail(email);
+    if (customer.length === 0) {
+      //send 404 if Customer not found
+      return res.status(404).send("Customer not found");
+    }
+    //send customer data as json
     res.json(customer);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    //log the error if there is
+    console.error(error);
+    res.status(500).send("Error retrieving Customer");
   }
-};
+}
 
-exports.updateCustomer = async (req, res) => {
-  try {
-    await Customer.updateCustomer(req.params.id, req.body);
-    res.status(200).json({ message: "Customer updated successfully" });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-};
-
-exports.deleteCustomer = async (req, res) => {
-  try {
-    await Customer.deleteCustomer(req.params.id);
-    res
-      .status(200)
-      .json({ message: "Customer and related bookings deleted successfully" });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-};
+module.exports = {
+  getCustomerByEmail
+}
