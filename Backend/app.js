@@ -8,7 +8,7 @@ const sql = require('mysql2/promise');
 const dotenv = require('dotenv');
 dotenv.config();
 
-const customerController = require('./controllers/customerController');
+const customerController = require('./controllers/testController');
 
 app.get("/customer/email/:email", customerController.getCustomerByEmail)
 app.get("/customer/id/:id", customerController.getCustomerByID)
