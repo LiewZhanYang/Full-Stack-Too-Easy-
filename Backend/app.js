@@ -10,7 +10,9 @@ dotenv.config();
 
 const customerController = require('./controllers/customerController');
 
-app.get("/customer/:email", customerController.getCustomerByEmail)
+app.get("/customer/email/:email", customerController.getCustomerByEmail)
+app.get("/customer/id/:id", customerController.getCustomerByID)
+app.post("/customer", customerController.postCustomer)
 
 const dbConfig = require('./dbConfig')
 
