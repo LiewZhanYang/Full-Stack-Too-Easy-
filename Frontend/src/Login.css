@@ -1,0 +1,46 @@
+/* Login.css */  
+.login-container {  
+  width: 100%;  
+  max-width: 400px;  
+  padding: 0 20px;  
+}  
+
+.input-group-text {  
+  border-radius: 4px 0 0 4px;  
+  border-right: none;  
+}  
+
+.form-control {  
+  border-radius: 0 4px 4px 0;  
+  padding: 0.75rem 1rem;  
+  background-color: #f8f8f8;  
+}  
+
+.form-control:focus {  
+  box-shadow: none;  
+  border-color: #ced4da;  
+  background-color: #f8f8f8;  
+}  
+
+.btn-dark {  
+  background-color: #212529;  
+  border: none;  
+  padding: 12px;  
+}  
+
+.btn-dark:hover {  
+  background-color: #1a1e21;  
+}  
+
+.btn-warning {  
+  background-color: #ffc107;  
+  color: #000;  
+}  
+
+.navbar {  
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);  
+}  
+
+.object-fit-cover {  
+  object-fit: cover;  
+}
