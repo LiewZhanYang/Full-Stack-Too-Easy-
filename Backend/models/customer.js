@@ -124,6 +124,7 @@ class Customer {
     return result.recordset.map(
       (row) =>
         new Customer(
+          row.AccountID,
           row.Name,
           row.EmailAddr,
           row.ContactNo,
@@ -134,6 +135,55 @@ class Customer {
           row.PfpPath
         )
     );
+  }
+
+  static async getCustomerByID(id) {
+    const connection = await sql.connect(dbConfig);
+
+    const sqlQuery = `
+      SELECT * FROM Customer WHERE AccountID = @id
+    `;
+
+    const request = connection.request();
+    request.input("id", id);
+    const result = await request.query(sqlQuery);
+
+    connection.close();
+    return result.recordset.map(
+      (row) =>
+        new Customer(
+          row.AccountID,
+          row.Name,
+          row.EmailAddr,
+          row.ContactNo,
+          row.Password,
+          row.MemberStatus,
+          row.MembershipExpiry,
+          row.DateJoined, 
+          row.PfpPath
+        )
+    );
+  }
+
+  static async postCustomer(postCustomer){
+    const connection = await sql.connect(dbConfig);
+    const sqlQuery = `
+      INSERT INTO Customer (Name, EmailAddr, ContactNo, MemberStatus, MembershipExpiry, PfpPath, Password)
+      VALUES
+      (@name, @emailAddr, @contactNo, @memberStatus, @memberExpiry, @pfpPath, @password);
+    `;
+
+    const request = connection.request();
+    request.input("name", postCustomer.name);
+    request.input("contactNo", postCustomer.contactNo);
+    request.input("memberStatus", postCustomer.memberStatus);
+    request.input("memberExpiry", postCustomer.memberExpiry);
+    request.input("pfpPath", postCustomer.pfpPath);
+    request.input("password", postCustomer.password);
+
+    const result = await request.query(sqlQuery);
+
+    connection.close();
   }
 }
 
