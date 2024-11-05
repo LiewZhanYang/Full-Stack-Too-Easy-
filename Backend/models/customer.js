@@ -3,51 +3,64 @@ const db = require("../dbConfig");
 
 class Customer {
   static async addCustomer(customerData) {
-    const {
-      accountID,
-      name,
-      emailAddr,
-      contactNo,
-      memberStatus = false,
-      membershipExpiry = null,
-      dateJoined = new Date(),
-      pfpPath = null,
-      password,
-    } = customerData;
+    try {
+      const {
+        Name,
+        EmailAddr,
+        ContactNo,
+        Password,
+        MemberStatus = null, // Set default to null
+        MembershipExpiry = null, // Set default to null
+        DateJoined = new Date(), // Set to current date by default
+        PfpPath = null, // Set default to null
+      } = customerData;
 
-    // Prepare SQL query and values
-    const query = accountID
-      ? `INSERT INTO Customer (AccountID, Name, EmailAddr, ContactNo, MemberStatus, MembershipExpiry, DateJoined, PfpPath, Password)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`
-      : `INSERT INTO Customer (Name, EmailAddr, ContactNo, MemberStatus, MembershipExpiry, DateJoined, PfpPath, Password)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?)`;
+      // Log the variables to ensure they are set correctly
+      console.log("Customer data prepared for SQL:", {
+        Name,
+        EmailAddr,
+        ContactNo,
+        MemberStatus,
+        MembershipExpiry,
+        DateJoined,
+        PfpPath,
+        Password,
+      });
 
-    const values = accountID
-      ? [
-          accountID,
-          name,
-          emailAddr,
-          contactNo,
-          memberStatus,
-          membershipExpiry,
-          dateJoined,
-          pfpPath,
-          password,
-        ]
-      : [
-          name,
-          emailAddr,
-          contactNo,
-          memberStatus,
-          membershipExpiry,
-          dateJoined,
-          pfpPath,
-          password,
-        ];
+      // Prepare SQL query
+      const query = `
+            INSERT INTO Customer (Name, EmailAddr, ContactNo, MemberStatus, MembershipExpiry, DateJoined, PfpPath, Password)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)`;
 
-    // Execute the query
-    const [result] = await db.execute(query, values);
-    return result;
+      // Prepare values
+      const values = [
+        Name,
+        EmailAddr,
+        ContactNo,
+        MemberStatus, // Will be null if not provided
+        MembershipExpiry, // Will be null if not provided
+        DateJoined, // Current date
+        PfpPath, // Will be null if not provided
+        Password,
+      ];
+
+      // Check for undefined values and log them
+      values.forEach((value, index) => {
+        if (value === undefined) {
+          console.error(
+            `Value at index ${index} is undefined. Setting to null.`
+          );
+          values[index] = null; // Set undefined values to null
+        }
+      });
+
+      // Execute the query
+      const [result] = await db.execute(query, values);
+      return result;
+    } catch (error) {
+      console.error("Error in addCustomer:", error);
+      throw error; // Rethrow error for further handling in the controller
+    }
   }
 
   static async getCustomerById(id) {

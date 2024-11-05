@@ -3,15 +3,9 @@ const Customer = require("../models/customer");
 exports.addCustomer = async (req, res) => {
   try {
     const result = await Customer.addCustomer(req.body);
-    res
-      .status(201)
-      .json({ message: "Customer added successfully", data: result });
+    res.status(201).json({ message: "Customer added successfully", result });
   } catch (error) {
-    if (error.code === "ER_DUP_ENTRY") {
-      return res
-        .status(400)
-        .json({ error: "EmailAddr or ContactNo already exists." });
-    }
+    console.error("Error in controller:", error);
     res.status(500).json({ error: error.message });
   }
 };
