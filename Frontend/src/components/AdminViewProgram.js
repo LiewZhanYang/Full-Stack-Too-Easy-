@@ -8,7 +8,7 @@ import {
   Form,
   Dropdown,
 } from "react-bootstrap";
-import { FaSearch, FaEdit } from "react-icons/fa";
+import { FaSearch, FaEdit, FaPlus } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 
 const AdminViewProgram = () => {
@@ -26,6 +26,10 @@ const AdminViewProgram = () => {
 
   const handleEditClick = (programId) => {
     navigate(`/admin-view-session/${programId}`);
+  };
+
+  const handleCreateProgramClick = () => {
+    navigate("/admin-create-program");
   };
 
   return (
@@ -54,7 +58,6 @@ const AdminViewProgram = () => {
           >
             Type
           </Dropdown.Toggle>
-
           <Dropdown.Menu className="admin-program-dropdown-menu">
             <Dropdown.Item href="#/action-1">Workshop</Dropdown.Item>
             <Dropdown.Item href="#/action-2">Camp</Dropdown.Item>
@@ -96,6 +99,15 @@ const AdminViewProgram = () => {
           </Col>
         ))}
       </Row>
+
+      {/* Create Program Button */}
+      <Button
+        variant="success"
+        className="admin-create-program-button d-flex align-items-center"
+        onClick={handleCreateProgramClick}
+      >
+        <FaPlus className="me-1" /> <span>Create Programme</span>
+      </Button>
     </Container>
   );
 };
