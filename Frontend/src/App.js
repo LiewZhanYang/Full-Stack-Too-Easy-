@@ -24,6 +24,7 @@ import AdminViewPayment from './components/AdminViewPayment.js';
 import AdminConfirmPayment from './components/AdminConfirmPayment.js';
 import AdminCreateProgram from './components/AdminCreateProgram.js';
 import AdminEditProgram from './components/AdminEditProgram.js';
+import AdminEditTiming from './components/AdminEditTiming.js';
 import './App.css';  
 
 // Layout component to handle conditional rendering  
@@ -88,6 +89,7 @@ function App() {
               <Route path="/admin-confirm-payment" element={<AdminConfirmPayment />} />
               <Route path="/admin-create-program" element={<AdminCreateProgram />} />
               <Route path="/admin-edit-program/:id" element={<AdminEditProgram />} />
+              <Route path="/admin-edit-timing" element={<AdminEditTiming />} />
 
               {/* Logout route redirects to login */}  
               <Route path="/logout" element={<Navigate to="/login" replace />} />  
