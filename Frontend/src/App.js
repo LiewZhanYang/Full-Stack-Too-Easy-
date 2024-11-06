@@ -20,6 +20,7 @@ import AdminProgram from './components/AdminProgram.js';
 import AdminViewSession from './components/AdminViewSession.js';
 import AdminEditSession from './components/AdminEditSession.js';
 import AdminCreateSession from './components/AdminCreateSession.js';
+import AdminViewPayment from './components/AdminViewPayment.js';
 import './App.css';  
 
 // Layout component to handle conditional rendering  
@@ -80,6 +81,7 @@ function App() {
               <Route path="/admin-view-session/:id" element={<AdminViewSession />} />
               <Route path="/admin-edit-session/:id" element={<AdminEditSession />} />
               <Route path="/admin-create-session" element={<AdminCreateSession />} />
+              <Route path="/admin-view-payment" element={<AdminViewPayment />} />
 
               {/* Logout route redirects to login */}  
               <Route path="/logout" element={<Navigate to="/login" replace />} />  

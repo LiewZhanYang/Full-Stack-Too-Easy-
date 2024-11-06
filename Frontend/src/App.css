@@ -700,3 +700,47 @@ body {
   justify-content: start;
   gap: 1rem;
 }
+
+/* Admin View Payments page */
+.admin-payments-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 0.5rem;
+}
+
+.admin-payments-divider {
+  border: none;
+  border-top: 1px solid #ccc;
+}
+
+.admin-payments-tab {
+  font-weight: 500;
+  color: #333;
+}
+
+.admin-payment-card {
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  background-color: #fff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  text-align: left;
+}
+
+.admin-payment-card .card-body {
+  padding: 1rem;
+}
+
+.admin-payment-order-id {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #333;
+  text-align: left; 
+}
+
+.admin-payment-text {
+  font-size: 1rem;
+  color: #555;
+  text-align: left;
+}
+
