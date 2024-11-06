@@ -2,7 +2,8 @@ import React, { useState } from "react";
 import { Calendar, dateFnsLocalizer } from "react-big-calendar";
 import { format, parse, startOfWeek, getDay, isBefore } from "date-fns";
 import "react-big-calendar/lib/css/react-big-calendar.css";
-import { Container, Row, Col, Button, ListGroup } from "react-bootstrap";
+import { Container, Row, Col, Button, ListGroup, Modal } from "react-bootstrap";
+import { useNavigate } from "react-router-dom";
 
 const locales = {
   "en-US": require("date-fns/locale/en-US"),
@@ -28,6 +29,8 @@ function Booking() {
   const [selectedSlot, setSelectedSlot] = useState(null);
   const [selectedTimeSlot, setSelectedTimeSlot] = useState(null);
   const [currentDate, setCurrentDate] = useState(new Date());
+  const [showModal, setShowModal] = useState(false);
+  const navigate = useNavigate();
   const today = new Date();
 
   const handleSelectSlot = (slotInfo) => {
@@ -35,13 +38,23 @@ function Booking() {
       return;
     }
     setSelectedSlot(slotInfo.start);
+    setSelectedTimeSlot(null); // Reset time slot if date changes
   };
 
   const handleTimeSlotClick = (timeSlot) => {
     setSelectedTimeSlot(timeSlot);
   };
 
-  const handleNavigate = (date, view) => {
+  const handleConfirmBooking = () => {
+    setShowModal(true);
+  };
+
+  const handleCloseModal = () => {
+    setShowModal(false);
+    navigate('/precoaching'); // Redirect to Precoaching.js (adjust the path as needed)
+  };
+
+  const handleNavigate = (date) => {
     if (
       date.getFullYear() < today.getFullYear() ||
       (date.getFullYear() === today.getFullYear() &&
@@ -90,7 +103,8 @@ function Booking() {
           <ListGroup className="mb-3">
             {selectedSlot ? (
               <ListGroup.Item className="selected-time">
-                Selected Time: {format(selectedSlot, "HH:mm - MMMM do, yyyy")}
+                Selected Time: {format(selectedSlot, "MMMM do, yyyy")}{" "}
+                {selectedTimeSlot ? `- ${selectedTimeSlot}` : ""}
               </ListGroup.Item>
             ) : (
               <ListGroup.Item className="no-selection">
@@ -107,6 +121,7 @@ function Booking() {
               }
               className="time-slot-button mb-2 w-100"
               onClick={() => handleTimeSlotClick(timeSlot)}
+              disabled={!selectedSlot} // Disable until a date is selected
             >
               {timeSlot}
             </Button>
@@ -115,7 +130,8 @@ function Booking() {
           <Button
             variant="warning"
             className="confirm-button w-100 mb-2"
-            disabled={!selectedTimeSlot}
+            disabled={!selectedTimeSlot || !selectedSlot} // Only enable if both date and time slot are selected
+            onClick={handleConfirmBooking}
           >
             Confirm Booking
           </Button>
@@ -124,6 +140,21 @@ function Booking() {
           </Button>
         </Col>
       </Row>
+
+      {/* Confirmation Modal */}
+      <Modal show={showModal} onHide={handleCloseModal}>
+        <Modal.Header closeButton>
+          <Modal.Title>Booking Confirmed</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          Your booking for {format(selectedSlot, "MMMM do, yyyy")} at {selectedTimeSlot} has been confirmed.
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="primary" onClick={handleCloseModal}>
+            Close
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </Container>
   );
 }
