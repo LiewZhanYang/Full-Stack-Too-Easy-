@@ -28,6 +28,8 @@ app.put("/approvepayment/:orderID", testController.approvePayment)
 app.put("/rejectpayment/:orderID", testController.rejectPayment)
 app.get("/program", testController.getAllPrograms)
 app.post("/program", testController.postProgram)
+app.get("/session/:id", testController.getSessionsByProgramID)
+app.post("/session", testController.postSession)
 
 const dbConfig = require('./dbConfig')
 
