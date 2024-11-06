@@ -829,3 +829,65 @@ body {
   gap: 1rem;
 }
 
+/* Admin Create Program page */
+.admin-create-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 0.5rem;
+}
+
+.admin-create-divider {
+  border: none;
+  border-top: 1px solid #ccc;
+}
+
+.admin-create-button-group {
+  display: flex;
+  justify-content: start;
+  gap: 1rem;
+}
+
+.admin-create-confirm-button {
+  background-color: #DCAF27;
+  color: white;
+  font-weight: 500;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 5px;
+}
+
+.admin-create-confirm-button:hover {
+  background-color: #b8921f;
+}
+
+.admin-create-cancel-button {
+  background-color: #FF5733;
+  color: white;
+  font-weight: 500;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 5px;
+}
+
+.admin-create-cancel-button:hover {
+  background-color: #cc4629;
+}
+
+.lunch-options .form-control {
+  margin-bottom: 8px;
+}
+
+.form-control {
+  border-radius: 8px;
+}
+
+.btn-outline-danger {
+  border-color: transparent;
+  color: #FF5733;
+}
+
+.btn-outline-danger:hover {
+  background-color: #FF5733;
+  color: white;
+}
