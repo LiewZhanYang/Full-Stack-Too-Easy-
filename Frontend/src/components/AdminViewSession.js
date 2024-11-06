@@ -2,7 +2,7 @@ import React from 'react';
 import { Container, Row, Col, Button, Table } from 'react-bootstrap';
 import { FaEdit, FaTrash } from 'react-icons/fa';
 
-const AdminEditProgram = () => {
+const AdminViewSession = () => {
   const sessions = [
     { 
       id: 1, 
@@ -54,4 +54,4 @@ const AdminEditProgram = () => {
   );
 };
 
-export default AdminEditProgram;
+export default AdminViewSession;
