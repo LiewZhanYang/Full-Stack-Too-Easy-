@@ -498,3 +498,49 @@ body {
   background-color: #ab881e;
   color: #fff;
 }
+
+/* Admin Homepage CSS */
+.admin-greeting {
+  font-size: 1.8rem;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 0.5rem;
+}
+
+.text-muted {
+  font-size: 1rem;
+  color: #555;
+}
+
+.admin-status, .shortcuts-title {
+  font-size: 1.2rem;
+  color: #666;
+}
+
+.pending-invoices {
+  font-size: 1.3rem;
+  font-weight: 500;
+}
+
+.shortcut-card {
+  background-color: #f9f9f9;
+  border: 1px solid #ddd;
+  border-radius: 15px;
+  padding: 1rem;
+  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.shortcut-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.shortcut-icon {
+  color: #DCAF27;
+}
+
+.shortcut-title {
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: #333;
+}
