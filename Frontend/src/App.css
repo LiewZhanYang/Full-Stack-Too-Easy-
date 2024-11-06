@@ -39,7 +39,6 @@ code {
   min-width: 250px;
 }
 
-
 /* Collapsible sidebar on smaller screens */
 @media (max-width: 768px) {
   .main-content {
@@ -219,7 +218,7 @@ body {
 .btn-primary.btn-sm.position-fixed {
   color: black;
   background-color: white;
-  border: 0px solid white; 
+  border: 0px solid white;
   padding: 8px 24px;
   font-weight: 500;
   border-radius: 10px;
@@ -228,7 +227,7 @@ body {
 }
 
 .btn-primary.btn-sm.position-fixed:hover {
-  background-color: #DCAF27;
+  background-color: #dcaf27;
   color: black;
   outline: none;
 }
@@ -237,8 +236,6 @@ body {
   outline: none;
   box-shadow: none;
 }
-
-
 
 ::-webkit-scrollbar {
   width: 8px;
@@ -342,7 +339,6 @@ body {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
-
 /* CSS for Booking.js */
 
 .booking-container {
@@ -372,7 +368,8 @@ body {
   margin-bottom: 1rem;
 }
 
-.selected-time, .no-selection {
+.selected-time,
+.no-selection {
   font-size: 1rem;
   color: #555;
   padding: 0.75rem;
@@ -382,7 +379,7 @@ body {
 }
 
 .selected-time-slot {
-  background-color: #2F455B !important;
+  background-color: #2f455b !important;
   color: white !important;
   border: none !important;
 }
@@ -395,12 +392,12 @@ body {
 }
 
 .time-slot-button.primary {
-  background-color: #2F455B;
+  background-color: #2f455b;
   color: white;
 }
 
 .time-slot-button:hover {
-  background-color: #2F455B;
+  background-color: #2f455b;
   color: white;
 }
 
@@ -430,12 +427,12 @@ body {
 }
 
 .hoverable-day:hover {
-  background-color: #DCAF27;
+  background-color: #dcaf27;
   cursor: pointer;
 }
 
 .selected-day {
-  background-color: #DCAF27 !important; 
+  background-color: #dcaf27 !important;
   color: white;
 }
 
@@ -488,7 +485,7 @@ body {
 
 /* Precoaching no sessions page */
 .custom-booking-button {
-  background-color: #DCAF27;
+  background-color: #dcaf27;
   color: #fff;
   border: none;
   box-shadow: none;
@@ -498,3 +495,453 @@ body {
   background-color: #ab881e;
   color: #fff;
 }
+
+/* Admin Homepage CSS */
+.admin-greeting {
+  font-size: 1.8rem;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 0.5rem;
+}
+
+.text-muted {
+  font-size: 1rem;
+  color: #555;
+}
+
+.admin-status,
+.shortcuts-title {
+  font-size: 1.2rem;
+  color: #666;
+}
+
+.pending-invoices {
+  font-size: 1.3rem;
+  font-weight: 500;
+}
+
+.shortcut-card {
+  background-color: #f9f9f9;
+  border: 1px solid #ddd;
+  border-radius: 15px;
+  padding: 1rem;
+  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.shortcut-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.shortcut-icon {
+  color: #dcaf27;
+}
+
+.shortcut-title {
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: #333;
+}
+
+/* Admin View Programs Page */
+.admin-program-card {
+  border-radius: 10px;
+  overflow: hidden;
+  position: relative;
+  padding: 0;
+}
+
+.admin-program-card-image-container {
+  width: 100%;
+  height: 220px;
+  overflow: hidden;
+}
+
+.admin-program-card-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.admin-program-card-title {
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: #333;
+  margin-top: 10px;
+}
+
+.admin-program-edit-button {
+  align-self: flex-start;
+  background-color: #dcaf27;
+  color: white;
+  border: none;
+  font-weight: 500;
+  padding: 5px 10px;
+  border-radius: 5px;
+  font-size: 0.9rem;
+  margin-top: auto;
+  display: flex;
+  align-items: center;
+}
+
+.admin-program-edit-button:hover {
+  background-color: #b8921f;
+}
+
+.admin-create-program-button {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background-color: #2F455B;
+  color: white;
+  font-weight: 500;
+  padding: 10px 16px;
+  border: none;
+  border-radius: 30px;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.15);
+  transition: background-color 0.3s ease;
+}
+
+.admin-create-program-button:hover {
+  background-color: #1b2835;
+}
+
+
+/* Admin Edit Program Page */
+.page-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 0.5rem;
+}
+
+.divider-line {
+  border: none;
+  border-top: 1px solid #ccc;
+}
+
+.session-container {
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  background-color: #f9f9f9;
+  padding: 0.5rem !important;
+}
+
+.session-table {
+  width: 100%;
+  margin: 0;
+  background-color: transparent;
+}
+
+.session-table th,
+.session-table td {
+  padding: 0.5rem;
+  font-size: 1rem;
+  color: #333;
+  vertical-align: middle;
+  background-color: #f9f9f9;
+  border: none;
+}
+
+.session-table th {
+  font-weight: 500;
+  color: #666;
+}
+
+.action-icon {
+  color: #333;
+  padding: 0;
+  margin-left: 10px;
+}
+
+.action-icon:hover {
+  color: #dcaf27;
+}
+
+.create-session-button {
+  background-color: #dcaf27;
+  color: white;
+  font-weight: 500;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 5px;
+}
+
+.create-session-button:hover {
+  background-color: #b8921f;
+}
+
+/* Admin Edit Session Page */
+.page-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 0.5rem;
+}
+
+.divider-line {
+  border: none;
+  border-top: 1px solid #ccc;
+}
+
+.form-control {
+  padding-right: 1rem; /* Adjust padding to standard */
+}
+
+.create-session-button {
+  background-color: #dcaf27;
+  color: white;
+  font-weight: 500;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 5px;
+}
+
+.create-session-button:hover {
+  background-color: #b8921f;
+}
+
+.cancel-button {
+  background-color: #ff5733;
+  color: white;
+  font-weight: 500;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 5px;
+}
+
+.cancel-button:hover {
+  background-color: #cc4629;
+}
+
+.button-group {
+  display: flex;
+  justify-content: start;
+  gap: 1rem;
+}
+
+/* Admin View Payments page */
+.admin-payments-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 0.5rem;
+}
+
+.admin-payments-divider {
+  border: none;
+  border-top: 1px solid #ccc;
+}
+
+.admin-payments-tab {
+  font-weight: 500;
+  color: #333;
+}
+
+.admin-payment-card {
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  background-color: #fff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  text-align: left;
+}
+
+.admin-payment-card .card-body {
+  padding: 1rem;
+}
+
+.admin-payment-order-id {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #333;
+  text-align: left; 
+}
+
+.admin-payment-text {
+  font-size: 1rem;
+  color: #555;
+  text-align: left;
+}
+
+/* Admin View Payments Page */
+.admin-confirm-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 0.5rem;
+}
+
+.admin-confirm-divider {
+  border: none;
+  border-top: 1px solid #ccc;
+}
+
+.admin-confirm-back-button {
+  font-size: 1rem;
+  color: #333;
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.admin-confirm-details p {
+  font-size: 1rem;
+  color: #333;
+  margin-bottom: 1rem;
+}
+
+.admin-confirm-details strong {
+  font-weight: 600;
+  color: #333;
+}
+
+.admin-confirm-screenshot-preview p {
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 0.5rem;
+}
+
+.admin-confirm-screenshot-placeholder {
+  width: 100%;
+  height: 300px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #f9f9f9;
+}
+
+.admin-confirm-screenshot-icon {
+  font-size: 2rem;
+  color: #aaa;
+}
+
+.admin-confirm-confirm-button {
+  background-color: #DCAF27;
+  color: white;
+  font-weight: 500;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+}
+
+.admin-confirm-confirm-button:hover {
+  background-color: #b8921f;
+}
+
+.admin-confirm-reject-button {
+  background-color: #FF5733;
+  color: white;
+  font-weight: 500;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+}
+
+.admin-confirm-reject-button:hover {
+  background-color: #cc4629;
+}
+
+.admin-confirm-button-group {
+  display: flex;
+  justify-content: start;
+  gap: 1rem;
+}
+
+/* Admin Create Program page */
+.admin-create-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 0.5rem;
+}
+
+.admin-create-divider {
+  border: none;
+  border-top: 1px solid #ccc;
+}
+
+.admin-create-button-group {
+  display: flex;
+  justify-content: start;
+  gap: 1rem;
+}
+
+.admin-create-confirm-button {
+  background-color: #DCAF27;
+  color: white;
+  font-weight: 500;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 5px;
+}
+
+.admin-create-confirm-button:hover {
+  background-color: #b8921f;
+}
+
+.admin-create-cancel-button {
+  background-color: #FF5733;
+  color: white;
+  font-weight: 500;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 5px;
+}
+
+.admin-create-cancel-button:hover {
+  background-color: #cc4629;
+}
+
+.lunch-options .form-control {
+  margin-bottom: 8px;
+}
+
+.form-control {
+  border-radius: 8px;
+}
+
+.btn-outline-danger {
+  border-color: transparent;
+  color: #FF5733;
+}
+
+.btn-outline-danger:hover {
+  background-color: #FF5733;
+  color: white;
+}
+
+/* Admin Edit Time Slot Page */
+.admin-edit-timing-page {
+  max-width: 1300px;
+}
+
+.admin-edit-timing-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 0.5rem;
+}
+
+.admin-edit-timing-divider {
+  border: none;
+  border-top: 1px solid #ccc;
+}
+
+.day-container {
+  padding: 15px;
+  background-color: #f9f9f9;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+}
+
+.btn-outline-danger {
+  border-color: transparent;
+  color: #FF5733;
+}
+
+.btn-outline-danger:hover {
+  background-color: #FF5733;
+  color: white;
+}
+

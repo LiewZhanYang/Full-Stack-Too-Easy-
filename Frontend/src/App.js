@@ -15,6 +15,16 @@ import Payment from './components/Payment';
 import Login from './components/Login.js'; 
 import Booking from './components/Booking.js';
 import PreCoaching from './components/PreCoaching.js';
+import AdminHome from './components/AdminHome.js';
+import AdminViewProgram from './components/AdminViewProgram.js';
+import AdminViewSession from './components/AdminViewSession.js';
+import AdminEditSession from './components/AdminEditSession.js';
+import AdminCreateSession from './components/AdminCreateSession.js';
+import AdminViewPayment from './components/AdminViewPayment.js';
+import AdminConfirmPayment from './components/AdminConfirmPayment.js';
+import AdminCreateProgram from './components/AdminCreateProgram.js';
+import AdminEditProgram from './components/AdminEditProgram.js';
+import AdminEditTiming from './components/AdminEditTiming.js';
 import './App.css';  
 
 // Layout component to handle conditional rendering  
@@ -68,7 +78,19 @@ function App() {
               <Route path="/profile" element={<Profile />} /> 
               <Route path="/booking" element={<Booking />} /> 
               <Route path="/preCoaching" element={<PreCoaching />} />
-              
+
+              {/* Admin routes */}
+              <Route path="/adminhome" element={<AdminHome />} />
+              <Route path="/admin-view-program" element={<AdminViewProgram />} />
+              <Route path="/admin-view-session/:id" element={<AdminViewSession />} />
+              <Route path="/admin-edit-session/:id" element={<AdminEditSession />} />
+              <Route path="/admin-create-session" element={<AdminCreateSession />} />
+              <Route path="/admin-view-payment" element={<AdminViewPayment />} />
+              <Route path="/admin-confirm-payment" element={<AdminConfirmPayment />} />
+              <Route path="/admin-create-program" element={<AdminCreateProgram />} />
+              <Route path="/admin-edit-program/:id" element={<AdminEditProgram />} />
+              <Route path="/admin-edit-timing" element={<AdminEditTiming />} />
+
               {/* Logout route redirects to login */}  
               <Route path="/logout" element={<Navigate to="/login" replace />} />  
               

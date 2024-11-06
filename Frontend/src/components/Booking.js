@@ -155,8 +155,7 @@ function Booking() {
           </Button>
         </Col>
       </Row>
-
-      {/* Confirmation Modal */}
+      
       {/* Confirmation Modal */}
       <Modal show={showModal} onHide={handleCloseModal} centered>
         <Modal.Header closeButton>
