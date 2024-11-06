@@ -15,6 +15,10 @@ app.get("/customer/email/:email", testController.getCustomerByEmail)
 app.get("/customer/id/:id", testController.getCustomerByID)
 app.post("/customer", testController.postCustomer)
 app.get("/admin/:username", testController.getAdminByUsername)
+app.get("/children/:id", testController.getChildByAccountID)
+app.post("/child", testController.postChild)
+app.delete("/child/:id", testController.deleteChild)
+app.put("/child/:id", testController.updateChild)
 
 const dbConfig = require('./dbConfig')
 
