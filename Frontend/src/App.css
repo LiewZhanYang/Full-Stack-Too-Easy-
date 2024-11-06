@@ -590,4 +590,68 @@ body {
   background-color: #b8921f;
 }
 
+/* Admin Edit Program Page */
+.page-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 0.5rem;
+}
+
+.divider-line {
+  border: none;
+  border-top: 1px solid #ccc;
+}
+
+.session-container {
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  background-color: #f9f9f9;
+  padding: 0.5rem !important;
+}
+
+.session-table {
+  width: 100%;
+  margin: 0; 
+  background-color: transparent; 
+}
+
+.session-table th,
+.session-table td {
+  padding: 0.5rem; 
+  font-size: 1rem;
+  color: #333;
+  vertical-align: middle;
+  background-color: #f9f9f9; 
+  border: none; 
+}
+
+.session-table th {
+  font-weight: 500;
+  color: #666;
+}
+
+.action-icon {
+  color: #333;
+  padding: 0;
+  margin-left: 10px;
+}
+
+.action-icon:hover {
+  color: #DCAF27;
+}
+
+
+.create-session-button {
+  background-color: #DCAF27;
+  color: white;
+  font-weight: 500;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 5px;
+}
+
+.create-session-button:hover {
+  background-color: #b8921f;
+}
 

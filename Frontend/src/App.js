@@ -16,7 +16,8 @@ import Login from './components/Login.js';
 import Booking from './components/Booking.js';
 import PreCoaching from './components/PreCoaching.js';
 import AdminHome from './components/AdminHome.js';
-import AdminPrograms from './components/AdminPrograms.js';
+import AdminProgram from './components/AdminProgram.js';
+import AdminEditProgram from './components/AdminEditProgram.js';
 import './App.css';  
 
 // Layout component to handle conditional rendering  
@@ -73,7 +74,8 @@ function App() {
 
               {/* Admin routes */}
               <Route path="/adminhome" element={<AdminHome />} />
-              <Route path="/adminprograms" element={<AdminPrograms />} />
+              <Route path="/adminprogram" element={<AdminProgram />} />
+              <Route path="/admineditprogram" element={<AdminEditProgram />} />
               
               {/* Logout route redirects to login */}  
               <Route path="/logout" element={<Navigate to="/login" replace />} />  

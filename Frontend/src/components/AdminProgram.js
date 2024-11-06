@@ -2,7 +2,7 @@ import React from 'react';
 import { Container, Row, Col, Card, Button, Form, Dropdown } from 'react-bootstrap';
 import { FaSearch, FaEdit } from 'react-icons/fa';
 
-const AdminPrograms = () => {
+const AdminProgram = () => {
   const programs = [
     { id: 1, title: 'Public Speaking Workshop', image: '/img/workshops.jpg' },
     { id: 2, title: 'PSLE Power Up Camp', image: '/img/camps.jpg' },
@@ -59,4 +59,4 @@ const AdminPrograms = () => {
   );
 };
 
-export default AdminPrograms;
+export default AdminProgram;
