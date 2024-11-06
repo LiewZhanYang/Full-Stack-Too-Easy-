@@ -9,11 +9,12 @@ import Camps from './components/Camps';
 import Labs from './components/Labs';  
 import Professionals from './components/Professionals';  
 import Webinars from './components/Webinars';  
-import Coaching from './components/Coaching';  
+import Coaching from './components/PreCoaching.js';  
 import Profile from './components/Profile';  
 import Payment from './components/Payment';  
 import Login from './components/Login.js'; 
 import Booking from './components/Booking.js';
+import PreCoaching from './components/PreCoaching.js';
 import './App.css';  
 
 // Layout component to handle conditional rendering  
@@ -66,6 +67,7 @@ function App() {
               <Route path="/coaching" element={<Coaching />} />  
               <Route path="/profile" element={<Profile />} /> 
               <Route path="/booking" element={<Booking />} /> 
+              <Route path="/preCoaching" element={<PreCoaching />} />
               
               {/* Logout route redirects to login */}  
               <Route path="/logout" element={<Navigate to="/login" replace />} />  

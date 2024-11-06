@@ -427,3 +427,46 @@ body {
   border-radius: 8px;
   border: 1px solid #ddd;
 }
+
+/* Precoaching Page CSS */
+
+.precoaching-container {
+  max-width: 1300px;
+}
+
+.precoaching-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #333;
+  margin: 1rem 0;
+  border-bottom: 1px solid #ccc;
+  padding-bottom: 0.5rem;
+}
+
+.session-details-card {
+  background-color: #f9f9f9;
+  padding: 1rem;
+  border-radius: 15px;
+  border: 1px solid #ddd;
+}
+
+.join-button {
+  font-size: 1rem;
+  font-weight: 500;
+  background-color: #d4af37;
+  border-color: #d4af37;
+  color: white;
+  border-radius: 4px;
+}
+
+.cancel-button {
+  font-size: 1rem;
+  font-weight: 500;
+  border-radius: 4px;
+  color: #333;
+}
+
+.text-success {
+  color: #555 !important;
+}
+
