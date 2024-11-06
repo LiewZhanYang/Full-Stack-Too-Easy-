@@ -381,6 +381,12 @@ body {
   border-radius: 4px;
 }
 
+.selected-time-slot {
+  background-color: #2F455B !important;
+  color: white !important;
+  border: none !important;
+}
+
 .time-slot-button {
   font-size: 1rem;
   font-weight: 500;
@@ -389,7 +395,12 @@ body {
 }
 
 .time-slot-button.primary {
-  background-color: #007bff;
+  background-color: #2F455B;
+  color: white;
+}
+
+.time-slot-button:hover {
+  background-color: #2F455B;
   color: white;
 }
 
@@ -419,8 +430,13 @@ body {
 }
 
 .hoverable-day:hover {
-  background-color: #108efc; 
+  background-color: #DCAF27;
   cursor: pointer;
+}
+
+.selected-day {
+  background-color: #DCAF27 !important; 
+  color: white;
 }
 
 .calendar {
@@ -470,3 +486,15 @@ body {
   color: #555 !important;
 }
 
+/* Precoaching no sessions page */
+.custom-booking-button {
+  background-color: #DCAF27;
+  color: #fff;
+  border: none;
+  box-shadow: none;
+}
+
+.custom-booking-button:hover {
+  background-color: #ab881e;
+  color: #fff;
+}

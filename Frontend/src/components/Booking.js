@@ -1,6 +1,13 @@
 import React, { useState } from "react";
 import { Calendar, dateFnsLocalizer } from "react-big-calendar";
-import { format, parse, startOfWeek, getDay, isBefore } from "date-fns";
+import {
+  format,
+  parse,
+  startOfWeek,
+  getDay,
+  isBefore,
+  isSameDay,
+} from "date-fns";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import { Container, Row, Col, Button, ListGroup, Modal } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
@@ -30,6 +37,7 @@ function Booking() {
   const [selectedTimeSlot, setSelectedTimeSlot] = useState(null);
   const [currentDate, setCurrentDate] = useState(new Date());
   const [showModal, setShowModal] = useState(false);
+  const [selectedDate, setSelectedDate] = useState(null); // State for selected date
   const navigate = useNavigate();
   const today = new Date();
 
@@ -38,6 +46,7 @@ function Booking() {
       return;
     }
     setSelectedSlot(slotInfo.start);
+    setSelectedDate(slotInfo.start); // Set the selected date
     setSelectedTimeSlot(null); // Reset time slot if date changes
   };
 
@@ -51,7 +60,7 @@ function Booking() {
 
   const handleCloseModal = () => {
     setShowModal(false);
-    navigate('/precoaching'); // Redirect to Precoaching.js (adjust the path as needed)
+    navigate("/precoaching"); // Redirect to Precoaching.js (adjust the path as needed)
   };
 
   const handleNavigate = (date) => {
@@ -68,8 +77,12 @@ function Booking() {
 
   const dayPropGetter = (date) => {
     const isPast = isBefore(date, today);
+    const isSelected = selectedDate && isSameDay(date, selectedDate);
+
     return {
-      className: `calendar-day ${isPast ? "greyed-out-day" : "hoverable-day"}`,
+      className: `calendar-day ${isPast ? "greyed-out-day" : "hoverable-day"} ${
+        isSelected ? "selected-day" : ""
+      }`,
     };
   };
 
@@ -119,7 +132,9 @@ function Booking() {
               variant={
                 selectedTimeSlot === timeSlot ? "primary" : "outline-secondary"
               }
-              className="time-slot-button mb-2 w-100"
+              className={`time-slot-button mb-2 w-100 ${
+                selectedTimeSlot === timeSlot ? "selected-time-slot" : ""
+              }`}
               onClick={() => handleTimeSlotClick(timeSlot)}
               disabled={!selectedSlot} // Disable until a date is selected
             >
@@ -142,15 +157,21 @@ function Booking() {
       </Row>
 
       {/* Confirmation Modal */}
-      <Modal show={showModal} onHide={handleCloseModal}>
+      {/* Confirmation Modal */}
+      <Modal show={showModal} onHide={handleCloseModal} centered>
         <Modal.Header closeButton>
           <Modal.Title>Booking Confirmed</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          Your booking for {format(selectedSlot, "MMMM do, yyyy")} at {selectedTimeSlot} has been confirmed.
+          Your booking for {format(selectedSlot, "MMMM do, yyyy")} at{" "}
+          {selectedTimeSlot} has been confirmed.
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="primary" onClick={handleCloseModal}>
+          <Button
+            variant="primary"
+            onClick={handleCloseModal}
+            style={{ backgroundColor: "#DCAF27", borderColor: "#DCAF27" }} // Customize color here
+          >
             Close
           </Button>
         </Modal.Footer>
