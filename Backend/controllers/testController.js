@@ -3,6 +3,7 @@ const Admin = require("../models/admin");
 const Child = require("../models/child");
 const Booking = require("../models/booking")
 const Payment = require("../models/payment")
+const Program = require("../models/program")
 
 const getCustomerByEmail = async (req, res) => {
   const email = req.params.email;
@@ -207,6 +208,31 @@ const rejectPayment = async (req, res) => {
   }
 }
 
+const getAllPrograms = async (req, res) => {
+  try {
+    const programs = await Program.getAllPrograms();
+    if (programs.length === 0) {
+      return res.status(404).send("Program not found");
+    }
+    res.json(programs);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Error retrieving Program");
+  }
+}
+
+const postProgram = async (req, res) => {
+  const programDetails = req.body;
+  try {
+    const newProgram = await Program.postProgram(programDetails);
+    res.status(201).json(newProgram);
+    console.log("Successfully posted Program");
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Error posting Program");
+  }
+}
+
 module.exports = {
   getCustomerByEmail,
   getCustomerByID,
@@ -222,5 +248,7 @@ module.exports = {
   getAllPayment,
   postPayment,
   approvePayment,
-  rejectPayment
+  rejectPayment,
+  getAllPrograms,
+  postProgram
 } 
