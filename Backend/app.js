@@ -8,12 +8,13 @@ const sql = require('mysql2/promise');
 const dotenv = require('dotenv');
 dotenv.config();
 
-const customerController = require('./controllers/testController');
+const testController = require('./controllers/testController');
 
 // Test Routes (Not Final Routes)
-app.get("/customer/email/:email", customerController.getCustomerByEmail)
-app.get("/customer/id/:id", customerController.getCustomerByID)
-app.post("/customer", customerController.postCustomer)
+app.get("/customer/email/:email", testController.getCustomerByEmail)
+app.get("/customer/id/:id", testController.getCustomerByID)
+app.post("/customer", testController.postCustomer)
+app.get("/admin/:username", testController.getAdminByUsername)
 
 const dbConfig = require('./dbConfig')
 

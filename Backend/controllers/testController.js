@@ -1,4 +1,5 @@
 const Customer = require("../models/customer");
+const Admin = require("../models/admin")
 
 const getCustomerByEmail = async (req, res) => {
   const email = req.params.email;
@@ -48,8 +49,23 @@ const postCustomer = async (req, res) => {
   }
 };
 
+const getAdminByUsername = async (req, res) => {
+  const username = req.params.username;
+  try {
+    const admin = await Admin.getAdminByUsername(username);
+    if (admin.length === 0) {
+      return res.status(404).send("admin not found");
+    }
+    res.json(admin);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Error retrieving admin");
+  }
+}
+
 module.exports = {
   getCustomerByEmail,
   getCustomerByID,
-  postCustomer
+  postCustomer,
+  getAdminByUsername
 }
