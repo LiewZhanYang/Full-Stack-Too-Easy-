@@ -13,20 +13,20 @@ class Child {
     static async getChildByAccountID(AccountID) {
         const connection = await mysql.createConnection(dbConfig);
 
-    const sqlQuery = `
-      SELECT * FROM Child WHERE AccountID = ?
-    `;
-    const [result] = await connection.execute(sqlQuery, [AccountID]);
+        const sqlQuery = `
+        SELECT * FROM Child WHERE AccountID = ?
+        `;
+        const [result] = await connection.execute(sqlQuery, [AccountID]);
 
-    connection.end();
-    return result.map(row => {
-        return new Child(
-        row.ChildID,
-        row.Name, 
-        row.Strength,
-        row.DOB,
-        row.AccountID
-    )});
+        connection.end();
+        return result.map(row => {
+            return new Child(
+            row.ChildID,
+            row.Name, 
+            row.Strength,
+            row.DOB,
+            row.AccountID
+        )});
     } 
 
     static async postChild(childDetails) {

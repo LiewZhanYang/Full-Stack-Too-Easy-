@@ -19,6 +19,9 @@ app.get("/children/:id", testController.getChildByAccountID)
 app.post("/child", testController.postChild)
 app.delete("/child/:id", testController.deleteChild)
 app.put("/child/:id", testController.updateChild)
+app.post("/booking", testController.postBooking)
+app.get("/booking/:id", testController.getBookingByAccountID)
+app.delete("/booking/:id", testController.deleteBookingByBookingID)
 
 const dbConfig = require('./dbConfig')
 
