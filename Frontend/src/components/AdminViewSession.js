@@ -19,6 +19,10 @@ const AdminViewSession = () => {
     navigate(`/admin-edit-session/${sessionId}`);
   };
 
+  const handleCreateSessionClick = () => {
+    navigate("/admin-create-session");
+  };
+
   return (
     <Container fluid className="admin-edit-program-page p-4">
       <h2 className="page-title">Public Speaking Workshop - Sessions</h2>
@@ -58,7 +62,11 @@ const AdminViewSession = () => {
         </Table>
       </div>
 
-      <Button variant="warning" className="create-session-button mt-3">
+      <Button
+        variant="warning"
+        className="create-session-button mt-3"
+        onClick={handleCreateSessionClick}
+      >
         Create Session
       </Button>
     </Container>
