@@ -1,22 +1,29 @@
-import React from 'react';
-import { Container, Row, Col, Button, Table } from 'react-bootstrap';
-import { FaEdit, FaTrash } from 'react-icons/fa';
+import React from "react";
+import { Container, Row, Col, Button, Table } from "react-bootstrap";
+import { FaEdit, FaTrash } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
 
 const AdminViewSession = () => {
+  const navigate = useNavigate();
+
   const sessions = [
-    { 
-      id: 1, 
-      date: 'April 4th-7th', 
-      time: '10:00-18:00', 
-      location: '1 Clarke Quay' 
-    }
+    {
+      id: 1,
+      date: "April 4th-7th",
+      time: "10:00-18:00",
+      location: "1 Clarke Quay",
+    },
   ];
+
+  const handleEditClick = (sessionId) => {
+    navigate(`/admin-edit-session/${sessionId}`);
+  };
 
   return (
     <Container fluid className="admin-edit-program-page p-4">
       <h2 className="page-title">Public Speaking Workshop - Sessions</h2>
       <hr className="divider-line mb-4" />
-      
+
       <div className="session-container p-3">
         <Table borderless className="session-table mb-0">
           <thead>
@@ -34,7 +41,11 @@ const AdminViewSession = () => {
                 <td>{session.time}</td>
                 <td>{session.location}</td>
                 <td className="text-end">
-                  <Button variant="link" className="action-icon">
+                  <Button
+                    variant="link"
+                    className="action-icon"
+                    onClick={() => handleEditClick(session.id)}
+                  >
                     <FaEdit />
                   </Button>
                   <Button variant="link" className="action-icon">
