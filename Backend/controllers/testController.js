@@ -2,6 +2,7 @@ const Customer = require("../models/customer");
 const Admin = require("../models/admin");
 const Child = require("../models/child");
 const Booking = require("../models/booking")
+const Payment = require("../models/payment")
 
 const getCustomerByEmail = async (req, res) => {
   const email = req.params.email;
@@ -153,6 +154,59 @@ const deleteBookingByBookingID = async (req, res) => {
     res.status(500).send("Error deleting Booking");
   }
 }
+
+const getAllPayment = async (req, res) => {
+  try {
+    const payments = await Payment.getAllPayment();
+    if (payments.length === 0) {
+      return res.status(404).send("Payment not found");
+    }
+    res.json(payments);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Error retrieving Payment");
+  }
+}
+
+const postPayment = async (req, res) => {
+  const id = req.params.id;
+  const paymentDetails = req.body;
+  try {
+    const newPayment = await Payment.postPayment(id, paymentDetails);
+    res.status(201).json(newPayment);
+    console.log("Successfully posted Payment");
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Error posting Payment");
+  }
+}
+
+const approvePayment = async (req, res) => {
+  const orderID = req.params.orderID;
+  const adminID = req.body;
+  try {
+    const updatedPayment = await Payment.approvePayment(orderID, adminID);
+    res.status(201).json(updatedPayment);
+    console.log("Successfully approved Payment");
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Error approved Payment");
+  }
+}
+
+const rejectPayment = async (req, res) => {
+  const orderID = req.params.orderID;
+  const rejectDetails = req.body;
+  try {
+    const rejectedPayment = await Payment.rejectPayment(orderID, rejectDetails);
+    res.status(201).json(rejectedPayment);
+    console.log("Successfully rejected Payment");
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Error rejecting Payment");
+  }
+}
+
 module.exports = {
   getCustomerByEmail,
   getCustomerByID,
@@ -164,5 +218,9 @@ module.exports = {
   updateChild,
   postBooking,
   getBookingByAccountID,
-  deleteBookingByBookingID
+  deleteBookingByBookingID,
+  getAllPayment,
+  postPayment,
+  approvePayment,
+  rejectPayment
 } 

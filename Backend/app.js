@@ -22,6 +22,10 @@ app.put("/child/:id", testController.updateChild)
 app.post("/booking", testController.postBooking)
 app.get("/booking/:id", testController.getBookingByAccountID)
 app.delete("/booking/:id", testController.deleteBookingByBookingID)
+app.get("/payment", testController.getAllPayment)
+app.post("/payment/:id", testController.postPayment)
+app.put("/approvepayment/:orderID", testController.approvePayment)
+app.put("/rejectpayment/:orderID", testController.rejectPayment)
 
 const dbConfig = require('./dbConfig')
 
