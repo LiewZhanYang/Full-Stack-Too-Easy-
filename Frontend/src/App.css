@@ -544,3 +544,50 @@ body {
   font-weight: 500;
   color: #333;
 }
+
+/* Admin View Programs Page */
+.admin-program-card {
+  border-radius: 10px;
+  overflow: hidden;
+  position: relative;
+  padding: 0;
+}
+
+.admin-program-card-image-container {
+  width: 100%;
+  height: 220px;
+  overflow: hidden;
+}
+
+.admin-program-card-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.admin-program-card-title {
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: #333;
+  margin-top: 10px;
+}
+
+.admin-program-edit-button {
+  align-self: flex-start;
+  background-color: #DCAF27;
+  color: white;
+  border: none;
+  font-weight: 500;
+  padding: 5px 10px;
+  border-radius: 5px;
+  font-size: 0.9rem;
+  margin-top: auto;
+  display: flex;
+  align-items: center;
+}
+
+.admin-program-edit-button:hover {
+  background-color: #b8921f;
+}
+
+
