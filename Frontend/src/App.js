@@ -16,7 +16,7 @@ import Login from './components/Login.js';
 import Booking from './components/Booking.js';
 import PreCoaching from './components/PreCoaching.js';
 import AdminHome from './components/AdminHome.js';
-import AdminProgram from './components/AdminProgram.js';
+import AdminViewProgram from './components/AdminViewProgram.js';
 import AdminViewSession from './components/AdminViewSession.js';
 import AdminEditSession from './components/AdminEditSession.js';
 import AdminCreateSession from './components/AdminCreateSession.js';
@@ -80,7 +80,7 @@ function App() {
 
               {/* Admin routes */}
               <Route path="/adminhome" element={<AdminHome />} />
-              <Route path="/adminprogram" element={<AdminProgram />} />
+              <Route path="/admin-view-program" element={<AdminViewProgram />} />
               <Route path="/admin-view-session/:id" element={<AdminViewSession />} />
               <Route path="/admin-edit-session/:id" element={<AdminEditSession />} />
               <Route path="/admin-create-session" element={<AdminCreateSession />} />

@@ -11,7 +11,7 @@ import {
 import { FaSearch, FaEdit } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 
-const AdminPrograms = () => {
+const AdminViewProgram = () => {
   const navigate = useNavigate();
 
   const programs = [
@@ -100,4 +100,4 @@ const AdminPrograms = () => {
   );
 };
 
-export default AdminPrograms;
+export default AdminViewProgram;
