@@ -24,7 +24,7 @@ const AdminViewPayment = () => {
     payments.map((payment, index) => (
       <Card key={index} className="admin-payment-card mb-3 p-3">
         <Card.Body>
-          <Card.Title className="admin-payment-order-id">Order ID: {payment.id}</Card.Title>
+          <Card.Title className="admin-payment-order-id">Invoice ID: {payment.id}</Card.Title>
           <Card.Text className="admin-payment-text">{payment.name}</Card.Text>
           <Card.Text className="admin-payment-text">{payment.contact}</Card.Text>
         </Card.Body>

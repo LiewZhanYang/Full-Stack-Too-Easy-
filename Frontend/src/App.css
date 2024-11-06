@@ -744,3 +744,88 @@ body {
   text-align: left;
 }
 
+/* Admin View Payments Page */
+.admin-confirm-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 0.5rem;
+}
+
+.admin-confirm-divider {
+  border: none;
+  border-top: 1px solid #ccc;
+}
+
+.admin-confirm-back-button {
+  font-size: 1rem;
+  color: #333;
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.admin-confirm-details p {
+  font-size: 1rem;
+  color: #333;
+  margin-bottom: 1rem;
+}
+
+.admin-confirm-details strong {
+  font-weight: 600;
+  color: #333;
+}
+
+.admin-confirm-screenshot-preview p {
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 0.5rem;
+}
+
+.admin-confirm-screenshot-placeholder {
+  width: 100%;
+  height: 300px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #f9f9f9;
+}
+
+.admin-confirm-screenshot-icon {
+  font-size: 2rem;
+  color: #aaa;
+}
+
+.admin-confirm-confirm-button {
+  background-color: #DCAF27;
+  color: white;
+  font-weight: 500;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+}
+
+.admin-confirm-confirm-button:hover {
+  background-color: #b8921f;
+}
+
+.admin-confirm-reject-button {
+  background-color: #FF5733;
+  color: white;
+  font-weight: 500;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+}
+
+.admin-confirm-reject-button:hover {
+  background-color: #cc4629;
+}
+
+.admin-confirm-button-group {
+  display: flex;
+  justify-content: start;
+  gap: 1rem;
+}
+
