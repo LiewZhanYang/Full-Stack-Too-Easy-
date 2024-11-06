@@ -135,7 +135,7 @@ function Sidebar() {
                       Webinars
                     </Link>
                     <Link
-                      to="/coaching"
+                      to="/booking"
                       className="d-block py-1 text-dark text-decoration-none"
                     >
                       1 to 1 Coaching

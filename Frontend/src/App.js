@@ -12,7 +12,8 @@ import Webinars from './components/Webinars';
 import Coaching from './components/Coaching';  
 import Profile from './components/Profile';  
 import Payment from './components/Payment';  
-import Login from './components/Login.js';  
+import Login from './components/Login.js'; 
+import Booking from './components/Booking.js';
 import './App.css';  
 
 // Layout component to handle conditional rendering  
@@ -63,13 +64,15 @@ function App() {
               <Route path="/professionals" element={<Professionals />} />  
               <Route path="/webinars" element={<Webinars />} />  
               <Route path="/coaching" element={<Coaching />} />  
-              <Route path="/profile" element={<Profile />} />  
+              <Route path="/profile" element={<Profile />} /> 
+              <Route path="/booking" element={<Booking />} /> 
               
               {/* Logout route redirects to login */}  
               <Route path="/logout" element={<Navigate to="/login" replace />} />  
               
               {/* Fallback route for unmatched paths */}  
               <Route path="*" element={<Navigate to="/dashboard" replace />} />  
+
             </Routes>  
           </Layout>  
         } />  
