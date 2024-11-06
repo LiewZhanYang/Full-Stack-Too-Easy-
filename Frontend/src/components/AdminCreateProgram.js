@@ -12,6 +12,7 @@ const AdminCreateProgram = () => {
   const [duration, setDuration] = useState('');
   const [lunchProvided, setLunchProvided] = useState(false);
   const [lunchOptions, setLunchOptions] = useState(['']);
+  const [image, setImage] = useState(null);
   const navigate = useNavigate();
 
   const handleAddTier = () => {
@@ -40,8 +41,15 @@ const AdminCreateProgram = () => {
     setLunchOptions(lunchOptions.filter((_, idx) => idx !== index));
   };
 
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setImage(URL.createObjectURL(file));
+    }
+  };
+
   const handleCreateProgram = () => {
-    console.log('Program Created:', { name, type, description, costTiers, classSize, duration, lunchProvided, lunchOptions });
+    console.log('Program Created:', { name, type, description, costTiers, classSize, duration, lunchProvided, lunchOptions, image });
   };
 
   const handleCancel = () => {
@@ -62,6 +70,16 @@ const AdminCreateProgram = () => {
             value={name}
             onChange={(e) => setName(e.target.value)}
           />
+        </Form.Group>
+        
+        <Form.Group controlId="programImage" className="mb-3">
+          <Form.Label>Upload Image</Form.Label>
+          <Form.Control type="file" accept="image/*" onChange={handleImageChange} />
+          {image && (
+            <div className="image-preview mt-3">
+              <img src={image} alt="Program Preview" className="img-fluid rounded" style={{ maxHeight: '200px' }} />
+            </div>
+          )}
         </Form.Group>
 
         <Form.Group controlId="programType" className="mb-3">
