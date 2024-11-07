@@ -41,25 +41,68 @@ function WorkshopPrice() {
     }  
   ];  
 
+  // Unique skill development content  
+  const skillDevelopmentData = [  
+    {  
+      title: "Personal Growth",  
+      description: "Develop confidence and eloquence in public speaking."  
+    },  
+    {  
+      title: "Presentation Skills",  
+      description: "Learn how to captivate your audience with engaging presentations."  
+    },  
+    {  
+      title: "Effective Communication",  
+      description: "Enhance your ability to convey information clearly and persuasively."  
+    },  
+    {  
+      title: "Dynamic Storytelling",  
+      description: "Master the art of storytelling to make your speeches impactful."  
+    }  
+  ];  
+
   return (  
     <div className="workshop-container">  
-      {/* Hero Section */}  
       <div className="hero-section position-relative">  
         <img  
           src={"/publickid.png"}  
           alt="Public Speaking"  
           className="w-100"  
-          style={{ height: '400px', objectFit: 'cover', objectPosition: 'center' }}  
+          style={{ minHeight: '600px', objectFit: 'cover' }}  
         />  
-        <div className="hero-content position-absolute start-0 bottom-0 w-100 p-4">  
-          <h1 className="text-white mb-3">Public Speaking Workshop</h1>  
+        <div  
+          className="position-absolute top-0 start-0 w-100 h-100"  
+          style={{  
+            background: 'linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.5))',  
+          }}  
+        ></div>  
+        <div  
+          className="hero-content position-absolute"  
+          style={{  
+            bottom: '100px',  
+            left: '20px',  
+            textAlign: 'left',  
+            width: 'auto',  
+            padding: 0,  
+          }}  
+        >  
+          <h1  
+            className="text-white mb-3"  
+            style={{  
+              fontSize: '2.5rem',  
+              fontWeight: 'bold',  
+              textShadow: '2px 2px 4px rgba(0,0,0,0.5)',  
+              marginLeft: 10,  
+              transform: 'translateY(20px)'  
+            }}  
+          >  
+            Public Speaking Workshop  
+          </h1>  
         </div>  
 
-        {/* Course Details Box */}  
-        <div className="course-details-box position-absolute bg-white rounded-3 shadow-sm"  
-          style={{ width: '300px', right: '20px', top: '50%', transform: 'translateY(-50%)', padding: '20px' }}>  
+        <div className="course-details-box position-absolute bg-white rounded-3 shadow-lg p-4">  
           <ul className="list-unstyled mb-3">  
-            <h1>Join this Course Today!</h1>  
+            <h2 className="text-center fw-bold mb-3">Join this Course Today!</h2>  
             <li className="mb-2">• Join this course now!</li>  
             <li className="mb-2">• Save LAST WARNING!</li>  
             <li className="mb-2">• Enjoy my full education!</li>  
@@ -69,28 +112,26 @@ function WorkshopPrice() {
           <button className="btn btn-primary w-100 rounded-pill">Learn More</button>  
         </div>  
 
-        {/* Skibidi Boxes - Removed inline bottom style */}  
         <div className="skibidi-section position-absolute w-100">  
           <div className="d-flex justify-content-center">  
-            {[1, 2, 3, 4].map((_, index) => (  
+            {skillDevelopmentData.map((skill, index) => (  
               <div  
                 key={index}  
                 className="skibidi-box bg-white p-3 flex-grow-1"  
                 style={{  
-                  borderRight: index !== 3 ? '1px solid #eee' : 'none',  
+                  borderRight: index !== skillDevelopmentData.length - 1 ? '1px solid #eee' : 'none',  
                   ...(index === 0 && { borderTopLeftRadius: '8px', borderBottomLeftRadius: '8px' }),  
-                  ...(index === 3 && { borderTopRightRadius: '8px', borderBottomRightRadius: '8px' }),  
+                  ...(index === skillDevelopmentData.length - 1 && { borderTopRightRadius: '8px', borderBottomRightRadius: '8px' }),  
                 }}  
               >  
-                <h6 className="mb-2" style={{ color: '#333' }}>sigma skibidi doo</h6>  
-                <p className="mb-0 small text-muted">hi archer lowenhaupt worked liked</p>  
+                <h6 className="mb-2" style={{ color: '#333' }}>{skill.title}</h6>  
+                <p className="mb-0 small text-muted">{skill.description}</p>  
               </div>  
             ))}  
           </div>  
         </div>  
       </div>  
 
-      {/* Navigation Tabs */}  
       <div className="tabs-section mt-4">  
         <div className="d-flex">  
           <div  
@@ -109,9 +150,7 @@ function WorkshopPrice() {
         <hr className="mt-0" />  
       </div>  
 
-      {/* Price Tiers */}  
       <div className="price-tiers-section mt-4">  
-        <h4 className="mb-4">Price Tiers</h4>  
         <div className="row g-4">  
           {priceTiers.map((tier, index) => (  
             <div key={index} className="col-md-4">  
@@ -147,4 +186,4 @@ function WorkshopPrice() {
   );  
 }  
 
-export default WorkshopPrice;
+export default WorkshopPrice
