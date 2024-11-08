@@ -5,7 +5,7 @@ const Booking = require("../models/booking");
 const Payment = require("../models/payment");
 const Program = require("../models/program");
 const Session = require("../models/session");
-const SignUp = require("../models/SignUp");
+const SignUp = require("../models/signup");
 
 const getCustomerByEmail = async (req, res) => {
   const email = req.params.email;
