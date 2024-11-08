@@ -23,13 +23,12 @@ CREATE TABLE Admin(
 );
 
 CREATE TABLE Child (
-	ChildID INT NOT NULL,
+	ChildID INT PRIMARY KEY AUTO_INCREMENT,
     Name VARCHAR(50),
     Strength VARCHAR(100),
     DOB DATE NOT NULL,
     AccountID INT NOT NULL,
 
-    PRIMARY KEY (ChildID),
     FOREIGN KEY (AccountID) REFERENCES Customer(AccountID)
 );
 
@@ -48,7 +47,7 @@ CREATE TABLE Program (
 );
 
 CREATE TABLE Session (
-	SessionID INT PRIMARY KEY,
+	SessionID INT PRIMARY KEY AUTO_INCREMENT,
     Date DATE NOT NULL,
     Time TIME NOT NULL,
     Location VARCHAR(100) NOT NULL,
