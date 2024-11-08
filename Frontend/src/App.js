@@ -25,6 +25,7 @@ import AdminConfirmPayment from './components/AdminConfirmPayment.js';
 import AdminCreateProgram from './components/AdminCreateProgram.js';
 import AdminEditProgram from './components/AdminEditProgram.js';
 import AdminEditTiming from './components/AdminEditTiming.js';
+import Chatbot from './components/Chatbot.js'; 
 import './App.css';  
 
 // Layout component to handle conditional rendering  
@@ -49,7 +50,9 @@ function Layout({ children }) {
           {children}  
         </div>  
       </main>  
+      <Chatbot/>
     </div>  
+
   );  
 }  
 
@@ -78,6 +81,7 @@ function App() {
               <Route path="/profile" element={<Profile />} /> 
               <Route path="/booking" element={<Booking />} /> 
               <Route path="/preCoaching" element={<PreCoaching />} />
+              <Route path="/chatbot" element={<Chatbot/>} />
 
               {/* Admin routes */}
               <Route path="/adminhome" element={<AdminHome />} />
