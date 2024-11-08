@@ -1,35 +1,51 @@
-const AWS = require('aws-sdk');
-const fs = require('fs');
+// Imports
+const { S3Client, PutObjectCommand } = require("@aws-sdk/client-s3");
+const { sendEmailNotification } = require("./emailcontroller"); // Import the email function
+require("dotenv").config(); // Load environment variables
 
-AWS.config.update({
-    region: 'ap-southeast-1', // Your preferred AWS region
-    accessKeyId: 'YOUR_ACCESS_KEY_ID',
-    secretAccessKey: 'YOUR_SECRET_ACCESS_KEY'
+// Initialize S3 Client
+const s3 = new S3Client({
+  region: process.env.AWS_REGION,
+  credentials: {
+    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+  },
 });
+console.log("Configured to send email from:", process.env.GMAIL_USER); // Confirm sender email setup
 
-const s3 = new AWS.S3();
+// Upload function
+exports.uploadFile = async (req, res) => {
+  const file = req.file;
 
-const uploadFile = (req, res) => {
-    const fileContent = fs.readFileSync(req.file.path);
-    const params = {
-        Bucket: 'your-bucket-name', // Replace with your bucket name
-        Key: req.file.originalname, // File name you want to save as in S3
-        Body: fileContent,
-        ContentType: req.file.mimetype, // Set the content type
-    };
+  if (!file) {
+    return res.status(400).send("No file uploaded.");
+  }
 
-    // Uploading files to the bucket
-    s3.upload(params, (err, data) => {
-        // Clean up temporary file
-        fs.unlinkSync(req.file.path);
+  const params = {
+    Bucket: process.env.AWS_BUCKET_NAME,
+    Key: `PaymentInvoice/${file.originalname}`, // Define the path and file name in S3
+    Body: file.buffer,
+    ContentType: file.mimetype,
+  };
 
-        if (err) {
-            console.error('Error uploading file:', err);
-            return res.status(500).send('Error uploading file');
-        }
-        console.log(`File uploaded successfully at ${data.Location}`);
-        res.send(`File uploaded successfully at ${data.Location}`);
+  try {
+    console.log("Attempting to upload file to S3 with params:", params);
+    const command = new PutObjectCommand(params);
+    const data = await s3.send(command);
+    console.log("File uploaded successfully:", data);
+
+    // Trigger email after successful upload
+    await sendEmailNotification(
+      process.env.ADMIN_EMAIL, // Recipient's email from environment variable
+      file.originalname // File name in email content
+    );
+
+    res.status(200).json({
+      message: "File uploaded to S3 and email notification sent!",
+      data,
     });
+  } catch (error) {
+    console.error("Error during upload or email notification:", error);
+    res.status(500).send("Error uploading file or sending email notification.");
+  }
 };
-
-module.exports = { uploadFile };
