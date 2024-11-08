@@ -1,12 +1,16 @@
 import React, { useState, useEffect } from 'react';  
-import { useLocation, useNavigate } from 'react-router-dom';  
+import { useLocation, useNavigate } from 'react-router-dom';   
+import { AppContext } from '../AppContext';  
+import { useContext } from 'react';
+
 
 function Payment() {  
   const location = useLocation();  
   const navigate = useNavigate();  
-  const { tier, price } = location.state || {};  
+  const { tier, price, } = location.state || {};  
 
   const [activeTab, setActiveTab] = useState('Overview');  
+  const { sessionName, setSessionName } = useContext(AppContext);  
   const [childrenCount, setChildrenCount] = useState('2 Children');  
   const [firstChildLunch, setFirstChildLunch] = useState('');  
   const [secondChildLunch, setSecondChildLunch] = useState('');  
@@ -76,7 +80,7 @@ function Payment() {
 
   return (  
     <div className="p-4" style={{ backgroundColor: '#fff' }}>  
-      <h1 className="fs-4 mb-4">Sign Up For Public Speaking Workshop</h1>  
+      <h1 className="fs-4 mb-4">Sign Up For {sessionName}</h1>  
 
       <div className="mb-4" style={{ borderBottom: '1px solid #dee2e6' }}>  
         <div className="d-flex gap-4">  
@@ -242,7 +246,7 @@ function Payment() {
 
         <div className="mb-3">  
           <small className="text-muted">Programme</small>  
-          <p className="mb-0">Public Speaking Workshop x{childrenCount}</p>  
+          <p className="mb-0">{sessionName}x{childrenCount}</p>  
         </div>  
 
         <div className="mb-3">  

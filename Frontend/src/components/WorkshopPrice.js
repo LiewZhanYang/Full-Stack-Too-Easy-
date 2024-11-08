@@ -1,10 +1,18 @@
 import React, { useState } from 'react';  
-import { useNavigate } from 'react-router-dom';  
-import '../App.css';  
+import { useNavigate } from 'react-router-dom'; 
+import { useContext, useEffect } from 'react';
+import { AppContext } from '../AppContext';
 
+import '../App.css';  
 function WorkshopPrice() {  
+  const { sessionName, setSessionName } = useContext(AppContext); 
   const [activeTab, setActiveTab] = useState('About');  
-  const navigate = useNavigate();  
+  const navigate = useNavigate();
+
+  useEffect(() => {  
+    // Set the session name to "Public Speaking Workshop"  
+    setSessionName('Public Speaking Workshop');  
+  }, [setSessionName]);  
 
   const handleGetStarted = (tier) => {  
     navigate('/payment', {  
@@ -96,7 +104,7 @@ function WorkshopPrice() {
               transform: 'translateY(20px)'  
             }}  
           >  
-            Public Speaking Workshop  
+            {sessionName} 
           </h1>  
         </div>  
 
