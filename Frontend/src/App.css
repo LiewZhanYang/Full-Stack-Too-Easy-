@@ -1,0 +1,926 @@
+body {  
+  margin: 0;  
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',  
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',  
+    sans-serif;  
+  -webkit-font-smoothing: antialiased;  
+  -moz-osx-font-smoothing: grayscale;  
+  background-color: #f8f9fa;  
+  
+}  
+
+code {  
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',  
+    monospace;  
+}  
+/* Sidebar width */
+.sidebar {
+  width: 250px;
+  min-width: 250px;
+}
+
+/* Collapsible sidebar on smaller screens */
+@media (max-width: 768px) {
+  .main-content {
+    margin-left: 0;
+    width: 100%;
+  }
+}
+.main-content {  
+  margin-left: 0px;  
+  padding: 0;  
+  width: calc(100% - 250px);  
+  min-height: 100vh;  
+  background-color: #f8f9fa;  
+  overflow-x: hidden;  
+  transition: margin-left 0.3s ease-in-out;  
+}  
+
+
+.workshop-container {  
+  width: 100%;  
+  background-color: #f8f9fa;  
+}  
+
+.hero-section {  
+  width: 100%;  
+  height: 600px;  
+  overflow: visible;  
+  position: relative;  
+  margin-top: 0; /* Ensure no margin at the top */  
+  padding-top: 0; /* Ensure no padding at the top */ 
+  margin:0;
+  top: -150px;
+  
+}  
+
+.hero-section img {  
+  width: 100%;  
+  height: 100%;  
+  object-fit: cover;  
+  overflow: hidden;  
+}  
+
+
+.hero-content {  
+  text-align: left; /* Align text to the left */  
+  left: 10%; /* Position from the left */  
+  bottom: 100px;  
+  transform: translateX(0); /* Remove centering */  
+  padding: 2rem;  
+}  
+
+.course-details-box {  
+  width: 280px; /* Adjust dimensions as needed */  
+  top: 50%; /* Center vertically if needed */  
+  right: 60px; /* Move more to the left by increasing this value */  
+  transform: translateY(-50%);  
+}
+
+ 
+.course-details-box li {  
+  color: #666;  
+  font-size: 14px;  
+  margin-bottom: 8px;  
+}  
+
+.skibidi-section {  
+  position: absolute;  
+  left: 0;  
+  right: 0;  
+  bottom: -20px;  
+  padding: 0 20px;  
+  z-index: 10;  
+}  
+.skibidi-section .d-flex {  
+  background: rgba(255, 255, 255, 0.95);  
+  border-radius: 8px;  
+  max-width: 1200px;  
+  margin: 0 auto;  
+  display: flex;  
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);  
+}  
+
+.skibidi-box {  
+  padding: 15px 20px;  
+  min-height: 100px;  
+  flex: 1;  
+  background: transparent;  
+  border: none;  
+  margin: 0;  
+  position: relative;  
+  display: flex;  
+  flex-direction: column;  
+  justify-content: center;  
+}  
+
+.skibidi-box:not(:last-child)::after {  
+  content: '';  
+  position: absolute;  
+  right: 0;  
+  top: 20%;  
+  height: 60%;  
+  width: 1px;  
+  background-color: rgba(0, 0, 0, 0.1);  
+}  
+
+.skibidi-box h6 {  
+  color: #333;  
+  margin-bottom: 8px;  
+  font-size: 14px;  
+  font-weight: 600;  
+}  
+
+.skibidi-box p {  
+  color: #666;  
+  font-size: 12px;  
+  margin: 0;  
+  opacity: 0.8;  
+  line-height: 1.4;  
+}  
+
+.tabs-section {  
+  position: sticky;  
+  top: 60px; /* Adjust this value to control the distance from the top */  
+  background-color: #f8f9fa;  
+  z-index: 10;  
+  padding: 0 20px;  
+  margin-top: -120px !important; /* Negative margin to pull it up */  
+}  
+
+.tab-item {  
+  cursor: pointer;  
+  padding: 12px 24px;  
+  color: #6c757d;  
+  font-weight: 500;  
+  border-bottom: 2px solid transparent;  
+  transition: all 0.3s ease;  
+}  
+
+.tab-item.active {  
+  color: #0d6efd;  
+  border-bottom: 2px solid #0d6efd;  
+}  
+
+.price-tiers-section {  
+  padding: 20px;  
+  margin-top: 0 !important;  
+}  
+
+.price-amount {  
+  font-size: 1.5rem;  
+  font-weight: bold;  
+  color: #333;  
+  margin: 15px 0;  
+}  
+
+.tier-details {  
+  color: #666;  
+  font-size: 14px;  
+}  
+
+.tier-details i {  
+  margin-right: 10px;  
+  color: #0d6efd;  
+}  
+
+.card {  
+  background-color: white;  
+  border-radius: 8px;  
+  padding: 20px;  
+  margin-bottom: 20px;  
+  text-align: center;  
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);  
+  flex: 1;  
+  min-width: 250px;  
+}  
+
+.container {  
+  padding: 20px;  
+  max-width: 1920px;  
+  margin: 0 auto;  
+}  
+
+.workshop-section {  
+  padding: 0 20px;  
+  max-width: 1200px;  
+  margin: 0 auto;  
+}  
+
+.btn-primary {  
+  background-color: #0d6efd;  
+  border-color: #0d6efd;  
+  padding: 8px 24px;  
+  font-weight: 500;  
+  border-radius: 50px;  
+}  
+
+.btn-outline-primary {  
+  color: #0d6efd;  
+  border-color: #0d6efd;  
+  padding: 8px 24px;  
+  font-weight: 500;  
+  border-radius: 50px;  
+}  
+
+::-webkit-scrollbar {  
+  width: 8px;  
+}  
+
+::-webkit-scrollbar-track {  
+  background: #f1f1f1;  
+}  
+
+::-webkit-scrollbar-thumb {  
+  background: #888;  
+  border-radius: 4px;  
+}  
+
+::-webkit-scrollbar-thumb:hover {  
+  background: #555;  
+}  
+
+@media (max-width: 768px) {  
+  .main-content {  
+    margin-left: 0;  
+    width: 100%;  
+  }  
+
+  .workshop-section {  
+    padding: 0 10px;  
+  }  
+
+  .skibidi-section {  
+    bottom: 80px;  
+    padding: 0 10px;  
+  }  
+
+  .skibidi-section .d-flex {  
+    flex-direction: column;  
+  }  
+
+  .skibidi-box {  
+    padding: 20px 15px;  
+    min-height: 100px;  
+  }  
+
+  .skibidi-box:not(:last-child)::after {  
+    right: 10%;  
+    top: auto;  
+    bottom: 0;  
+    width: 80%;  
+    height: 1px;  
+    left: 10%;  
+  }  
+
+
+
+  .hero-section {  
+    height: auto;  
+  }  
+
+  .hero-content {  
+    position: relative;  
+    padding: 20px;  
+  }  
+
+  .price-tiers-section {  
+    padding: 10px;  
+  }  
+}  
+
+.row {  
+  display: flex;  
+  flex-wrap: wrap;  
+  margin: -10px;  
+}  
+
+.col-md-4 {  
+  flex: 0 0 33.333333%;  
+  max-width: 33.333333%;  
+  padding: 10px;  
+}  
+
+@media (max-width: 768px) {  
+  .col-md-4 {  
+    flex: 0 0 100%;  
+    max-width: 100%;  
+  }  
+}  
+
+.price-tiers-section .col-md-4 .rounded-4 {  
+  border-radius: 12px;  
+  transition: transform 0.3s, box-shadow 0.3s;  
+}  
+
+.price-tiers-section .col-md-4 .rounded-4:hover {  
+  transform: translateY(-5px);  
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);  
+}
+
+/* CSS for Booking.js */
+
+.booking-container {
+  max-width: 1300px;
+}
+
+.booking-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 1rem;
+  border-bottom: 1px solid #ccc;
+  padding-bottom: 0.5rem;
+}
+
+.time-slot-section {
+  background-color: #f9f9f9;
+  padding: 1rem;
+  border-radius: 15px;
+  border: 1px solid #ddd;
+}
+
+.time-slot-title {
+  font-size: 1.25rem;
+  font-weight: 500;
+  color: #333;
+  margin-bottom: 1rem;
+}
+
+.selected-time,
+.no-selection {
+  font-size: 1rem;
+  color: #555;
+  padding: 0.75rem;
+  border: 1px solid #ddd;
+  background-color: #fff;
+  border-radius: 4px;
+}
+
+.selected-time-slot {
+  background-color: #2f455b !important;
+  color: white !important;
+  border: none !important;
+}
+
+.time-slot-button {
+  font-size: 1rem;
+  font-weight: 500;
+  color: #333;
+  border-radius: 4px;
+}
+
+.time-slot-button.primary {
+  background-color: #2f455b;
+  color: white;
+}
+
+.time-slot-button:hover {
+  background-color: #2f455b;
+  color: white;
+}
+
+.confirm-button {
+  font-size: 1rem;
+  font-weight: 500;
+  background-color: #d4af37;
+  border-color: #d4af37;
+  color: white;
+  border-radius: 4px;
+}
+
+.back-button {
+  font-size: 1rem;
+  font-weight: 500;
+  border-radius: 4px;
+}
+
+.greyed-out-day {
+  background-color: #e0e0e0;
+  color: #a9a9a9;
+  cursor: not-allowed;
+}
+
+.hoverable-day {
+  transition: background-color 0.3s ease;
+}
+
+.hoverable-day:hover {
+  background-color: #dcaf27;
+  cursor: pointer;
+}
+
+.selected-day {
+  background-color: #dcaf27 !important;
+  color: white;
+}
+
+.calendar {
+  border-radius: 8px;
+  border: 1px solid #ddd;
+}
+
+/* Precoaching Page CSS */
+
+.precoaching-container {
+  max-width: 1300px;
+}
+
+.precoaching-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #333;
+  margin: 1rem 0;
+  border-bottom: 1px solid #ccc;
+  padding-bottom: 0.5rem;
+}
+
+.session-details-card {
+  background-color: #f9f9f9;
+  padding: 1rem;
+  border-radius: 15px;
+  border: 1px solid #ddd;
+}
+
+.join-button {
+  font-size: 1rem;
+  font-weight: 500;
+  background-color: #d4af37;
+  border-color: #d4af37;
+  color: white;
+  border-radius: 4px;
+}
+
+.cancel-button {
+  font-size: 1rem;
+  font-weight: 500;
+  border-radius: 4px;
+  color: #333;
+}
+
+.text-success {
+  color: #555 !important;
+}
+
+/* Precoaching no sessions page */
+.custom-booking-button {
+  background-color: #dcaf27;
+  color: #fff;
+  border: none;
+  box-shadow: none;
+}
+
+.custom-booking-button:hover {
+  background-color: #ab881e;
+  color: #fff;
+}
+
+/* Admin Homepage CSS */
+.admin-greeting {
+  font-size: 1.8rem;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 0.5rem;
+}
+
+.text-muted {
+  font-size: 1rem;
+  color: #555;
+}
+
+.admin-status,
+.shortcuts-title {
+  font-size: 1.2rem;
+  color: #666;
+}
+
+.pending-invoices {
+  font-size: 1.3rem;
+  font-weight: 500;
+}
+
+.shortcut-card {
+  background-color: #f9f9f9;
+  border: 1px solid #ddd;
+  border-radius: 15px;
+  padding: 1rem;
+  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.shortcut-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.shortcut-icon {
+  color: #dcaf27;
+}
+
+.shortcut-title {
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: #333;
+}
+
+/* Admin View Programs Page */
+.admin-program-card {
+  border-radius: 10px;
+  overflow: hidden;
+  position: relative;
+  padding: 0;
+}
+
+.admin-program-card-image-container {
+  width: 100%;
+  height: 220px;
+  overflow: hidden;
+}
+
+.admin-program-card-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.admin-program-card-title {
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: #333;
+  margin-top: 10px;
+}
+
+.admin-program-edit-button {
+  align-self: flex-start;
+  background-color: #dcaf27;
+  color: white;
+  border: none;
+  font-weight: 500;
+  padding: 5px 10px;
+  border-radius: 5px;
+  font-size: 0.9rem;
+  margin-top: auto;
+  display: flex;
+  align-items: center;
+}
+
+.admin-program-edit-button:hover {
+  background-color: #b8921f;
+}
+
+.admin-create-program-button {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background-color: #2F455B;
+  color: white;
+  font-weight: 500;
+  padding: 10px 16px;
+  border: none;
+  border-radius: 30px;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.15);
+  transition: background-color 0.3s ease;
+}
+
+.admin-create-program-button:hover {
+  background-color: #1b2835;
+}
+
+
+/* Admin Edit Program Page */
+.page-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 0.5rem;
+}
+
+.divider-line {
+  border: none;
+  border-top: 1px solid #ccc;
+}
+
+.session-container {
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  background-color: #f9f9f9;
+  padding: 0.5rem !important;
+}
+
+.session-table {
+  width: 100%;
+  margin: 0;
+  background-color: transparent;
+}
+
+.session-table th,
+.session-table td {
+  padding: 0.5rem;
+  font-size: 1rem;
+  color: #333;
+  vertical-align: middle;
+  background-color: #f9f9f9;
+  border: none;
+}
+
+.session-table th {
+  font-weight: 500;
+  color: #666;
+}
+
+.action-icon {
+  color: #333;
+  padding: 0;
+  margin-left: 10px;
+}
+
+.action-icon:hover {
+  color: #dcaf27;
+}
+
+.create-session-button {
+  background-color: #dcaf27;
+  color: white;
+  font-weight: 500;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 5px;
+}
+
+.create-session-button:hover {
+  background-color: #b8921f;
+}
+
+/* Admin Edit Session Page */
+.page-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 0.5rem;
+}
+
+.divider-line {
+  border: none;
+  border-top: 1px solid #ccc;
+}
+
+.form-control {
+  padding-right: 1rem; /* Adjust padding to standard */
+}
+
+.create-session-button {
+  background-color: #dcaf27;
+  color: white;
+  font-weight: 500;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 5px;
+}
+
+.create-session-button:hover {
+  background-color: #b8921f;
+}
+
+.cancel-button {
+  background-color: #ff5733;
+  color: white;
+  font-weight: 500;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 5px;
+}
+
+.cancel-button:hover {
+  background-color: #cc4629;
+}
+
+.button-group {
+  display: flex;
+  justify-content: start;
+  gap: 1rem;
+}
+
+/* Admin View Payments page */
+.admin-payments-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 0.5rem;
+}
+
+.admin-payments-divider {
+  border: none;
+  border-top: 1px solid #ccc;
+}
+
+.admin-payments-tab {
+  font-weight: 500;
+  color: #333;
+}
+
+.admin-payment-card {
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  background-color: #fff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  text-align: left;
+}
+
+.admin-payment-card .card-body {
+  padding: 1rem;
+}
+
+.admin-payment-order-id {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #333;
+  text-align: left; 
+}
+
+.admin-payment-text {
+  font-size: 1rem;
+  color: #555;
+  text-align: left;
+}
+
+/* Admin View Payments Page */
+.admin-confirm-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 0.5rem;
+}
+
+.admin-confirm-divider {
+  border: none;
+  border-top: 1px solid #ccc;
+}
+
+.admin-confirm-back-button {
+  font-size: 1rem;
+  color: #333;
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.admin-confirm-details p {
+  font-size: 1rem;
+  color: #333;
+  margin-bottom: 1rem;
+}
+
+.admin-confirm-details strong {
+  font-weight: 600;
+  color: #333;
+}
+
+.admin-confirm-screenshot-preview p {
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 0.5rem;
+}
+
+.admin-confirm-screenshot-placeholder {
+  width: 100%;
+  height: 300px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #f9f9f9;
+}
+
+.admin-confirm-screenshot-icon {
+  font-size: 2rem;
+  color: #aaa;
+}
+
+.admin-confirm-confirm-button {
+  background-color: #DCAF27;
+  color: white;
+  font-weight: 500;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+}
+
+.admin-confirm-confirm-button:hover {
+  background-color: #b8921f;
+}
+
+.admin-confirm-reject-button {
+  background-color: #FF5733;
+  color: white;
+  font-weight: 500;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+}
+
+.admin-confirm-reject-button:hover {
+  background-color: #cc4629;
+}
+
+.admin-confirm-button-group {
+  display: flex;
+  justify-content: start;
+  gap: 1rem;
+}
+
+/* Admin Create Program page */
+.admin-create-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 0.5rem;
+}
+
+.admin-create-divider {
+  border: none;
+  border-top: 1px solid #ccc;
+}
+
+.admin-create-button-group {
+  display: flex;
+  justify-content: start;
+  gap: 1rem;
+}
+
+.admin-create-confirm-button {
+  background-color: #DCAF27;
+  color: white;
+  font-weight: 500;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 5px;
+}
+
+.admin-create-confirm-button:hover {
+  background-color: #b8921f;
+}
+
+.admin-create-cancel-button {
+  background-color: #FF5733;
+  color: white;
+  font-weight: 500;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 5px;
+}
+
+.admin-create-cancel-button:hover {
+  background-color: #cc4629;
+}
+
+.lunch-options .form-control {
+  margin-bottom: 8px;
+}
+
+.form-control {
+  border-radius: 8px;
+}
+
+.btn-outline-danger {
+  border-color: transparent;
+  color: #FF5733;
+}
+
+.btn-outline-danger:hover {
+  background-color: #FF5733;
+  color: white;
+}
+
+/* Admin Edit Time Slot Page */
+.admin-edit-timing-page {
+  max-width: 1300px;
+}
+
+.admin-edit-timing-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 0.5rem;
+}
+
+.admin-edit-timing-divider {
+  border: none;
+  border-top: 1px solid #ccc;
+}
+
+.day-container {
+  padding: 15px;
+  background-color: #f9f9f9;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+}
+
+.btn-outline-danger {
+  border-color: transparent;
+  color: #FF5733;
+}
+
+.btn-outline-danger:hover {
+  background-color: #FF5733;
+  color: white;
+}
+
