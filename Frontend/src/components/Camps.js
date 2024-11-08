@@ -1,11 +1,17 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../App.css';
+import { useContext, useEffect } from 'react';
+import { AppContext } from '../AppContext';
 
 function PslePowerCamp() {
+  const { sessionName, setSessionName } = useContext(AppContext); 
   const [activeTab, setActiveTab] = useState('About');
   const navigate = useNavigate();
-
+  useEffect(() => {  
+    // Set the session name to "Public Speaking Workshop"  
+    setSessionName('PSLE Speaking Workshop');  
+  }, [setSessionName]);  
   const handleGetStarted = (tier) => {
     navigate('/payment', {
       state: {
