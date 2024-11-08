@@ -30,6 +30,11 @@ app.get("/program", testController.getAllPrograms)
 app.post("/program", testController.postProgram)
 app.get("/session/:id", testController.getSessionsByProgramID)
 app.post("/session", testController.postSession)
+app.get('/signup', signUpController.getAllSignUps);
+app.get('/signup/:id', signUpController.getSignUpById);
+app.post('/createsignup/:id', signUpController.createSignUp);
+app.put('/updatesignup/:id', signUpController.updateSignUp);
+app.delete('/deletesignup/:id', signUpController.deleteSignUp);
 
 const dbConfig = require('./dbConfig')
 

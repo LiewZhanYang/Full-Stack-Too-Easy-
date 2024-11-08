@@ -1,10 +1,11 @@
 const Customer = require("../models/customer");
 const Admin = require("../models/admin");
 const Child = require("../models/child");
-const Booking = require("../models/booking")
-const Payment = require("../models/payment")
-const Program = require("../models/program")
-const Session = require("../models/session")
+const Booking = require("../models/booking");
+const Payment = require("../models/payment");
+const Program = require("../models/program");
+const Session = require("../models/session");
+const SignUp = require("../models/SignUp");
 
 const getCustomerByEmail = async (req, res) => {
   const email = req.params.email;
@@ -22,7 +23,7 @@ const getCustomerByEmail = async (req, res) => {
     console.error(error);
     res.status(500).send("Error retrieving Customer");
   }
-}
+};
 
 const getCustomerByID = async (req, res) => {
   const id = parseInt(req.params.id);
@@ -40,7 +41,7 @@ const getCustomerByID = async (req, res) => {
     console.error(error);
     res.status(500).send("Error retrieving Customer");
   }
-}
+};
 
 const postCustomer = async (req, res) => {
   const customerDetails = req.body;
@@ -66,7 +67,7 @@ const getAdminByUsername = async (req, res) => {
     console.error(error);
     res.status(500).send("Error retrieving admin");
   }
-}
+};
 
 const getChildByAccountID = async (req, res) => {
   const AccountID = req.params.id;
@@ -80,7 +81,7 @@ const getChildByAccountID = async (req, res) => {
     console.error(error);
     res.status(500).send("Error retrieving children");
   }
-}
+};
 
 const postChild = async (req, res) => {
   const childDetails = req.body;
@@ -92,7 +93,7 @@ const postChild = async (req, res) => {
     console.error(error);
     res.status(500).send("Error posting Child");
   }
-}
+};
 
 const deleteChild = async (req, res) => {
   const childID = req.params.id;
@@ -104,7 +105,7 @@ const deleteChild = async (req, res) => {
     console.error(error);
     res.status(500).send("Error deleting Child");
   }
-}
+};
 
 const updateChild = async (req, res) => {
   const id = req.params.id;
@@ -117,7 +118,7 @@ const updateChild = async (req, res) => {
     console.error(error);
     res.status(500).send("Error updating Child");
   }
-}
+};
 
 const postBooking = async (req, res) => {
   const bookingDetails = req.body;
@@ -129,7 +130,7 @@ const postBooking = async (req, res) => {
     console.error(error);
     res.status(500).send("Error posting Booking");
   }
-}
+};
 
 const getBookingByAccountID = async (req, res) => {
   const AccountID = req.params.id;
@@ -143,7 +144,7 @@ const getBookingByAccountID = async (req, res) => {
     console.error(error);
     res.status(500).send("Error retrieving bookings");
   }
-}
+};
 
 const deleteBookingByBookingID = async (req, res) => {
   const id = req.params.id;
@@ -155,7 +156,7 @@ const deleteBookingByBookingID = async (req, res) => {
     console.error(error);
     res.status(500).send("Error deleting Booking");
   }
-}
+};
 
 const getAllPayment = async (req, res) => {
   try {
@@ -168,7 +169,7 @@ const getAllPayment = async (req, res) => {
     console.error(error);
     res.status(500).send("Error retrieving Payment");
   }
-}
+};
 
 const postPayment = async (req, res) => {
   const id = req.params.id;
@@ -181,7 +182,7 @@ const postPayment = async (req, res) => {
     console.error(error);
     res.status(500).send("Error posting Payment");
   }
-}
+};
 
 const approvePayment = async (req, res) => {
   const orderID = req.params.orderID;
@@ -194,7 +195,7 @@ const approvePayment = async (req, res) => {
     console.error(error);
     res.status(500).send("Error approved Payment");
   }
-}
+};
 
 const rejectPayment = async (req, res) => {
   const orderID = req.params.orderID;
@@ -207,7 +208,7 @@ const rejectPayment = async (req, res) => {
     console.error(error);
     res.status(500).send("Error rejecting Payment");
   }
-}
+};
 
 const getAllPrograms = async (req, res) => {
   try {
@@ -220,7 +221,7 @@ const getAllPrograms = async (req, res) => {
     console.error(error);
     res.status(500).send("Error retrieving Program");
   }
-}
+};
 
 const postProgram = async (req, res) => {
   const programDetails = req.body;
@@ -232,10 +233,10 @@ const postProgram = async (req, res) => {
     console.error(error);
     res.status(500).send("Error posting Program");
   }
-}
+};
 
 const getSessionsByProgramID = async (req, res) => {
-  const programID = req.params.id
+  const programID = req.params.id;
   try {
     const sessions = await Session.getSessionsByProgramID(programID);
     if (sessions.length === 0) {
@@ -246,7 +247,7 @@ const getSessionsByProgramID = async (req, res) => {
     console.error(error);
     res.status(500).send("Error retrieving Sessions");
   }
-}
+};
 
 const postSession = async (req, res) => {
   const sessionDetails = req.body;
@@ -258,7 +259,91 @@ const postSession = async (req, res) => {
     console.error(error);
     res.status(500).send("Error posting Session");
   }
-}
+};
+
+// Get all signups
+const getAllSignUps = async (req, res) => {
+  try {
+    const signups = await SignUp.getAllSignUps();
+    res.status(200).json(signups);
+  } catch (error) {
+    console.error("Error retrieving signups:", error);
+    res.status(500).json({ error: "Failed to retrieve signups" });
+  }
+};
+
+// Get signup by ID
+const getSignUpById = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const signup = await SignUp.getSignUpById(id);
+
+    if (signup) {
+      res.status(200).json(signup);
+    } else {
+      res.status(404).json({ message: "Signup not found" });
+    }
+  } catch (error) {
+    console.error("Error retrieving signup:", error);
+    res.status(500).json({ error: "Failed to retrieve signup" });
+  }
+};
+
+// Create a new signup
+const createSignUp = async (req, res) => {
+  try {
+    const { AccountID, SessionID, LunchOptionID, ChildID } = req.body;
+    const signUpDetails = { AccountID, SessionID, LunchOptionID, ChildID };
+
+    const newSignUpId = await SignUp.postSignUp(signUpDetails);
+
+    res
+      .status(201)
+      .json({ message: "Signup created successfully", signUpId: newSignUpId });
+  } catch (error) {
+    console.error("Error creating signup:", error);
+    res.status(500).json({ error: "Failed to create signup" });
+  }
+};
+
+// Update an existing signup
+const updateSignUp = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { AccountID, SessionID, LunchOptionID, ChildID } = req.body;
+
+    const signUpDetails = { AccountID, SessionID, LunchOptionID, ChildID };
+
+    const success = await SignUp.updateSignUp(id, signUpDetails);
+
+    if (success) {
+      res.status(200).json({ message: "Signup updated successfully" });
+    } else {
+      res.status(404).json({ message: "Signup not found" });
+    }
+  } catch (error) {
+    console.error("Error updating signup:", error);
+    res.status(500).json({ error: "Failed to update signup" });
+  }
+};
+
+// Delete a signup
+const deleteSignUp = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const success = await SignUp.deleteSignUp(id);
+
+    if (success) {
+      res.status(200).json({ message: "Signup deleted successfully" });
+    } else {
+      res.status(404).json({ message: "Signup not found" });
+    }
+  } catch (error) {
+    console.error("Error deleting signup:", error);
+    res.status(500).json({ error: "Failed to delete signup" });
+  }
+};
 
 module.exports = {
   getCustomerByEmail,
@@ -279,5 +364,10 @@ module.exports = {
   getAllPrograms,
   postProgram,
   getSessionsByProgramID,
-  postSession
-} 
+  postSession,
+  getAllSignUps,
+  getSignUpById,
+  createSignUp,
+  updateSignUp,
+  deleteSignUp
+};
