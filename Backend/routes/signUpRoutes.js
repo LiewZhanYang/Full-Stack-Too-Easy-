@@ -5,7 +5,7 @@ const signupController = require("../controllers/signupController");
 
 router.get("/", signupController.getAllSignUps);
 router.get("/:id", signupController.getSignUpById);
-router.post("/:id", signupController.createSignUp);
+router.post("/", signupController.createSignUp);
 router.put("/:id", signupController.updateSignUp);
 router.delete("/:id", signupController.deleteSignUp);
 

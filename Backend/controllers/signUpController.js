@@ -1,8 +1,9 @@
-const SignUp = require("../models/signup");
+const SignUp = require("../models/signup"); // Should match exported class name
 
 const getAllSignUps = async (req, res) => {
   try {
     const signups = await SignUp.getAllSignUps();
+    console.log("Retrieved signups:", signups);
     res.status(200).json(signups);
   } catch (error) {
     console.error("Error retrieving signups:", error);
