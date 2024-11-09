@@ -1,4 +1,4 @@
-const Customer = require("../models/customer");
+/*const Customer = require("../models/customer");
 const Admin = require("../models/admin");
 const Child = require("../models/child");
 const Booking = require("../models/booking");
@@ -370,4 +370,4 @@ module.exports = {
   createSignUp,
   updateSignUp,
   deleteSignUp
-};
+};*/

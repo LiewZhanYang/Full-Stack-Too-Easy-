@@ -2,16 +2,34 @@ const express = require("express");
 const app = express();
 app.use(express.json());
 
-const port = 8000
-const sql = require('mysql2/promise');
+const port = 8000;
+const sql = require("mysql2/promise");
 
-const dotenv = require('dotenv');
+const dotenv = require("dotenv");
 dotenv.config();
 
-const testController = require('./controllers/testController');
+const customerRoutes = require("./routes/customerRoutes");
+const adminRoutes = require("./routes/adminRoutes");
+const childRoutes = require("./routes/childRoutes");
+const bookingRoutes = require("./routes/bookingRoutes");
+const paymentRoutes = require("./routes/paymentRoutes");
+const programRoutes = require("./routes/programRoutes");
+const sessionRoutes = require("./routes/sessionRoutes");
+const signupRoutes = require("./routes/signupRoutes");
+
+app.use("/customer", customerRoutes);
+app.use("/admin", adminRoutes);
+app.use("/children", childRoutes);
+app.use("/booking", bookingRoutes);
+app.use("/payment", paymentRoutes);
+app.use("/program", programRoutes);
+app.use("/session", sessionRoutes);
+app.use("/signup", signupRoutes);
+
+//const testController = require('./controllers/testController');
 
 // Test Routes (Not Final Routes)
-app.get("/customer/email/:email", testController.getCustomerByEmail)
+/*app.get("/customer/email/:email", testController.getCustomerByEmail)
 app.get("/customer/id/:id", testController.getCustomerByID)
 app.post("/customer", testController.postCustomer)
 app.get("/admin/:username", testController.getAdminByUsername)
@@ -34,14 +52,14 @@ app.get('/signup', testController.getAllSignUps);
 app.get('/signup/:id', testController.getSignUpById);
 app.post('/createsignup/:id', testController.createSignUp);
 app.put('/updatesignup/:id', testController.updateSignUp);
-app.delete('/deletesignup/:id',testController.deleteSignUp);
+app.delete('/deletesignup/:id',testController.deleteSignUp);*/
 
-const dbConfig = require('./dbConfig')
+const dbConfig = require("./dbConfig");
 
 app.listen(port, async () => {
   try {
     const connection = await sql.createConnection(dbConfig);
-    console.log("Database connection established successfully");    
+    console.log("Database connection established successfully");
     console.log(`Server listening on port ${port}`);
 
     process.on("SIGINT", async () => {
@@ -57,7 +75,6 @@ app.listen(port, async () => {
     process.exit(1); // Exit with code 1 indicating an error
   }
 });
-
 
 // Past Code
 
