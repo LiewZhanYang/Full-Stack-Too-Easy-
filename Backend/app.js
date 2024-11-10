@@ -16,6 +16,7 @@ const paymentRoutes = require("./routes/paymentRoutes");
 const programRoutes = require("./routes/programRoutes");
 const sessionRoutes = require("./routes/sessionRoutes");
 const signupRoutes = require("./routes/signupRoutes");
+const authController = require('./controllers/authController');
 
 app.use("/customer", customerRoutes);
 app.use("/admin", adminRoutes);
@@ -25,6 +26,7 @@ app.use("/payment", paymentRoutes);
 app.use("/program", programRoutes);
 app.use("/session", sessionRoutes);
 app.use("/signup", signupRoutes);
+app.post('/login', authController.login);
 
 //const testController = require('./controllers/testController');
 
