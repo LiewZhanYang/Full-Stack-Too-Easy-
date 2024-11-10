@@ -1,9 +1,18 @@
-
-const dbConfig = require('../dbConfig');
-const mysql = require('mysql2/promise');
+const dbConfig = require("../dbConfig");
+const mysql = require("mysql2/promise");
 
 class Customer {
-  constructor(AccountID, Name, EmailAddr, ContactNo, Password, MemberStatus, MembershipExpiry, DateJoined, PfpPath) {
+  constructor(
+    AccountID,
+    Name,
+    EmailAddr,
+    ContactNo,
+    Password,
+    MemberStatus,
+    MembershipExpiry,
+    DateJoined,
+    PfpPath
+  ) {
     this.AccountID = AccountID;
     this.Name = Name;
     this.EmailAddr = EmailAddr;
@@ -15,7 +24,7 @@ class Customer {
     this.PfpPath = PfpPath;
   }
 
-  static async getCustomerByEmail(email){
+  static async getCustomerByEmail(email) {
     const connection = await mysql.createConnection(dbConfig);
 
     const sqlQuery = `
@@ -24,8 +33,8 @@ class Customer {
     const [result] = await connection.execute(sqlQuery, [email]);
 
     connection.end();
-    return result.map(row => {
-        return new Customer(
+    return result.map((row) => {
+      return new Customer(
         row.AccountID,
         row.Name,
         row.EmailAddr,
@@ -35,7 +44,8 @@ class Customer {
         row.MembershipExpiry,
         row.DateJoined,
         row.PfpPath
-    )});
+      );
+    });
   }
 
   static async getCustomerByID(id) {
@@ -48,28 +58,29 @@ class Customer {
     const [result] = await connection.execute(sqlQuery, [id]);
 
     connection.end();
-    return result.map(row => {
+    return result.map((row) => {
       return new Customer(
-      row.AccountID,
-      row.Name,
-      row.EmailAddr,
-      row.ContactNo,
-      row.Password,
-      row.MemberStatus,
-      row.MembershipExpiry,
-      row.DateJoined,
-      row.PfpPath
-    )});
+        row.AccountID,
+        row.Name,
+        row.EmailAddr,
+        row.ContactNo,
+        row.Password,
+        row.MemberStatus,
+        row.MembershipExpiry,
+        row.DateJoined,
+        row.PfpPath
+      );
+    });
   }
 
-  static async postCustomer(postCustomer){
+  static async postCustomer(postCustomer) {
     const connection = await mysql.createConnection(dbConfig);
     const sqlQuery = `
       INSERT INTO Customer (Name, EmailAddr, ContactNo, MemberStatus, MembershipExpiry, DateJoined, PfpPath, Password)
       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`;
 
-    console.log(postCustomer.Name)
-    const today = new Date()
+    console.log(postCustomer.Name);
+    const today = new Date();
     const values = [
       postCustomer.Name,
       postCustomer.EmailAddr,
@@ -78,11 +89,42 @@ class Customer {
       new Date(today.getFullYear() + 1, today.getMonth(), today.getDate()),
       today,
       postCustomer.PfpPath,
-      postCustomer.Password
+      postCustomer.Password,
     ];
-      
+
     const [result] = await connection.execute(sqlQuery, values);
     connection.end();
+  }
+
+  static async findCustomerByEmailOrUsername(emailOrUsername) {
+    const connection = await mysql.createConnection(dbConfig);
+    const query = `
+      SELECT * FROM Customer 
+      WHERE LOWER(EmailAddr) = LOWER(?) OR LOWER(Name) = LOWER(?)
+      LIMIT 1
+    `;
+
+    const [result] = await connection.execute(query, [
+      emailOrUsername,
+      emailOrUsername,
+    ]);
+    connection.end();
+
+    if (result.length > 0) {
+      const row = result[0];
+      return new Customer(
+        row.AccountID,
+        row.Name,
+        row.EmailAddr,
+        row.ContactNo,
+        row.Password,
+        row.MemberStatus,
+        row.MembershipExpiry,
+        row.DateJoined,
+        row.PfpPath
+      );
+    }
+    return null;
   }
 }
 
@@ -92,14 +134,14 @@ module.exports = Customer;
 //   static async addCustomer(customerData) {
 //     try {
 //       const {
-        // Name,
-        // EmailAddr,
-        // ContactNo,
-        // Password,
-        // MemberStatus = null, // Set default to null
-        // MembershipExpiry = null, // Set default to null
-        // DateJoined = new Date(), // Set to current date by default
-        // PfpPath = null, // Set default to null
+// Name,
+// EmailAddr,
+// ContactNo,
+// Password,
+// MemberStatus = null, // Set default to null
+// MembershipExpiry = null, // Set default to null
+// DateJoined = new Date(), // Set to current date by default
+// PfpPath = null, // Set default to null
 //       } = customerData;
 
 //       // Log the variables to ensure they are set correctly
@@ -116,8 +158,8 @@ module.exports = Customer;
 
 //       // Prepare SQL query
 //       const query = `
-            // INSERT INTO Customer (Name, EmailAddr, ContactNo, MemberStatus, MembershipExpiry, DateJoined, PfpPath, Password)
-            // VALUES (?, ?, ?, ?, ?, ?, ?, ?)`;
+// INSERT INTO Customer (Name, EmailAddr, ContactNo, MemberStatus, MembershipExpiry, DateJoined, PfpPath, Password)
+// VALUES (?, ?, ?, ?, ?, ?, ?, ?)`;
 
 //       // Prepare values
 //       const values = [
