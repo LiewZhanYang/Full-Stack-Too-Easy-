@@ -126,6 +126,33 @@ class Customer {
     }
     return null;
   }
+
+  static async updateCustomer(id, updateData) {
+    const connection = await mysql.createConnection(dbConfig);
+
+    // Construct the SQL query dynamically based on updateData keys
+    const fields = Object.keys(updateData)
+      .map((field) => `${field} = ?`)
+      .join(", ");
+    const values = Object.values(updateData);
+    values.push(id); // Add the ID at the end for the WHERE clause
+
+    const sqlQuery = `
+      UPDATE Customer
+      SET ${fields}
+      WHERE AccountID = ?
+    `;
+
+    try {
+      const [result] = await connection.execute(sqlQuery, values);
+      connection.end();
+      return result;
+    } catch (error) {
+      console.error("Error updating customer:", error);
+      connection.end();
+      throw error;
+    }
+  }
 }
 
 module.exports = Customer;

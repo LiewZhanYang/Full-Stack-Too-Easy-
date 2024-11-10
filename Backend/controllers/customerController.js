@@ -40,4 +40,27 @@ const postCustomer = async (req, res) => {
   }
 };
 
-module.exports = { getCustomerByEmail, getCustomerByID, postCustomer };
+const updateCustomer = async (req, res) => {
+  const id = parseInt(req.params.id); // Customer ID from URL parameters
+  const updateData = req.body; // Customer data to be updated
+
+  try {
+    const result = await Customer.updateCustomer(id, updateData);
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ message: "Customer not found" });
+    }
+
+    res.json({ message: "Customer updated successfully" });
+  } catch (error) {
+    console.error("Error updating customer:", error);
+    res.status(500).json({ message: "Error updating customer" });
+  }
+};
+
+module.exports = {
+  getCustomerByEmail,
+  getCustomerByID,
+  postCustomer,
+  updateCustomer,
+};

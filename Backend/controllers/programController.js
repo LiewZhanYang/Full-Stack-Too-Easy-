@@ -25,4 +25,22 @@ const postProgram = async (req, res) => {
   }
 };
 
-module.exports = { getAllPrograms, postProgram };
+const updateProgram = async (req, res) => {
+  const id = parseInt(req.params.id); // Program ID from URL parameters
+  const updateData = req.body; // Program data to be updated
+
+  try {
+    const result = await Program.updateProgram(id, updateData);
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ message: "Program not found" });
+    }
+
+    res.json({ message: "Program updated successfully" });
+  } catch (error) {
+    console.error("Error updating program:", error);
+    res.status(500).json({ message: "Error updating program" });
+  }
+};
+
+module.exports = { getAllPrograms, postProgram, updateProgram };
