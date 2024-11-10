@@ -52,4 +52,27 @@ const rejectPayment = async (req, res) => {
   }
 };
 
-module.exports = { getAllPayment, postPayment, approvePayment, rejectPayment };
+const getPaymentById = async (req, res) => {
+  const orderID = req.params.orderID;
+
+  try {
+    const payment = await Payment.getPaymentById(orderID);
+
+    if (!payment) {
+      return res.status(404).json({ message: "Payment not found" });
+    }
+
+    res.json(payment);
+  } catch (error) {
+    console.error("Error retrieving payment by ID:", error);
+    res.status(500).json({ message: "Error retrieving payment" });
+  }
+};
+
+module.exports = {
+  getAllPayment,
+  postPayment,
+  approvePayment,
+  rejectPayment,
+  getPaymentById,
+};
