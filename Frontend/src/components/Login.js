@@ -160,7 +160,7 @@ function Login() {
                     value={formData.username}
                     onChange={handleInputChange}
                     className="w-full px-4 py-3 rounded-lg bg-[#f8f8f8] focus:outline-none text-sm"
-                    placeholder="Username"
+                    placeholder="Username or Email Address"
                     required
                   />
                 </div>
