@@ -1,64 +1,89 @@
-const db = require("../dbConfig"); // Assuming dbConfig is set up for MySQL connection
+const SignUp = require("../models/signup"); // Should match exported class name
 
-// Create a new sign-up
-exports.createSignUp = (req, res) => {
-  const { AccountID, SessionID, LunchOptionID, ChildID } = req.body;
-  const query = `INSERT INTO SignUp (AccountID, SessionID, LunchOptionID, ChildID) VALUES (?, ?, ?, ?)`;
+const getAllSignUps = async (req, res) => {
+  try {
+    const signups = await SignUp.getAllSignUps();
+    console.log("Retrieved signups:", signups);
+    res.status(200).json(signups);
+  } catch (error) {
+    console.error("Error retrieving signups:", error);
+    res.status(500).json({ error: "Failed to retrieve signups" });
+  }
+};
 
-  db.query(
-    query,
-    [AccountID, SessionID, LunchOptionID, ChildID],
-    (err, result) => {
-      if (err) return res.status(500).json({ error: err.message });
-      res
-        .status(201)
-        .json({ message: "SignUp created successfully", id: result.insertId });
+const getSignUpById = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const signup = await SignUp.getSignUpById(id);
+
+    if (signup) {
+      res.status(200).json(signup);
+    } else {
+      res.status(404).json({ message: "Signup not found" });
     }
-  );
+  } catch (error) {
+    console.error("Error retrieving signup:", error);
+    res.status(500).json({ error: "Failed to retrieve signup" });
+  }
 };
 
-// Get all sign-ups
-exports.getAllSignUps = (req, res) => {
-  const query = `SELECT * FROM SignUp`;
+const createSignUp = async (req, res) => {
+  try {
+    const { AccountID, SessionID, LunchOptionID, ChildID } = req.body;
+    const signUpDetails = { AccountID, SessionID, LunchOptionID, ChildID };
 
-  db.query(query, (err, results) => {
-    if (err) return res.status(500).json({ error: err.message });
-    res.status(200).json(results);
-  });
+    const newSignUpId = await SignUp.postSignUp(signUpDetails);
+
+    res
+      .status(201)
+      .json({ message: "Signup created successfully", signUpId: newSignUpId });
+  } catch (error) {
+    console.error("Error creating signup:", error);
+    res.status(500).json({ error: "Failed to create signup" });
+  }
 };
 
-// Get a specific sign-up by ID
-exports.getSignUpById = (req, res) => {
-  const { id } = req.params;
-  const query = `SELECT * FROM SignUp WHERE id = ?`;
+const updateSignUp = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { AccountID, SessionID, LunchOptionID, ChildID } = req.body;
 
-  db.query(query, [id], (err, result) => {
-    if (err) return res.status(500).json({ error: err.message });
-    if (result.length === 0)
-      return res.status(404).json({ message: "SignUp not found" });
-    res.status(200).json(result[0]);
-  });
+    const signUpDetails = { AccountID, SessionID, LunchOptionID, ChildID };
+
+    const success = await SignUp.updateSignUp(id, signUpDetails);
+
+    if (success) {
+      res.status(200).json({ message: "Signup updated successfully" });
+    } else {
+      res.status(404).json({ message: "Signup not found" });
+    }
+  } catch (error) {
+    console.error("Error updating signup:", error);
+    res.status(500).json({ error: "Failed to update signup" });
+  }
 };
 
-// Update a specific sign-up by ID
-exports.updateSignUp = (req, res) => {
-  const { id } = req.params;
-  const { AccountID, SessionID, LunchOptionID, ChildID } = req.body;
-  const query = `UPDATE SignUp SET AccountID = ?, SessionID = ?, LunchOptionID = ?, ChildID = ? WHERE id = ?`;
+const deleteSignUp = async (req, res) => {
+  try {
+    const { id } = req.params;
 
-  db.query(query, [AccountID, SessionID, LunchOptionID, ChildID, id], (err) => {
-    if (err) return res.status(500).json({ error: err.message });
-    res.status(200).json({ message: "SignUp updated successfully" });
-  });
+    const success = await SignUp.deleteSignUp(id);
+
+    if (success) {
+      res.status(200).json({ message: "Signup deleted successfully" });
+    } else {
+      res.status(404).json({ message: "Signup not found" });
+    }
+  } catch (error) {
+    console.error("Error deleting signup:", error);
+    res.status(500).json({ error: "Failed to delete signup" });
+  }
 };
 
-// Delete a specific sign-up by ID
-exports.deleteSignUp = (req, res) => {
-  const { id } = req.params;
-  const query = `DELETE FROM SignUp WHERE id = ?`;
-
-  db.query(query, [id], (err) => {
-    if (err) return res.status(500).json({ error: err.message });
-    res.status(200).json({ message: "SignUp deleted successfully" });
-  });
+module.exports = {
+  getAllSignUps,
+  getSignUpById,
+  createSignUp,
+  updateSignUp,
+  deleteSignUp,
 };

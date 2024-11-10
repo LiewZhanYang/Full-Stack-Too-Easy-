@@ -1,63 +1,29 @@
-const db = require("../dbConfig"); // Assuming dbConfig.js is your database connection setup
+const Session = require("../models/session");
 
-// Get all sessions
-exports.getAllSessions = (req, res) => {
-  const query = `SELECT * FROM Session`;
-  db.query(query, (error, results) => {
-    if (error) {
-      return res.status(500).json({ error: error.message });
+const getSessionsByProgramID = async (req, res) => {
+  const programID = req.params.id;
+  try {
+    const sessions = await Session.getSessionsByProgramID(programID);
+    if (sessions.length === 0) {
+      return res.status(404).send("Sessions not found");
     }
-    res.json(results);
-  });
+    res.json(sessions);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Error retrieving sessions");
+  }
 };
 
-// Get session by ID
-exports.getSessionById = (req, res) => {
-  const { id } = req.params;
-  const query = `SELECT * FROM Session WHERE SessionID = ?`;
-  db.query(query, [id], (error, results) => {
-    if (error) {
-      return res.status(500).json({ error: error.message });
-    }
-    res.json(results[0]);
-  });
+const postSession = async (req, res) => {
+  const sessionDetails = req.body;
+  try {
+    const newSession = await Session.postSession(sessionDetails);
+    res.status(201).json(newSession);
+    console.log("Successfully posted Session");
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Error posting session");
+  }
 };
 
-// Create a new session
-exports.createSession = (req, res) => {
-  const { Date, Time, ProgramID } = req.body;
-  const query = `INSERT INTO Session (Date, Time, ProgramID) VALUES (?, ?, ?)`;
-  db.query(query, [Date, Time, ProgramID], (error, results) => {
-    if (error) {
-      return res.status(500).json({ error: error.message });
-    }
-    res
-      .status(201)
-      .json({ message: "Session created", sessionId: results.insertId });
-  });
-};
-
-// Update an existing session
-exports.updateSession = (req, res) => {
-  const { id } = req.params;
-  const { Date, Time, ProgramID } = req.body;
-  const query = `UPDATE Session SET Date = ?, Time = ?, ProgramID = ? WHERE SessionID = ?`;
-  db.query(query, [Date, Time, ProgramID, id], (error, results) => {
-    if (error) {
-      return res.status(500).json({ error: error.message });
-    }
-    res.json({ message: "Session updated" });
-  });
-};
-
-// Delete a session
-exports.deleteSession = (req, res) => {
-  const { id } = req.params;
-  const query = `DELETE FROM Session WHERE SessionID = ?`;
-  db.query(query, [id], (error, results) => {
-    if (error) {
-      return res.status(500).json({ error: error.message });
-    }
-    res.json({ message: "Session deleted" });
-  });
-};
+module.exports = { getSessionsByProgramID, postSession };

@@ -1,20 +1,12 @@
+// routes/signupRoutes.js
 const express = require("express");
 const router = express.Router();
-const signUpController = require("../controllers/signUpController");
+const signupController = require("../controllers/signupController");
 
-// Create a new sign-up
-router.post("/signUp", signUpController.createSignUp);
-
-// Get all sign-ups
-router.get("/signUp", signUpController.getAllSignUps);
-
-// Get a specific sign-up
-router.get("/signUp/:id", signUpController.getSignUpById);
-
-// Update a specific sign-up
-router.put("/signUp/:id", signUpController.updateSignUp);
-
-// Delete a specific sign-up
-router.delete("/signUp/:id", signUpController.deleteSignUp);
+router.get("/", signupController.getAllSignUps);
+router.get("/:id", signupController.getSignUpById);
+router.post("/", signupController.createSignUp);
+router.put("/:id", signupController.updateSignUp);
+router.delete("/:id", signupController.deleteSignUp);
 
 module.exports = router;

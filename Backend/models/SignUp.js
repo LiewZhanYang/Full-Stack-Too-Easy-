@@ -1,7 +1,7 @@
 const dbConfig = require("../dbConfig");
 const mysql = require("mysql2/promise");
 
-class signup {
+class Signup {
   constructor(SignUpID, AccountID, SessionID, LunchOptionID, ChildID) {
     this.SignUpID = SignUpID;
     this.AccountID = AccountID;
@@ -14,16 +14,13 @@ class signup {
   static async getAllSignUps() {
     const connection = await mysql.createConnection(dbConfig);
 
-    const sqlQuery = `
-            SELECT * FROM SignUp
-        `;
-
+    const sqlQuery = `SELECT * FROM signup`;
     const [result] = await connection.execute(sqlQuery);
     connection.end();
 
     return result.map(
       (row) =>
-        new SignUp(
+        new Signup(
           row.SignUpID,
           row.AccountID,
           row.SessionID,
@@ -38,9 +35,9 @@ class signup {
     const connection = await mysql.createConnection(dbConfig);
 
     const sqlQuery = `
-            INSERT INTO SignUp (AccountID, SessionID, LunchOptionID, ChildID)
-            VALUES (?, ?, ?, ?)
-        `;
+      INSERT INTO signup (AccountID, SessionID, LunchOptionID, ChildID)
+      VALUES (?, ?, ?, ?)
+    `;
 
     const values = [
       signUpDetails.AccountID,
@@ -60,15 +57,15 @@ class signup {
     const connection = await mysql.createConnection(dbConfig);
 
     const sqlQuery = `
-            SELECT * FROM SignUp WHERE SignUpID = ?
-        `;
+      SELECT * FROM signup WHERE SignUpID = ?
+    `;
 
     const [result] = await connection.execute(sqlQuery, [signUpID]);
     connection.end();
 
     if (result.length > 0) {
       const row = result[0];
-      return new SignUp(
+      return new Signup(
         row.SignUpID,
         row.AccountID,
         row.SessionID,
@@ -84,10 +81,10 @@ class signup {
     const connection = await mysql.createConnection(dbConfig);
 
     const sqlQuery = `
-            UPDATE SignUp 
-            SET AccountID = ?, SessionID = ?, LunchOptionID = ?, ChildID = ?
-            WHERE SignUpID = ?
-        `;
+      UPDATE signup 
+      SET AccountID = ?, SessionID = ?, LunchOptionID = ?, ChildID = ?
+      WHERE SignUpID = ?
+    `;
 
     const values = [
       signUpDetails.AccountID,
@@ -108,8 +105,8 @@ class signup {
     const connection = await mysql.createConnection(dbConfig);
 
     const sqlQuery = `
-            DELETE FROM SignUp WHERE SignUpID = ?
-        `;
+      DELETE FROM signup WHERE SignUpID = ?
+    `;
 
     const [result] = await connection.execute(sqlQuery, [signUpID]);
     connection.end();
@@ -118,4 +115,4 @@ class signup {
   }
 }
 
-module.exports = signup;
+module.exports = Signup;
