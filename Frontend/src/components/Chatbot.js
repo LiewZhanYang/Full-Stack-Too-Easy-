@@ -13,6 +13,8 @@ const ExpandableChatbot = () => {
     setMessages([]);
     setCustomQuestion('');
     setShowCustomQuestionInput(false);
+
+    
   };
 
   const handleQuestionClick = (question) => {
@@ -159,6 +161,8 @@ const ExpandableChatbot = () => {
       </div>
     </div>
   );
+
+  
 };
 
 export default ExpandableChatbot;

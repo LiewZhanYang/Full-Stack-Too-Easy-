@@ -1,6 +1,12 @@
 const express = require("express");
 const app = express();
+const cors = require("cors");
 app.use(express.json());
+app.use(
+  cors({
+    origin: "http://localhost:3000",
+  })
+);
 
 const port = 8000;
 const sql = require("mysql2/promise");
@@ -16,7 +22,7 @@ const paymentRoutes = require("./routes/paymentRoutes");
 const programRoutes = require("./routes/programRoutes");
 const sessionRoutes = require("./routes/sessionRoutes");
 const signupRoutes = require("./routes/signupRoutes");
-const authController = require('./controllers/authController');
+const authController = require("./controllers/authController");
 
 app.use("/customer", customerRoutes);
 app.use("/admin", adminRoutes);
@@ -26,7 +32,7 @@ app.use("/payment", paymentRoutes);
 app.use("/program", programRoutes);
 app.use("/session", sessionRoutes);
 app.use("/signup", signupRoutes);
-app.post('/login', authController.login);
+app.post("/login", authController.login);
 
 //const testController = require('./controllers/testController');
 

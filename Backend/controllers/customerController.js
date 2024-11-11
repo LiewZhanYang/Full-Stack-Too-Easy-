@@ -58,9 +58,20 @@ const updateCustomer = async (req, res) => {
   }
 };
 
+const getAllCustomers = async (req, res) => {
+  try {
+    const customers = await Customer.getAllCustomers();
+    res.status(200).json(customers);
+  } catch (error) {
+    console.error("Error retrieving customers:", error);
+    res.status(500).json({ message: "Error retrieving customers" });
+  }
+};
+
 module.exports = {
   getCustomerByEmail,
   getCustomerByID,
   postCustomer,
   updateCustomer,
+  getAllCustomers,
 };
