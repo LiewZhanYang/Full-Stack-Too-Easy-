@@ -48,8 +48,11 @@ const AdminViewProgram = () => {
 
   useEffect(() => {
     const filtered = programs.filter((program) => {
-      const matchesSearchTerm = program.ProgrameName.toLowerCase().includes(searchTerm.toLowerCase());
-      const matchesType = selectedType === "All" || program.TypeID === typeMapping[selectedType];
+      const matchesSearchTerm = program.ProgrameName.toLowerCase().includes(
+        searchTerm.toLowerCase()
+      );
+      const matchesType =
+        selectedType === "All" || program.TypeID === typeMapping[selectedType];
       return matchesSearchTerm && matchesType;
     });
 
@@ -66,7 +69,11 @@ const AdminViewProgram = () => {
   };
 
   const handleEditClick = (programId) => {
-    navigate(`/admin-view-session/${programId}`);
+    navigate(`/admin-edit-program/${programId}`);
+  };
+
+  const handleEditSessionClick = (programId) => {
+    navigate(`/admin-edit-session/${programId}`);
   };
 
   const handleCreateProgramClick = () => {
@@ -90,7 +97,7 @@ const AdminViewProgram = () => {
         <Button
           variant="outline-secondary"
           className="admin-program-search-button me-2"
-          onClick={() => setSearchTerm("")} 
+          onClick={() => setSearchTerm("")}
         >
           <FaSearch />
         </Button>
@@ -103,12 +110,24 @@ const AdminViewProgram = () => {
             {selectedType}
           </Dropdown.Toggle>
           <Dropdown.Menu className="admin-program-dropdown-menu">
-            <Dropdown.Item onClick={() => handleTypeSelect("All")}>All</Dropdown.Item>
-            <Dropdown.Item onClick={() => handleTypeSelect("Workshop")}>Workshop</Dropdown.Item>
-            <Dropdown.Item onClick={() => handleTypeSelect("Camps")}>Camps</Dropdown.Item>
-            <Dropdown.Item onClick={() => handleTypeSelect("Labs")}>Labs</Dropdown.Item>
-            <Dropdown.Item onClick={() => handleTypeSelect("Professional")}>Professional</Dropdown.Item>
-            <Dropdown.Item onClick={() => handleTypeSelect("Webinar")}>Webinar</Dropdown.Item>
+            <Dropdown.Item onClick={() => handleTypeSelect("All")}>
+              All
+            </Dropdown.Item>
+            <Dropdown.Item onClick={() => handleTypeSelect("Workshop")}>
+              Workshop
+            </Dropdown.Item>
+            <Dropdown.Item onClick={() => handleTypeSelect("Camps")}>
+              Camps
+            </Dropdown.Item>
+            <Dropdown.Item onClick={() => handleTypeSelect("Labs")}>
+              Labs
+            </Dropdown.Item>
+            <Dropdown.Item onClick={() => handleTypeSelect("Professional")}>
+              Professional
+            </Dropdown.Item>
+            <Dropdown.Item onClick={() => handleTypeSelect("Webinar")}>
+              Webinar
+            </Dropdown.Item>
           </Dropdown.Menu>
         </Dropdown>
       </div>
@@ -131,19 +150,31 @@ const AdminViewProgram = () => {
                 />
               </div>
               <Card.Body className="d-flex flex-column justify-content-between">
-                <Card.Title className="admin-program-card-title" style={{ textAlign: "left" }}>
-                  {program.ProgrameName} 
+                <Card.Title
+                  className="admin-program-card-title"
+                  style={{ textAlign: "left" }}
+                >
+                  {program.ProgrameName}
                 </Card.Title>
                 <Card.Text style={{ textAlign: "left" }}>
                   Cost: ${program.Cost}
                 </Card.Text>
-                <Button
-                  variant="warning"
-                  className="admin-program-edit-button d-flex align-items-center"
-                  onClick={() => handleEditClick(program.ProgramID)}
-                >
-                  <FaEdit className="me-1" /> <span>Edit</span>
-                </Button>
+                <div className="d-flex gap-2 mt-auto">
+                  <Button
+                    variant="warning"
+                    className="admin-program-edit-button d-flex align-items-center"
+                    onClick={() => handleEditClick(program.ProgramID)}
+                  >
+                    <FaEdit className="me-1" /> <span>Edit Details</span>
+                  </Button>
+                  <Button
+                    variant="warning"
+                    className="admin-program-edit-session-button d-flex align-items-center"
+                    onClick={() => handleEditSessionClick(program.ProgramID)}
+                  >
+                    <FaPlus className="me-1" /> <span>Edit Session</span>
+                  </Button>
+                </div>
               </Card.Body>
             </Card>
           </Col>
