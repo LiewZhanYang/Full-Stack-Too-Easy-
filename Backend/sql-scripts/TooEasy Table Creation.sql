@@ -186,8 +186,8 @@ VALUES
 
 -- Trigger
 
+-- Add Age On Insertion
 DELIMITER //
-
 CREATE TRIGGER update_age
 BEFORE INSERT ON Child
 FOR EACH ROW
@@ -195,11 +195,21 @@ BEGIN
     SET NEW.Age = YEAR(CURDATE()) - YEAR(NEW.DOB);
 END;
 //
-
 DELIMITER ;
 
+-- Add Age On Update
 DELIMITER //
+CREATE TRIGGER update_age_on_update
+BEFORE UPDATE ON Child
+FOR EACH ROW
+BEGIN
+    SET NEW.Age = YEAR(CURDATE()) - YEAR(NEW.DOB);
+END;
+//
+DELIMITER ;
 
+-- Add Discount Cost On Insertion
+DELIMITER //
 CREATE TRIGGER update_discount_cost
 BEFORE INSERT ON Program
 FOR EACH ROW
@@ -207,5 +217,4 @@ BEGIN
     SET NEW.DiscountedCost = NEW.Cost * 0.9;
 END;
 //
-
 DELIMITER ;
