@@ -40,7 +40,7 @@ function Login() {
 
         // Navigate to the appropriate dashboard
         if (user.userType === "admin") {
-          navigate("/adminHome");
+          navigate("/AdminHome");
         } else {
           navigate("/dashboard");
         }
