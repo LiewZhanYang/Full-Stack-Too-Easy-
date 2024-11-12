@@ -72,13 +72,11 @@ function App() {
                 <Routes>
                   {/* Login route */}
                   <Route path="/login" element={<Login />} />
-
                   {/* Redirect root to dashboard */}
                   <Route
                     path="/"
                     element={<Navigate to="/dashboard" replace />}
                   />
-
                   {/* Main routes */}
                   <Route path="/dashboard" element={<Dashboard />} />
                   <Route path="/workshopPrice" element={<WorkshopPrice />} />
@@ -92,7 +90,6 @@ function App() {
                   <Route path="/booking" element={<Booking />} />
                   <Route path="/preCoaching" element={<PreCoaching />} />
                   <Route path="/chatbot" element={<Chatbot />} />
-
                   {/* Admin routes */}
                   <Route path="/adminhome" element={<AdminHome />} />
                   <Route
@@ -108,7 +105,7 @@ function App() {
                     element={<AdminEditSession />}
                   />
                   <Route
-                    path="/admin-create-session"
+                    path="/admin-create-session/:id"
                     element={<AdminCreateSession />}
                   />
                   <Route
@@ -131,13 +128,11 @@ function App() {
                     path="/admin-edit-timing"
                     element={<AdminEditTiming />}
                   />
-
                   {/* Logout route redirects to login */}
                   <Route
                     path="/logout"
                     element={<Navigate to="/login" replace />}
                   />
-
                   {/* Fallback route for unmatched paths */}
                   <Route
                     path="*"
