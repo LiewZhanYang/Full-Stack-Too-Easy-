@@ -16,7 +16,7 @@ class Session {
     const connection = await mysql.createConnection(dbConfig);
 
     const sqlQuery = `
-        SELECT * FROM Session WHERE ProgramID = ?
+        SELECT * FROM session WHERE ProgramID = ?
         `;
     const [result] = await connection.execute(sqlQuery, [ProgramID]);
 
@@ -37,7 +37,7 @@ class Session {
   static async postSession(sessionDetails) {
     const connection = await mysql.createConnection(dbConfig);
     const sqlQuery = `
-            INSERT INTO Session (StartDate, EndDate, Time, Location, Vacancy, ProgramID)
+            INSERT INTO session (StartDate, EndDate, Time, Location, Vacancy, ProgramID)
             VALUES (?, ?, ?, ?, ?, ?)`;
 
     const values = [
@@ -58,9 +58,9 @@ class Session {
     const connection = await mysql.createConnection(dbConfig);
 
     const sqlQuery = `
-            UPDATE Session 
+            UPDATE session 
             SET StartDate = ?, EndDate = ?, Time = ?, Location = ?
-            WHERE SessionID = ?
+            WHERE sessionID = ?
         `;
 
     const values = [
@@ -80,7 +80,7 @@ class Session {
   static async deleteSession(SessionID) {
     const connection = await mysql.createConnection(dbConfig);
     const sqlQuery = `
-            DELETE FROM Session WHERE SessionID = ?;`;
+            DELETE FROM session WHERE SessionID = ?;`;
 
     const [result] = await connection.execute(sqlQuery, [SessionID]);
     connection.end();
@@ -90,7 +90,7 @@ class Session {
     const connection = await mysql.createConnection(dbConfig);
 
     const sqlQuery = `
-          SELECT * FROM Session WHERE SessionID = ?
+          SELECT * FROM session WHERE SessionID = ?
         `;
     const [result] = await connection.execute(sqlQuery, [sessionID]);
 
