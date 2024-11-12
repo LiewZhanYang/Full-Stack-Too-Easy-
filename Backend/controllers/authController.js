@@ -21,12 +21,12 @@ async function login(req, res) {
     let user;
     let userType;
 
-    // Try to find the user in Customer table first
+    // Check the Customer table first
     user = await Customer.findCustomerByEmailOrUsername(emailOrUsername);
     if (user) {
       userType = "customer";
     } else {
-      // If not found in Customer, search in Admin table
+      // If not found in Customer, check the Admin table
       user = await Admin.findAdminByEmailOrUsername(emailOrUsername);
       if (user) {
         userType = "admin";
