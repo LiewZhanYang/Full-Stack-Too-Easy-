@@ -27,6 +27,7 @@ CREATE TABLE Child (
     Name VARCHAR(50),
     Strength VARCHAR(100),
     DOB DATE NOT NULL,
+    Age INT NOT NULL DEFAULT 0,
     AccountID INT NOT NULL,
 
     FOREIGN KEY (AccountID) REFERENCES Customer(AccountID)
@@ -42,6 +43,7 @@ CREATE TABLE Program (
     ProgramName  VARCHAR(50) NOT NULL,
     ProgramDesc VARCHAR(100) NOT NULL,
     Cost INT NOT NULL,
+    DiscountedCost INT NOT NULL DEFAULT 0,
     LunchProvided BOOL NOT NULL,
     Duration INT NOT NULL,
     ClassSize INT NOT NULL,
@@ -52,9 +54,11 @@ CREATE TABLE Program (
 
 CREATE TABLE Session (
 	SessionID INT PRIMARY KEY AUTO_INCREMENT,
-    Date DATE NOT NULL,
+    StartDate DATE NOT NULL,
+    EndDate DATE NOT NULL,
     Time TIME NOT NULL,
     Location VARCHAR(100) NOT NULL,
+	Vacancy INT NOT NULL DEFAULT 0,
     ProgramID INT, 
     
     FOREIGN KEY (ProgramID) REFERENCES Program(ProgramID)
@@ -120,13 +124,13 @@ VALUES
 (1, 'admin1', 'adminpassword1'),
 (2, 'admin2', 'adminpassword2');
 
-INSERT INTO Child (ChildID, Name, Strength, DOB, AccountID)
+INSERT INTO Child (ChildID, Name, Strength, DOB, Age, AccountID)
 VALUES
-(1, 'Emily Doe', 'Swimming', '2012-08-15', 1),
-(2, 'Max Doe', 'Basketball', '2015-02-20', 1),
-(3, 'Sophia Smith', 'Tennis', '2010-11-01', 2),
-(4, 'Oliver Johnson', 'Soccer', '2013-04-10', 2),
-(5, 'Ava Brown', 'Dancing', '2011-06-25', 1);
+(1, 'Emily Doe', 'Swimming', '2012-08-15', 12,  1),
+(2, 'Max Doe', 'Basketball', '2015-02-20', 9,  1),
+(3, 'Sophia Smith', 'Tennis', '2010-11-01', 14,  2),
+(4, 'Oliver Johnson', 'Soccer', '2013-04-10', 11,  2),
+(5, 'Ava Brown', 'Dancing', '2011-06-25', 13,  1);
 
 INSERT INTO ProgramType (TypeID, TypeDesc)
 VALUES
@@ -136,20 +140,20 @@ VALUES
 (4, 'Professional'),
 (5, 'Webinar');
 
-INSERT INTO Program (ProgramName, ProgramDesc, Cost, LunchProvided, Duration, ClassSize, TypeID)
+INSERT INTO Program (ProgramName, ProgramDesc, Cost, DiscountedCost, LunchProvided, Duration, ClassSize, TypeID)
 VALUES
-('Public Speaking Workshop - Beginner', 'Learn the basics of public speaking', 788, TRUE, 8, 15, 1),
-('Public Speaking Workshop - Intermediate', 'Improve your public speaking skills', 988, TRUE, 8, 15, 1),
-('Public Speaking Workshop - Advanced', 'Master the art of public speaking', 1388, TRUE, 8, 10, 1),
-('PSLE Power Up Camp - PSLE Power Up', 'Comprehensive PSLE revision', 388, FALSE, 2, 20, 2),
-('PSLE Power Up Camp - PSLE Chinese Oral Booster', 'Boost your Chinese oral skills', 488, FALSE, 2, 15, 2);
+('Public Speaking Workshop - Beginner', 'Learn the basics of public speaking', 788, 709.2, TRUE, 8, 15, 1),
+('Public Speaking Workshop - Intermediate', 'Improve your public speaking skills', 988, 889.2, TRUE, 8, 15, 1),
+('Public Speaking Workshop - Advanced', 'Master the art of public speaking', 1388, 1249.2, TRUE, 8, 10, 1),
+('PSLE Power Up Camp - PSLE Power Up', 'Comprehensive PSLE revision', 388, 349.2, FALSE, 2, 20, 2),
+('PSLE Power Up Camp - PSLE Chinese Oral Booster', 'Boost your Chinese oral skills', 488, 439.2, FALSE, 2, 15, 2);
 
-INSERT INTO Session (SessionID, Date, Time, Location, ProgramID)
+INSERT INTO Session (SessionID, StartDate, EndDate, Time, Location, Vacancy, ProgramID)
 VALUES
-(1, '2025-01-04', '10:00:00', 'Auditorium A', 1),
-(2, '2025-07-11', '14:00:00', 'Classroom B', 1),
-(3, '2025-07-18', '10:00:00', 'Auditorium C', 1),
-(4, '2025-07-25', '14:00:00', 'Classroom B', 1);
+(1, '2025-01-04', '2025-01-05', '10:00:00', 'Auditorium A', 15, 1),
+(2, '2025-07-11', '2025-07-12', '14:00:00', 'Classroom B', 15, 1),
+(3, '2025-07-18', '2025-07-19', '10:00:00', 'Auditorium C', 15, 1),
+(4, '2025-07-25', '2025-07-26', '14:00:00', 'Classroom B', 15, 1);
 
 INSERT INTO Lunch (LunchOptionID, LunchDesc)
 VALUES
@@ -180,3 +184,74 @@ VALUES
 (2, 93157026, 988, '2024-10-10 12:00:00', 'Pending', 'path/to/invoice-93157026.pdf', 2, 2, NULL, NULL),
 (3, 67491350, 1388, '2024-10-15 12:00:00', 'Approved', 'path/to/invoice-67491350.pdf', 3, 3, 1, 'Approved by Admin 1'),
 (4, 28653104, 388, '2024-10-20 12:00:00', 'Pending', 'path/to/invoice-28653104.pdf', 4, 4, NULL, NULL);
+
+-- Trigger
+
+-- Add Age On Insertion
+DELIMITER //
+CREATE TRIGGER update_age
+BEFORE INSERT ON Child
+FOR EACH ROW
+BEGIN
+    SET NEW.Age = YEAR(CURDATE()) - YEAR(NEW.DOB);
+END;
+//
+DELIMITER ;
+
+-- Add Age On Update
+DELIMITER //
+CREATE TRIGGER update_age_on_update
+BEFORE UPDATE ON Child
+FOR EACH ROW
+BEGIN
+    SET NEW.Age = YEAR(CURDATE()) - YEAR(NEW.DOB);
+END;
+//
+DELIMITER ;
+
+-- Add Discount Cost On Insertion
+DELIMITER //
+CREATE TRIGGER update_discount_cost
+BEFORE INSERT ON Program
+FOR EACH ROW
+BEGIN
+    SET NEW.DiscountedCost = NEW.Cost * 0.9;
+END;
+//
+DELIMITER ;
+
+-- Update Discount Cost on Update
+DELIMITER //
+CREATE TRIGGER update_discount_cost_on_update
+BEFORE UPDATE ON Program
+FOR EACH ROW
+BEGIN
+    SET NEW.DiscountedCost = NEW.Cost * 0.9;
+END;
+//
+DELIMITER ;
+
+-- Update Vacancy on Post in SignUp
+DELIMITER //
+CREATE TRIGGER decrease_vacancy
+AFTER INSERT ON SignUp
+FOR EACH ROW
+BEGIN
+    UPDATE Session
+    SET Vacancy = Vacancy - 1
+    WHERE SessionID = NEW.SessionID;
+END;
+//
+DELIMITER ;
+
+DELIMITER //
+CREATE TRIGGER increase_vacancy
+AFTER DELETE ON SignUp
+FOR EACH ROW
+BEGIN
+    UPDATE Session
+    SET Vacancy = Vacancy + 1
+    WHERE SessionID = OLD.SessionID;
+END;
+//
+DELIMITER ;

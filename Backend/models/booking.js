@@ -9,6 +9,24 @@ class Booking {
         this.AccountID = AccountID;
     }
 
+    static async getAllBooking() {
+        const connection = await mysql.createConnection(dbConfig);
+
+        const sqlQuery = `
+        SELECT * FROM Booking
+        `;
+        const [result] = await connection.execute(sqlQuery);
+
+        connection.end();
+        return result.map(row => {
+            return new Booking(
+            row.BookingID,
+            row.Time, 
+            row.Date,
+            row.AccountID
+        )});       
+    }
+
     static async getBookingByAccountID(id) {
         const connection = await mysql.createConnection(dbConfig);
 

@@ -12,6 +12,17 @@ const postBooking = async (req, res) => {
   }
 };
 
+const getAllBooking = async (req, res) => {
+  try {
+    const newBooking = await Booking.getAllBooking();
+    res.status(200).json(newBooking);
+    console.log("Successfully get Booking");
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Error getting Booking");
+  }
+}
+
 const getBookingByAccountID = async (req, res) => {
   const AccountID = req.params.id;
   try {
@@ -42,4 +53,5 @@ module.exports = {
   postBooking,
   getBookingByAccountID,
   deleteBookingByBookingID,
+  getAllBooking
 };

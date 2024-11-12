@@ -2,11 +2,12 @@ const dbConfig = require('../dbConfig');
 const mysql = require('mysql2/promise');
 
 class Child {
-    constructor(ChildID, Name, Strength, DOB, AccountID){
+    constructor(ChildID, Name, Strength, DOB, Age, AccountID){
         this.ChildID = ChildID;
         this.Name = Name;
         this.Strength = Strength;
         this.DOB = DOB;
+        this.Age = Age;
         this.AccountID = AccountID;
     }
 
@@ -39,6 +40,7 @@ class Child {
             childDetails.Name, 
             childDetails.Strength,
             childDetails.DOB,
+            childDetails.Age,
             childDetails.AccountID
         ];
 

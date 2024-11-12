@@ -45,7 +45,7 @@ function Sidebar() {
         <div className="offcanvas-body d-flex flex-column h-100 bg-white border-end">
           {/* Logo Section */}
           <div className="flex-shrink-0 text-center p-3 border-bottom">
-            <Link to="/dashboard">
+            <Link to="/AdminHome">
               <img
                 src="/mindsphere.png"
                 alt="mindsphere"
@@ -59,11 +59,11 @@ function Sidebar() {
           <div className="flex-grow-1 overflow-auto">
             <nav className="mt-3">
               <Link
-                to="/dashboard"
+                to="/AdminHome"
                 className="d-flex align-items-center px-3 py-2 text-dark fw-bold text-decoration-none"
               >
                 <i className="bi bi-columns-gap me-2"></i>
-                Dashboard
+                Home
               </Link>
 
               {/* Programmes Dropdown */}
@@ -85,28 +85,62 @@ function Sidebar() {
                 {expandedMenu === "programmes" && (
                   <div className="ps-4">
                     <Link
-                      to="/workshopPrice"
+                      to="/admin-view-program"
                       className="d-block py-1 text-dark text-decoration-none"
                     >
-                      Workshops
+                      View All
                     </Link>
                     <Link
-                      to="/camps"
+                      to="/admin-create-program"
                       className="d-block py-1 text-dark text-decoration-none"
                     >
-                      Camps
+                      Create
                     </Link>
                     <Link
-                      to="/labs"
+                      to="/admin-edit-program/:id"
                       className="d-block py-1 text-dark text-decoration-none"
                     >
-                      Labs
+                      Update
+                    </Link>
+                  </div>
+                )}
+              </div>
+
+              {/* Sessions Dropdown */}
+              <div className="mt-3">
+                <button
+                  onClick={() => toggleMenu("session")}
+                  className="btn d-flex align-items-center w-100 text-dark fw-bold px-3 py-2 border-0 bg-transparent"
+                >
+                  <i className="bi bi-journal-text me-2"></i>
+                  Sessions
+                  <i
+                    className={`bi ${
+                      expandedMenu === "session"
+                        ? "bi-chevron-up"
+                        : "bi-chevron-down"
+                    } ms-auto`}
+                  ></i>
+                </button>
+                {expandedMenu === "session" && (
+                  <div className="ps-4">
+                    <Link
+                      to="/admin-view-session/:id"
+                      className="d-block py-1 text-dark text-decoration-none"
+                    >
+                      View All
                     </Link>
                     <Link
-                      to="/professionals"
+                      to="/admin-create-session"
                       className="d-block py-1 text-dark text-decoration-none"
                     >
-                      Professionals
+                      Create
+                    </Link>
+                    <Link
+                      to="/admin-edit-session/:id"
+                      className="d-block py-1 text-dark text-decoration-none"
+                    >
+                      Update
                     </Link>
                   </div>
                 )}
@@ -119,7 +153,7 @@ function Sidebar() {
                   className="btn d-flex align-items-center w-100 text-dark fw-bold px-3 py-2 border-0 bg-transparent"
                 >
                   <i className="bi bi-calendar-event me-2"></i>
-                  Events
+                  Registration
                   <i
                     className={`bi ${
                       expandedMenu === "events"
@@ -131,16 +165,10 @@ function Sidebar() {
                 {expandedMenu === "events" && (
                   <div className="ps-4">
                     <Link
-                      to="/webinars"
+                      to="/admin-view-payment"
                       className="d-block py-1 text-dark text-decoration-none"
                     >
-                      Webinars
-                    </Link>
-                    <Link
-                      to="/precoaching"
-                      className="d-block py-1 text-dark text-decoration-none"
-                    >
-                      1 to 1 Coaching
+                      Incoming Payments
                     </Link>
                   </div>
                 )}
@@ -150,13 +178,6 @@ function Sidebar() {
 
           {/* Bottom Profile and Logout Section */}
           <div className="flex-shrink-0 border-top mt-auto">
-            <Link
-              to="/profile"
-              className="d-flex align-items-center px-3 py-2 text-dark text-decoration-none"
-            >
-              <i className="bi bi-person me-2"></i>
-              Profile
-            </Link>
             <div
               onClick={handleLogout}
               className="d-flex align-items-center px-3 py-2 text-dark text-decoration-none"

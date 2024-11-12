@@ -20,8 +20,9 @@ const childRoutes = require("./routes/childRoutes");
 const bookingRoutes = require("./routes/bookingRoutes");
 const paymentRoutes = require("./routes/paymentRoutes");
 const programRoutes = require("./routes/programRoutes");
+const programtypeRoutes = require("./routes/programtypeRoutes")
 const sessionRoutes = require("./routes/sessionRoutes");
-const signupRoutes = require("./routes/signupRoutes");
+const signupRoutes = require("./routes/signUpRoutes");
 const authController = require("./controllers/authController");
 const uploadRoutes = require("./routes/uploadRoutes");
 const emailRoutes = require("./routes/emailRoutes");
@@ -32,6 +33,7 @@ app.use("/children", childRoutes);
 app.use("/booking", bookingRoutes);
 app.use("/payment", paymentRoutes);
 app.use("/program", programRoutes);
+app.use("/type", programtypeRoutes)
 app.use("/session", sessionRoutes);
 app.use("/signup", signupRoutes);
 app.post("/login", authController.login);
@@ -67,6 +69,7 @@ app.put('/updatesignup/:id', testController.updateSignUp);
 app.delete('/deletesignup/:id',testController.deleteSignUp);*/
 
 const dbConfig = require("./dbConfig");
+const ProgramType = require("./models/programtype");
 /*
 
 app.listen(port, async () => {

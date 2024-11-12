@@ -1,6 +1,5 @@
 const dbConfig = require("../dbConfig");
 const mysql = require("mysql2/promise");
-const Admin = require("./admin");
 
 class Payment {
   constructor(
@@ -13,7 +12,10 @@ class Payment {
     SessionID,
     PaidBy,
     Reason,
-    ApprovedBy
+    ApprovedBy,
+    Name,
+    ContactNo,
+    ProgramID
   ) {
     this.OrderID = OrderID;
     this.InvoiceID = InvoiceID;
@@ -25,6 +27,8 @@ class Payment {
     this.PaidBy = PaidBy;
     this.Reason = Reason;
     this.ApprovedBy = ApprovedBy;
+    this.Name = Name;
+    this.ContactNo = ContactNo;
   }
 
   static async getAllPayment() {
@@ -47,7 +51,9 @@ class Payment {
         row.SessionID,
         row.PaidBy,
         row.Reason,
-        row.ApprovedBy
+        row.ApprovedBy,
+        null,
+        null
       );
     });
   }
@@ -126,7 +132,9 @@ class Payment {
   static async getPaymentById(orderID) {
     const connection = await mysql.createConnection(dbConfig);
     const sqlQuery = `
-            SELECT * FROM Payment WHERE OrderID = ?
+            SELECT p.*, c.Name, c.ContactNo FROM Payment p 
+            INNER JOIN Customer c ON p.PaidBy = c.AccountID
+            WHERE p.OrderID = ?
         `;
     const [result] = await connection.execute(sqlQuery, [orderID]);
     connection.end();
@@ -138,12 +146,14 @@ class Payment {
         row.InvoiceID,
         row.Amount,
         row.CreatedAt,
-        row.ApprovedStatus,
+        row.Status,
         row.InvoicePath,
         row.SessionID,
         row.PaidBy,
         row.Reason,
-        row.ApprovedBy
+        row.ApprovedBy,
+        row.Name,
+        row.ContactNo
       );
     } else {
       return null; // Return null if no payment is found with the given ID

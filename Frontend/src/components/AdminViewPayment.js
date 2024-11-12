@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { Container, Row, Col, Nav, Card } from "react-bootstrap";
+import { useNavigate } from "react-router-dom";
 
 const AdminViewPayment = () => {
   const [activeTab, setActiveTab] = useState("pending");
   const [pendingPayments, setPendingPayments] = useState([]);
   const [confirmedPayments, setConfirmedPayments] = useState([]);
+  const navigate = useNavigate(); // Initialize useNavigate hook
 
   // Fetch payments from backend
   useEffect(() => {
@@ -48,10 +50,20 @@ const AdminViewPayment = () => {
     setActiveTab(selectedTab);
   };
 
+  // Navigate to confirmation page for a specific payment
+  const handleCardClick = (orderID) => {
+    navigate(`/admin-confirm-payment/${orderID}`);
+  };
+
   // Render payments list
   const renderPayments = (payments) => {
     return payments.map((payment) => (
-      <Card key={payment.OrderID} className="admin-payment-card mb-3 p-3">
+      <Card
+        key={payment.OrderID}
+        className="admin-payment-card mb-3 p-3"
+        onClick={() => handleCardClick(payment.OrderID)} 
+        style={{ cursor: "pointer" }} 
+      >
         <Card.Body>
           <Card.Title className="admin-payment-order-id">
             Invoice ID: {payment.InvoiceID}

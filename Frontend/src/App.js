@@ -32,13 +32,15 @@ import AdminCreateProgram from "./components/AdminCreateProgram.js";
 import AdminEditProgram from "./components/AdminEditProgram.js";
 import AdminEditTiming from "./components/AdminEditTiming.js";
 import Chatbot from "./components/Chatbot.js";
+import AdminSideBar from './components/AdminSidebar.js';
 import "./App.css";
-import axios from "axios";
+
 
 // Layout component to handle conditional rendering
 function Layout({ children }) {
   const location = useLocation();
   const isLoginPage = location.pathname.toLowerCase() === "/login";
+  const isAdminPage = location.pathname.toLowerCase().startsWith("/admin");
 
   if (isLoginPage) {
     return (
@@ -51,7 +53,7 @@ function Layout({ children }) {
 
   return (
     <div className="d-flex min-vh-100">
-      <Sidebar />
+      {isAdminPage ? <AdminSideBar /> : <Sidebar />}
       <main className="main-content">
         <div className="container-fluid p-4">{children}</div>
       </main>
@@ -72,13 +74,11 @@ function App() {
                 <Routes>
                   {/* Login route */}
                   <Route path="/login" element={<Login />} />
-
                   {/* Redirect root to dashboard */}
                   <Route
                     path="/"
                     element={<Navigate to="/dashboard" replace />}
                   />
-
                   {/* Main routes */}
                   <Route path="/dashboard" element={<Dashboard />} />
                   <Route path="/workshopPrice" element={<WorkshopPrice />} />
@@ -92,7 +92,6 @@ function App() {
                   <Route path="/booking" element={<Booking />} />
                   <Route path="/preCoaching" element={<PreCoaching />} />
                   <Route path="/chatbot" element={<Chatbot />} />
-
                   {/* Admin routes */}
                   <Route path="/adminhome" element={<AdminHome />} />
                   <Route
@@ -108,7 +107,7 @@ function App() {
                     element={<AdminEditSession />}
                   />
                   <Route
-                    path="/admin-create-session"
+                    path="/admin-create-session/:id"
                     element={<AdminCreateSession />}
                   />
                   <Route
@@ -116,7 +115,7 @@ function App() {
                     element={<AdminViewPayment />}
                   />
                   <Route
-                    path="/admin-confirm-payment"
+                    path="/admin-confirm-payment/:id"
                     element={<AdminConfirmPayment />}
                   />
                   <Route
@@ -131,13 +130,11 @@ function App() {
                     path="/admin-edit-timing"
                     element={<AdminEditTiming />}
                   />
-
                   {/* Logout route redirects to login */}
                   <Route
                     path="/logout"
                     element={<Navigate to="/login" replace />}
                   />
-
                   {/* Fallback route for unmatched paths */}
                   <Route
                     path="*"
