@@ -23,21 +23,19 @@ class Admin {
   }
   static async findAdminByEmailOrUsername(emailOrUsername) {
     const connection = await mysql.createConnection(dbConfig);
+
     const query = `
       SELECT * FROM Admin 
-      WHERE LOWER(EmailAddr) = LOWER(?) OR LOWER(Name) = LOWER(?)
+      WHERE LOWER(Username) = LOWER(?)
       LIMIT 1
     `;
 
-    const [result] = await connection.execute(query, [
-      emailOrUsername,
-      emailOrUsername,
-    ]);
+    const [result] = await connection.execute(query, [emailOrUsername]);
     connection.end();
 
     if (result.length > 0) {
       const row = result[0];
-      return new Admin(row.AdminID, row.Name, row.EmailAddr, row.Password);
+      return new Admin(row.AdminID, row.Username, row.Password);
     }
     return null;
   }
