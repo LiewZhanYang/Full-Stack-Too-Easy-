@@ -91,22 +91,56 @@ function Sidebar() {
                       View All
                     </Link>
                     <Link
-                      to="/"
+                      to="/admin-create-program"
                       className="d-block py-1 text-dark text-decoration-none"
                     >
                       Create
                     </Link>
                     <Link
-                      to="/"
+                      to="/admin-edit-program/:id"
                       className="d-block py-1 text-dark text-decoration-none"
                     >
                       Update
                     </Link>
+                  </div>
+                )}
+              </div>
+
+              {/* Sessions Dropdown */}
+              <div className="mt-3">
+                <button
+                  onClick={() => toggleMenu("session")}
+                  className="btn d-flex align-items-center w-100 text-dark fw-bold px-3 py-2 border-0 bg-transparent"
+                >
+                  <i className="bi bi-journal-text me-2"></i>
+                  Sessions
+                  <i
+                    className={`bi ${
+                      expandedMenu === "session"
+                        ? "bi-chevron-up"
+                        : "bi-chevron-down"
+                    } ms-auto`}
+                  ></i>
+                </button>
+                {expandedMenu === "session" && (
+                  <div className="ps-4">
                     <Link
-                      to="/"
+                      to="/admin-view-session/:id"
                       className="d-block py-1 text-dark text-decoration-none"
                     >
-                      Delete
+                      View All
+                    </Link>
+                    <Link
+                      to="/admin-create-session"
+                      className="d-block py-1 text-dark text-decoration-none"
+                    >
+                      Create
+                    </Link>
+                    <Link
+                      to="/admin-edit-session/:id"
+                      className="d-block py-1 text-dark text-decoration-none"
+                    >
+                      Update
                     </Link>
                   </div>
                 )}
@@ -131,22 +165,10 @@ function Sidebar() {
                 {expandedMenu === "events" && (
                   <div className="ps-4">
                     <Link
-                      to="/"
+                      to="/admin-view-payment"
                       className="d-block py-1 text-dark text-decoration-none"
                     >
-                      Invoice Confirmation
-                    </Link>
-                    <Link
-                      to="/"
-                      className="d-block py-1 text-dark text-decoration-none"
-                    >
-                      Edit Session Registration
-                    </Link>
-                    <Link
-                      to="/"
-                      className="d-block py-1 text-dark text-decoration-none"
-                    >
-                      Order History
+                      Incoming Payments
                     </Link>
                   </div>
                 )}
@@ -156,13 +178,6 @@ function Sidebar() {
 
           {/* Bottom Profile and Logout Section */}
           <div className="flex-shrink-0 border-top mt-auto">
-            <Link
-              to="/profile"
-              className="d-flex align-items-center px-3 py-2 text-dark text-decoration-none"
-            >
-              <i className="bi bi-person me-2"></i>
-              Profile
-            </Link>
             <div
               onClick={handleLogout}
               className="d-flex align-items-center px-3 py-2 text-dark text-decoration-none"
