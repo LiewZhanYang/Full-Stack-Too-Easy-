@@ -4,18 +4,6 @@
     "bootstrap": "^5.3.3",
     "bootstrap-icons": "^1.11.3",
     "lucide-react": "^0.454.0",
-    "react-messenger-customer-chat": "^0.8.0",
-    "react-scripts": "^5.0.1"
-  },
-  "name": "full-stack-too-easy-",
-  "description": "",
-  "version": "1.0.0",
-  "main": "index.js",
-  "scripts": {
-    "server": "cd Backend && node app.js",
-    "client": "cd Frontend && npm start",
-    "dev": "concurrently \"npm run server\" \"npm run client\""
-  },
-  "author": "",
-  "license": "ISC"
+    "react-messenger-customer-chat": "^0.8.0"
+  }
 }
