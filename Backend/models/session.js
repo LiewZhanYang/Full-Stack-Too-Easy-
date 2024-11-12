@@ -2,9 +2,10 @@ const dbConfig = require('../dbConfig');
 const mysql = require('mysql2/promise');
 
 class Session {
-    constructor(SessionID, Date, Time, Location, ProgramID) {
+    constructor(SessionID, StartDate, EndDate, Time, Location, ProgramID) {
         this.SessionID = SessionID;
-        this.Date = Date;
+        this.StartDate = StartDate;
+        this.EndDate = EndDate;
         this.Time = Time;
         this.Location = Location;
         this.ProgramID = ProgramID;
@@ -22,7 +23,8 @@ class Session {
         return result.map(row => {
             return new Session(
             row.SessionID,
-            row.Date, 
+            row.StartDate,
+            row.EndDate, 
             row.Time,
             row.Location,
             row.ProgramID
@@ -32,11 +34,12 @@ class Session {
     static async postSession(sessionDetails) {
         const connection = await mysql.createConnection(dbConfig);
         const sqlQuery = `
-            INSERT INTO Session (Date, Time, Location, ProgramID)
-            VALUES (?, ?, ?, ?)`;
+            INSERT INTO Session (StartDate, EndDate, Time, Location, ProgramID)
+            VALUES (?, ?, ?, ?, ?)`;
 
         const values = [
-            sessionDetails.Date, 
+            sessionDetails.StartDate,
+            sessionDetails.EndDate, 
             sessionDetails.Time,
             sessionDetails.Location,
             sessionDetails.ProgramID
