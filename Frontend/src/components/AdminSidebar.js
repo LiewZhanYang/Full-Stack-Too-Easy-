@@ -85,28 +85,28 @@ function Sidebar() {
                 {expandedMenu === "programmes" && (
                   <div className="ps-4">
                     <Link
-                      to="/workshopPrice"
+                      to="/"
                       className="d-block py-1 text-dark text-decoration-none"
                     >
-                      Workshops
+                      View All
                     </Link>
                     <Link
-                      to="/camps"
+                      to="/"
                       className="d-block py-1 text-dark text-decoration-none"
                     >
-                      Camps
+                      Create
                     </Link>
                     <Link
-                      to="/labs"
+                      to="/"
                       className="d-block py-1 text-dark text-decoration-none"
                     >
-                      Labs
+                      Update
                     </Link>
                     <Link
-                      to="/professionals"
+                      to="/"
                       className="d-block py-1 text-dark text-decoration-none"
                     >
-                      Professionals
+                      Delete
                     </Link>
                   </div>
                 )}
@@ -119,7 +119,7 @@ function Sidebar() {
                   className="btn d-flex align-items-center w-100 text-dark fw-bold px-3 py-2 border-0 bg-transparent"
                 >
                   <i className="bi bi-calendar-event me-2"></i>
-                  Events
+                  Registration
                   <i
                     className={`bi ${
                       expandedMenu === "events"
@@ -131,16 +131,22 @@ function Sidebar() {
                 {expandedMenu === "events" && (
                   <div className="ps-4">
                     <Link
-                      to="/webinars"
+                      to="/"
                       className="d-block py-1 text-dark text-decoration-none"
                     >
-                      Webinars
+                      Invoice Confirmation
                     </Link>
                     <Link
-                      to="/precoaching"
+                      to="/"
                       className="d-block py-1 text-dark text-decoration-none"
                     >
-                      1 to 1 Coaching
+                      Edit Session Registration
+                    </Link>
+                    <Link
+                      to="/"
+                      className="d-block py-1 text-dark text-decoration-none"
+                    >
+                      Order History
                     </Link>
                   </div>
                 )}
