@@ -26,4 +26,34 @@ const postSession = async (req, res) => {
   }
 };
 
-module.exports = { getSessionsByProgramID, postSession };
+const updateSession = async (req, res) => {
+  const sessionID = req.params.id;
+  const sessionDetails = req.body; // Program data to be updated
+
+  try {
+    const result = await Session.updateSession(sessionID, sessionDetails);
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ message: "Session not found" });
+    }
+
+    res.json({ message: "Session updated successfully" });
+  } catch (error) {
+    console.error("Error updating Session:", error);
+    res.status(500).json({ message: "Error updating Session" });
+  }
+}
+
+const deleteSession = async (req, res) => {
+  const SessionID = req.params.id;
+  try {
+    const deletedSession = await Session.deleteSession(SessionID);
+    res.status(201).json(deletedSession);
+    console.log("Successfully deleted Session");
+  } catch (error) {
+    console.error(error);
+    res.status(403).send("Unable to delete session as it has payments for it");
+  }
+}
+
+module.exports = { getSessionsByProgramID, postSession, updateSession, deleteSession };
