@@ -62,6 +62,7 @@ class Payment {
       paymentDetails.InvoiceID,
       paymentDetails.Amount,
       paymentDetails.CreatedAt,
+      // filename: /orderID/(original.name)
       paymentDetails.ApprovedStatus,
       paymentDetails.InvoicePath,
       paymentDetails.SessionID,
