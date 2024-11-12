@@ -2,12 +2,13 @@ const dbConfig = require("../dbConfig");
 const mysql = require("mysql2/promise");
 
 class Session {
-  constructor(SessionID, StartDate, EndDate, Time, Location, ProgramID) {
+  constructor(SessionID, StartDate, EndDate, Time, Location, Vacancy, ProgramID) {
     this.SessionID = SessionID;
     this.StartDate = StartDate;
     this.EndDate = EndDate;
     this.Time = Time;
     this.Location = Location;
+    this.Vacancy = Vacancy;
     this.ProgramID = ProgramID;
   }
 
@@ -27,6 +28,7 @@ class Session {
         row.EndDate,
         row.Time,
         row.Location,
+        row.Vacancy,
         row.ProgramID
       );
     });
@@ -35,14 +37,15 @@ class Session {
   static async postSession(sessionDetails) {
     const connection = await mysql.createConnection(dbConfig);
     const sqlQuery = `
-            INSERT INTO Session (StartDate, EndDate, Time, Location, ProgramID)
-            VALUES (?, ?, ?, ?, ?)`;
+            INSERT INTO Session (StartDate, EndDate, Time, Location, Vacancy, ProgramID)
+            VALUES (?, ?, ?, ?, ?, ?)`;
 
     const values = [
       sessionDetails.StartDate,
       sessionDetails.EndDate,
       sessionDetails.Time,
       sessionDetails.Location,
+      sessionDetails.ClassSize,
       sessionDetails.ProgramID,
     ];
 
@@ -103,6 +106,7 @@ class Session {
       row.EndDate,
       row.Time,
       row.Location,
+      row.Vacancy,
       row.ProgramID
     );
   }

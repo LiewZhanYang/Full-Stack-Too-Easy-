@@ -7,6 +7,8 @@ const programController = require("../controllers/programController");
 router.get("/", programController.getAllPrograms); 
 // Route to get a single program by ID
 router.get("/:id", programController.getProgramById); 
+
+router.get("/signup/:id", programController.getProgramBySignUp)
 // Route to create a new program
 router.post("/", programController.postProgram);
 // Route to update a program by ID

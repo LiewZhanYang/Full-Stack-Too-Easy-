@@ -2,16 +2,10 @@ const dbConfig = require("../dbConfig");
 const mysql = require("mysql2/promise");
 
 class Signup {
-  constructor(SignUpID, AccountID, SessionID, ProgramName, ProgramDesc, Cost, Duration, ClassSize, TypeID, LunchOptionID, ChildID) {
+  constructor(SignUpID, AccountID, SessionID, LunchOptionID, ChildID) {
     this.SignUpID = SignUpID;
     this.AccountID = AccountID;
     this.SessionID = SessionID;
-    this.ProgramName = ProgramName;
-    this.ProgramDesc = ProgramDesc;
-    this.Cost = Cost;
-    this.Duration = Duration;
-    this.ClassSize = ClassSize;
-    this.TypeID = TypeID;
     this.LunchOptionID = LunchOptionID;
     this.ChildID = ChildID;
   }
@@ -63,10 +57,7 @@ class Signup {
     const connection = await mysql.createConnection(dbConfig);
 
     const sqlQuery = `
-      SELECT su.AccountID, su.SessionID, p.* FROM SignUp su
-      INNER JOIN Session s ON s.SessionID = su.SessionID
-      INNER JOIN Program p ON s.ProgramID = p.ProgramID
-      WHERE su.AccountID = ?
+      SELECT * FROM SignUp WHERE AccountID = ?
     `;
 
     const [result] = await connection.execute(sqlQuery, [signUpID]);
@@ -77,14 +68,8 @@ class Signup {
       return new Signup(
         row.AccountID, 
         row.SessionID, 
-        row.ProgramID,
-        row.ProgramName,
-        row.ProgramDesc,
-        row.Cost, 
-        row.LunchProvided,
-        row.Duration, 
-        row.ClassSize,
-        row.TypeID
+        row.LunchOptionID,
+        row.ChildID
       );
     }
     return null; // Return null if no signup found

@@ -58,6 +58,7 @@ CREATE TABLE Session (
     EndDate DATE NOT NULL,
     Time TIME NOT NULL,
     Location VARCHAR(100) NOT NULL,
+	Vacancy INT NOT NULL DEFAULT 0,
     ProgramID INT, 
     
     FOREIGN KEY (ProgramID) REFERENCES Program(ProgramID)
@@ -147,12 +148,12 @@ VALUES
 ('PSLE Power Up Camp - PSLE Power Up', 'Comprehensive PSLE revision', 388, 349.2, FALSE, 2, 20, 2),
 ('PSLE Power Up Camp - PSLE Chinese Oral Booster', 'Boost your Chinese oral skills', 488, 439.2, FALSE, 2, 15, 2);
 
-INSERT INTO Session (SessionID, StartDate, EndDate, Time, Location, ProgramID)
+INSERT INTO Session (SessionID, StartDate, EndDate, Time, Location, Vacancy, ProgramID)
 VALUES
-(1, '2025-01-04', '2025-01-05', '10:00:00', 'Auditorium A', 1),
-(2, '2025-07-11', '2025-07-12', '14:00:00', 'Classroom B', 1),
-(3, '2025-07-18', '2025-07-19', '10:00:00', 'Auditorium C', 1),
-(4, '2025-07-25', '2025-07-26', '14:00:00', 'Classroom B', 1);
+(1, '2025-01-04', '2025-01-05', '10:00:00', 'Auditorium A', 15, 1),
+(2, '2025-07-11', '2025-07-12', '14:00:00', 'Classroom B', 15, 1),
+(3, '2025-07-18', '2025-07-19', '10:00:00', 'Auditorium C', 15, 1),
+(4, '2025-07-25', '2025-07-26', '14:00:00', 'Classroom B', 15, 1);
 
 INSERT INTO Lunch (LunchOptionID, LunchDesc)
 VALUES
@@ -226,6 +227,31 @@ BEFORE UPDATE ON Program
 FOR EACH ROW
 BEGIN
     SET NEW.DiscountedCost = NEW.Cost * 0.9;
+END;
+//
+DELIMITER ;
+
+-- Update Vacancy on Post in SignUp
+DELIMITER //
+CREATE TRIGGER decrease_vacancy
+AFTER INSERT ON SignUp
+FOR EACH ROW
+BEGIN
+    UPDATE Session
+    SET Vacancy = Vacancy - 1
+    WHERE SessionID = NEW.SessionID;
+END;
+//
+DELIMITER ;
+
+DELIMITER //
+CREATE TRIGGER increase_vacancy
+AFTER DELETE ON SignUp
+FOR EACH ROW
+BEGIN
+    UPDATE Session
+    SET Vacancy = Vacancy + 1
+    WHERE SessionID = OLD.SessionID;
 END;
 //
 DELIMITER ;
