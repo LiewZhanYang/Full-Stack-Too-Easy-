@@ -26,7 +26,7 @@ class Program {
     }
 
     const row = rows[0];
-    return new Program(row.ProgramID, row.ProgramName, row.Cost, row.TypeID);
+    return new Program(row.ProgramID, row.ProgrameName, row.ProgramDesc, row.Cost, row.LunchProvided, row.Duration, row.ClassSize, row.TypeID);
   }
 
   static async getAllPrograms() {
