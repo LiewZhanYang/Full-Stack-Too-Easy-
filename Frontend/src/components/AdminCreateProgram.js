@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Container, Row, Col, Button, Form, InputGroup } from 'react-bootstrap';
+import { Container, Button, Form, InputGroup } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import { FaTrash } from 'react-icons/fa';
 
@@ -53,7 +53,7 @@ const AdminCreateProgram = () => {
   };
 
   const handleCancel = () => {
-    navigate('/admin-programs');
+    navigate('/admin-view-program');
   };
 
   return (

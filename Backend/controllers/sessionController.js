@@ -26,4 +26,21 @@ const postSession = async (req, res) => {
   }
 };
 
-module.exports = { getSessionsByProgramID, postSession };
+const getSessionBySessionID = async (req, res) => {
+  const sessionID = req.params.sessionID;
+
+  try {
+    const session = await Session.getSessionBySessionID(sessionID);
+
+    if (!session) {
+      return res.status(404).json({ message: "Session not found" });
+    }
+
+    res.json(session);
+  } catch (error) {
+    console.error("Error fetching session:", error);
+    res.status(500).json({ message: "Error fetching session" });
+  }
+};
+
+module.exports = { getSessionsByProgramID, postSession, getSessionBySessionID};
