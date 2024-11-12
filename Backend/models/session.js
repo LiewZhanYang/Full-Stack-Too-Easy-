@@ -45,7 +45,8 @@ class Session {
       sessionDetails.EndDate,
       sessionDetails.Time,
       sessionDetails.Location,
-      sessionDetails.ClassSize,
+      // this should not be changed
+      sessionDetails.Vacancy,
       sessionDetails.ProgramID,
     ];
 
