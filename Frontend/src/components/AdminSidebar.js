@@ -85,7 +85,7 @@ function Sidebar() {
                 {expandedMenu === "programmes" && (
                   <div className="ps-4">
                     <Link
-                      to="/"
+                      to="/admin-view-program"
                       className="d-block py-1 text-dark text-decoration-none"
                     >
                       View All
