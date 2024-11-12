@@ -116,7 +116,7 @@ function App() {
                     element={<AdminViewPayment />}
                   />
                   <Route
-                    path="/admin-confirm-payment"
+                    path="/admin-confirm-payment/:id"
                     element={<AdminConfirmPayment />}
                   />
                   <Route
