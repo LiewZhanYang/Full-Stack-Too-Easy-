@@ -121,12 +121,12 @@ const AdminConfirmPayment = () => {
             <p>
               <strong>Full Name</strong>
               <br />
-              {paymentDetails.FullName || "N/A"}
+              {paymentDetails.Name}
             </p>
             <p>
               <strong>Phone Number</strong>
               <br />
-              {paymentDetails.PhoneNumber || "N/A"}
+              {paymentDetails.ContactNo}
             </p>
             <p>
               <strong>Total Payment Amount:</strong>
