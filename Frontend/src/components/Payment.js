@@ -206,7 +206,9 @@ function Payment() {
               }}
             >
               <div className="fw-bold">
-                {selectedSession ? `${new Date(selectedSession.Date).toLocaleDateString()} - ${selectedSession.Time}` : 'Select a Session'}
+                {selectedSession
+                  ? `${new Date(selectedSession.StartDate).toLocaleDateString()} - ${new Date(selectedSession.EndDate).toLocaleDateString()} - ${selectedSession.Time}`
+                  : 'Select a Session'}
               </div>
             </button>
             <ul className="dropdown-menu w-100" aria-labelledby="sessionDropdown" style={{ maxHeight: '300px', overflowY: 'auto' }}>
@@ -217,7 +219,7 @@ function Payment() {
                     href="#"
                     onClick={(e) => { e.preventDefault(); setSelectedSession(session); }}
                   >
-                    {new Date(session.Date).toLocaleDateString()} - {session.Time} ({session.Location})
+                    {new Date(session.StartDate).toLocaleDateString()} - {new Date(session.EndDate).toLocaleDateString()} - {session.Time} ({session.Location})
                   </a>
                 </li>
               ))}
@@ -284,7 +286,11 @@ function Payment() {
             </div>
             <div className="col-6">
               <small className="text-muted">Date</small>
-              <p className="mb-0">{selectedSession ? new Date(selectedSession.Date).toLocaleDateString() : 'Select a session'}</p>
+              <p className="mb-0">
+                {selectedSession
+                  ? `${new Date(selectedSession.StartDate).toLocaleDateString()} - ${new Date(selectedSession.EndDate).toLocaleDateString()}`
+                  : 'Select a session'}
+              </p>
             </div>
           </div>
         </div>
