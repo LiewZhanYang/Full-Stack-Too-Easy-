@@ -1,24 +1,72 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, Button, Form } from 'react-bootstrap';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { FaArrowLeft, FaImage } from 'react-icons/fa';
 
 const AdminConfirmPayment = () => {
+  const [paymentDetails, setPaymentDetails] = useState({});
   const [rejectionReason, setRejectionReason] = useState('');
   const navigate = useNavigate();
+  const { id } = useParams(); // Get the payment ID from the URL
+
+  // Fetch payment details from backend on component load
+  useEffect(() => {
+    const fetchPaymentDetails = async () => {
+      try {
+        const response = await fetch(`http://localhost:8000/payment/${id}`); // GET request to fetch payment by ID
+        if (!response.ok) {
+          throw new Error(`Failed to fetch payment details: ${response.statusText}`);
+        }
+        const data = await response.json();
+        setPaymentDetails(data);
+      } catch (error) {
+        console.error("Error fetching payment details:", error);
+      }
+    };
+
+    fetchPaymentDetails();
+  }, [id]);
 
   const handleBackClick = () => {
     navigate(-1); // Go back to the previous page
   };
 
-  const handleConfirmClick = () => {
-    // Add logic for confirming the payment
-    console.log('Payment Confirmed');
+  const handleConfirmClick = async () => {
+    try {
+      const response = await fetch(`http://localhost:8000/payment/approvepayment/${id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ AdminID: 1 }) // Example AdminID, replace as necessary
+      });
+      if (!response.ok) {
+        throw new Error('Failed to approve payment');
+      }
+      console.log('Payment Confirmed');
+      navigate(-1); // Navigate back after confirming
+    } catch (error) {
+      console.error("Error confirming payment:", error);
+    }
   };
 
-  const handleRejectClick = () => {
-    // Add logic for rejecting the payment with the provided reason
-    console.log('Payment Rejected:', rejectionReason);
+  const handleRejectClick = async () => {
+    try {
+      const response = await fetch(`http://localhost:8000/payment/rejectpayment/${id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ AdminID: 1, Reason: rejectionReason }) // Include AdminID and rejection reason
+      });
+      if (!response.ok) {
+        throw new Error('Failed to reject payment');
+      }
+      console.log('Payment Rejected:', rejectionReason);
+      navigate(-1); // Navigate back after rejecting
+    } catch (error) {
+      console.error("Error rejecting payment:", error);
+    }
   };
 
   return (
@@ -38,10 +86,10 @@ const AdminConfirmPayment = () => {
       <Row>
         <Col md={6}>
           <div className="admin-confirm-details">
-            <p><strong>Invoice ID</strong><br />12345678</p>
-            <p><strong>Full Name</strong><br />John Doe</p>
-            <p><strong>Phone Number</strong><br />8123 4567</p>
-            <p><strong>Total Payment Amount:</strong><br />$788.00</p>
+            <p><strong>Invoice ID</strong><br />{paymentDetails.InvoiceID}</p>
+            <p><strong>Full Name</strong><br />{paymentDetails.FullName || "N/A"}</p>
+            <p><strong>Phone Number</strong><br />{paymentDetails.PhoneNumber || "N/A"}</p>
+            <p><strong>Total Payment Amount:</strong><br />${paymentDetails.Amount}</p>
             
             <Form.Group controlId="rejectionReason" className="mt-3">
               <Form.Label>Reason (for rejection only):</Form.Label>
