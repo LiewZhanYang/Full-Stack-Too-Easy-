@@ -17,6 +17,7 @@ function WorkshopPrice() {
   const handleGetStarted = (tier) => {  
     navigate('/payment', {  
       state: {  
+        programId: tier.programId,
         tier: tier.level,  
         price: tier.price,  
         classSize: tier.classSize,  
@@ -28,27 +29,35 @@ function WorkshopPrice() {
   const priceTiers = [  
     {  
       level: "Beginner",  
+      programId: 1,
+      programName: "Public Speaking Workshop - Beginner",
       price: "$204",  
       classSize: "15-20",  
       duration: "3.5 days",  
+      lunchProvided: true,  
       bgColor: "#e0f7fa"  
     },  
     {  
       level: "Intermediate",  
+      programId: 2,
+      programName: "Public Speaking Workshop - Intermediate",
       price: "$275",  
       classSize: "10-15",  
       duration: "3.5 days",  
+      lunchProvided: true,  
       bgColor: "#e8f5e9"  
     },  
     {  
       level: "Advanced",  
+      programId: 3,
+      programName: "Public Speaking Workshop - Advanced",
       price: "$340",  
       classSize: "5-10",  
       duration: "3.5 days",  
+      lunchProvided: true,  
       bgColor: "#f3e5f5"  
     }  
   ];  
-
   // Unique skill development content  
   const skillDevelopmentData = [  
     {  
