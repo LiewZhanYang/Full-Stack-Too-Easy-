@@ -72,6 +72,7 @@ class Payment {
     ];
 
     const [result] = await connection.execute(sqlQuery, values);
+    const OrdID = result.insertId;
     connection.end();
   }
 
