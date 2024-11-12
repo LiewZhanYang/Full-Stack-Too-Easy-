@@ -23,6 +23,8 @@ const programRoutes = require("./routes/programRoutes");
 const sessionRoutes = require("./routes/sessionRoutes");
 const signupRoutes = require("./routes/signupRoutes");
 const authController = require("./controllers/authController");
+const uploadRoutes = require("./routes/uploadRoutes");
+const emailRoutes = require("./routes/emailRoutes");
 
 app.use("/customer", customerRoutes);
 app.use("/admin", adminRoutes);
@@ -33,6 +35,8 @@ app.use("/program", programRoutes);
 app.use("/session", sessionRoutes);
 app.use("/signup", signupRoutes);
 app.post("/login", authController.login);
+app.use("/upload", uploadRoutes);
+app.use("/email", emailRoutes);
 
 //const testController = require('./controllers/testController');
 
@@ -63,6 +67,7 @@ app.put('/updatesignup/:id', testController.updateSignUp);
 app.delete('/deletesignup/:id',testController.deleteSignUp);*/
 
 const dbConfig = require("./dbConfig");
+/*
 
 app.listen(port, async () => {
   try {
@@ -83,7 +88,30 @@ app.listen(port, async () => {
     process.exit(1); // Exit with code 1 indicating an error
   }
 });
+*/
 
+app.listen(port, async () => {
+  let connection;
+  try {
+    connection = await sql.createConnection(dbConfig);
+    console.log("Database connection established successfully");
+  } catch (err) {
+    console.error("Database connection error:", err);
+    console.log("Continuing without database connection...");
+  }
+
+  console.log(`Server listening on port ${port}`);
+
+  process.on("SIGINT", async () => {
+    console.log("Server is gracefully shutting down");
+    // Perform cleanup tasks (e.g., close database connections)
+    if (connection) {
+      await connection.end();
+      console.log("Database connection closed");
+    }
+    process.exit(0); // Exit with code 0 indicating successful shutdown
+  });
+});
 // Past Code
 
 // const customerRoutes = require("./routes/customerRoutes");
