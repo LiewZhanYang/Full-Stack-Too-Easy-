@@ -121,7 +121,7 @@ class Payment {
         row.InvoiceID,
         row.Amount,
         row.CreatedAt,
-        row.ApprovedStatus,
+        row.Status,
         row.InvoicePath,
         row.SessionID,
         row.PaidBy,
