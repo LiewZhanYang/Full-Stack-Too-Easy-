@@ -16,7 +16,7 @@ const AdminHome = () => {
     <div className="d-flex">
 
       {/* Main Content */}
-      <Container fluid className="p-4" style={{ marginLeft: "250px" }}>
+      <Container fluid className="p-4">
         <h1 className="admin-greeting">Welcome Back, Admin!</h1>
         <p className="text-muted">{formattedDate}</p>
         <br></br>
