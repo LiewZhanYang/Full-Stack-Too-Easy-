@@ -1,7 +1,5 @@
 const axios = require("axios");
-
-const WHEREBY_API_KEY = "YOUR_WHEREBY_API_KEY";
-
+const WHEREBY_API_KEY = process.env.WHEREBY_API_KEY;
 const createMeeting = async (req, res) => {
   try {
     const response = await axios.post(

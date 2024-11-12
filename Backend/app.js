@@ -20,7 +20,7 @@ const childRoutes = require("./routes/childRoutes");
 const bookingRoutes = require("./routes/bookingRoutes");
 const paymentRoutes = require("./routes/paymentRoutes");
 const programRoutes = require("./routes/programRoutes");
-const programtypeRoutes = require("./routes/programtypeRoutes")
+const programtypeRoutes = require("./routes/programtypeRoutes");
 const sessionRoutes = require("./routes/sessionRoutes");
 const signupRoutes = require("./routes/signUpRoutes");
 const authController = require("./controllers/authController");
@@ -34,7 +34,7 @@ app.use("/children", childRoutes);
 app.use("/booking", bookingRoutes);
 app.use("/payment", paymentRoutes);
 app.use("/program", programRoutes);
-app.use("/type", programtypeRoutes)
+app.use("/type", programtypeRoutes);
 app.use("/session", sessionRoutes);
 app.use("/signup", signupRoutes);
 app.post("/login", authController.login);
