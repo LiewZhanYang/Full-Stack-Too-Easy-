@@ -45,7 +45,7 @@ function Sidebar() {
         <div className="offcanvas-body d-flex flex-column h-100 bg-white border-end">
           {/* Logo Section */}
           <div className="flex-shrink-0 text-center p-3 border-bottom">
-            <Link to="/dashboard">
+            <Link to="/AdminHome">
               <img
                 src="/mindsphere.png"
                 alt="mindsphere"
@@ -59,11 +59,11 @@ function Sidebar() {
           <div className="flex-grow-1 overflow-auto">
             <nav className="mt-3">
               <Link
-                to="/dashboard"
+                to="/AdminHome"
                 className="d-flex align-items-center px-3 py-2 text-dark fw-bold text-decoration-none"
               >
                 <i className="bi bi-columns-gap me-2"></i>
-                Dashboard
+                Home
               </Link>
 
               {/* Programmes Dropdown */}
