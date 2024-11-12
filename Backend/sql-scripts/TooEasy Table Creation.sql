@@ -218,3 +218,14 @@ BEGIN
 END;
 //
 DELIMITER ;
+
+-- Update Discount Cost on Update
+DELIMITER //
+CREATE TRIGGER update_discount_cost_on_update
+BEFORE UPDATE ON Program
+FOR EACH ROW
+BEGIN
+    SET NEW.DiscountedCost = NEW.Cost * 0.9;
+END;
+//
+DELIMITER ;
