@@ -73,7 +73,7 @@ const AdminViewProgram = () => {
   };
 
   const handleEditSessionClick = (programId) => {
-    navigate(`/admin-edit-session/${programId}`);
+    navigate(`/admin-view-session/${programId}`);
   };
 
   const handleCreateProgramClick = () => {
@@ -172,7 +172,7 @@ const AdminViewProgram = () => {
                     className="admin-program-edit-session-button d-flex align-items-center"
                     onClick={() => handleEditSessionClick(program.ProgramID)}
                   >
-                    <FaPlus className="me-1" /> <span>Edit Session</span>
+                    <FaPlus className="me-1" /> <span>View Session(s)</span>
                   </Button>
                 </div>
               </Card.Body>
