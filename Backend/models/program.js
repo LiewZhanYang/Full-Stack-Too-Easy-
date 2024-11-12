@@ -2,36 +2,60 @@ const dbConfig = require("../dbConfig");
 const mysql = require("mysql2/promise");
 
 class Program {
-  constructor(ProgramID, ProgrameName, Cost, TypeID) {
+  constructor(ProgramID, ProgrameName, ProgramDesc, Cost, LunchProvided, Duration, ClassSize, TypeID) {
     this.ProgramID = ProgramID;
     this.ProgrameName = ProgrameName;
+    this.ProgramDesc = ProgramDesc;
+    this.LunchProvided = LunchProvided;
+    this.Duration = Duration;
+    this.ClassSize = ClassSize;
     this.Cost = Cost;
     this.TypeID = TypeID;
+  }
+
+  static async getProgramById(id) {
+    const connection = await mysql.createConnection(dbConfig);
+    const sqlQuery = `
+        SELECT * FROM program WHERE ProgramID = ?
+    `;
+    const [rows] = await connection.execute(sqlQuery, [id]);
+    connection.end();
+
+    if (rows.length === 0) {
+      return null; // Return null if no program found with the given ID
+    }
+
+    const row = rows[0];
+    return new Program(row.ProgramID, row.ProgramName, row.ProgramDesc, row.Cost, row.LunchProvided, row.Duration, row.ClassSize, row.TypeID);
   }
 
   static async getAllPrograms() {
     const connection = await mysql.createConnection(dbConfig);
 
     const sqlQuery = `
-        SELECT * FROM Program
+        SELECT * FROM program
         `;
     const [result] = await connection.execute(sqlQuery);
 
     connection.end();
     return result.map((row) => {
-      return new Program(row.ProgramID, row.ProgramName, row.Cost, row.TypeID);
+      return new Program(row.ProgramID, row.ProgramName, row.ProgramDesc, row.Cost, row.LunchProvided, row.Duration, row.ClassSize, row.TypeID);
     });
   }
 
   static async postProgram(programDetails) {
     const connection = await mysql.createConnection(dbConfig);
     const sqlQuery = `
-            INSERT INTO Program (ProgramName, Cost, TypeID)
-            VALUES (?, ?, ?)`;
+            INSERT INTO program (ProgramName, ProgramDesc, Cost, LunchProvided, Duration, ClassSize, TypeID)
+            VALUES (?, ?, ?, ?, ?, ?, ?)`;
 
     const values = [
       programDetails.ProgramName,
+      programDetails.programDesc,
       programDetails.Cost,
+      programDetails.LunchProvided,
+      programDetails.Duration,
+      programDetails.ClassSize, 
       programDetails.TypeID,
     ];
 
@@ -50,7 +74,7 @@ class Program {
     values.push(id); // Add the ID at the end for the WHERE clause
 
     const sqlQuery = `
-            UPDATE Program
+            UPDATE program
             SET ${fields}
             WHERE ProgramID = ?
         `;

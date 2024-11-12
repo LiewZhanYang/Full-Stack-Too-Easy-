@@ -34,13 +34,15 @@ function Login() {
         });
 
         const { token, user } = response.data;
+        
 
         // Store the token in localStorage or sessionStorage
         localStorage.setItem("token", token);
+        localStorage.setItem("userId", user.id); // Store user.id in localStorage
 
         // Navigate to the appropriate dashboard
         if (user.userType === "admin") {
-          navigate("/adminHome");
+          navigate("/AdminHome");
         } else {
           navigate("/dashboard");
         }

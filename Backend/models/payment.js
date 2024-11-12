@@ -75,13 +75,13 @@ class Payment {
     connection.end();
   }
 
-  static async approvePayment(OrderID, AdminID) {
+  static async approvePayment(OrderID, ApproveDetails) {
     const connection = await mysql.createConnection(dbConfig);
     const sqlQuery = `
             UPDATE Payment
-            SET ApprovedStatus = 1, ApprovedBy = ?
+            SET Status = 'Approved', ApprovedBy = ?
             WHERE OrderID = ?`;
-    const values = [AdminID.AdminID, OrderID];
+    const values = [ApproveDetails.AdminID, OrderID];
 
     const [result] = await connection.execute(sqlQuery, values);
     connection.end();
@@ -91,7 +91,7 @@ class Payment {
     const connection = await mysql.createConnection(dbConfig);
     const sqlQuery = `
             UPDATE Payment
-            SET Reason = ?, ApprovedBy = ?
+            SET Status = 'Rejected', Reason = ?, ApprovedBy = ?
             WHERE OrderID = ?`;
     const values = [rejectDetails.Reason, rejectDetails.AdminID, OrderID];
 

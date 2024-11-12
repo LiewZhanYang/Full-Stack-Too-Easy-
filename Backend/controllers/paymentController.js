@@ -28,9 +28,9 @@ const postPayment = async (req, res) => {
 
 const approvePayment = async (req, res) => {
   const orderID = req.params.orderID;
-  const adminID = req.body;
+  const approveDetails = req.body;
   try {
-    const updatedPayment = await Payment.approvePayment(orderID, adminID);
+    const updatedPayment = await Payment.approvePayment(orderID, approveDetails);
     res.status(201).json(updatedPayment);
     console.log("Successfully approved Payment");
   } catch (error) {
