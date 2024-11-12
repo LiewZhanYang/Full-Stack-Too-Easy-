@@ -72,6 +72,10 @@ class Payment {
         paymentDetails.ApprovedBy,
         paymentDetails.Reason,
       ];
+
+      // For Darling Leong Kai Jie
+      const file = paymentDetails.File
+      console.log(file)
   
       // Execute the query and log the result
       const [result] = await connection.execute(sqlQuery, values);
@@ -89,6 +93,7 @@ class Payment {
     } finally {
       if (connection) connection.end();
     }
+
   }
   
 
