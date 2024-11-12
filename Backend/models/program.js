@@ -2,9 +2,13 @@ const dbConfig = require("../dbConfig");
 const mysql = require("mysql2/promise");
 
 class Program {
-  constructor(ProgramID, ProgrameName, Cost, TypeID) {
+  constructor(ProgramID, ProgrameName, ProgramDesc, Cost, LunchProvided, Duration, ClassSize, TypeID) {
     this.ProgramID = ProgramID;
     this.ProgrameName = ProgrameName;
+    this.ProgramDesc = ProgramDesc;
+    this.LunchProvided = LunchProvided;
+    this.Duration = Duration;
+    this.ClassSize = ClassSize;
     this.Cost = Cost;
     this.TypeID = TypeID;
   }
@@ -42,12 +46,16 @@ class Program {
   static async postProgram(programDetails) {
     const connection = await mysql.createConnection(dbConfig);
     const sqlQuery = `
-            INSERT INTO program (ProgramName, Cost, TypeID)
-            VALUES (?, ?, ?)`;
+            INSERT INTO program (ProgramName, ProgramDesc, Cost, LunchProvided, Duration, ClassSize, TypeID)
+            VALUES (?, ?, ?, ?, ?, ?, ?)`;
 
     const values = [
       programDetails.ProgramName,
+      programDetails.programDesc,
       programDetails.Cost,
+      programDetails.LunchProvided,
+      programDetails.Duration,
+      programDetails.ClassSize, 
       programDetails.TypeID,
     ];
 
