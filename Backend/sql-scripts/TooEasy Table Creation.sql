@@ -27,6 +27,7 @@ CREATE TABLE Child (
     Name VARCHAR(50),
     Strength VARCHAR(100),
     DOB DATE NOT NULL,
+    Age INT NOT NULL DEFAULT 0,
     AccountID INT NOT NULL,
 
     FOREIGN KEY (AccountID) REFERENCES Customer(AccountID)
@@ -121,13 +122,13 @@ VALUES
 (1, 'admin1', 'adminpassword1'),
 (2, 'admin2', 'adminpassword2');
 
-INSERT INTO Child (ChildID, Name, Strength, DOB, AccountID)
+INSERT INTO Child (ChildID, Name, Strength, DOB, Age, AccountID)
 VALUES
-(1, 'Emily Doe', 'Swimming', '2012-08-15', 1),
-(2, 'Max Doe', 'Basketball', '2015-02-20', 1),
-(3, 'Sophia Smith', 'Tennis', '2010-11-01', 2),
-(4, 'Oliver Johnson', 'Soccer', '2013-04-10', 2),
-(5, 'Ava Brown', 'Dancing', '2011-06-25', 1);
+(1, 'Emily Doe', 'Swimming', '2012-08-15', 12,  1),
+(2, 'Max Doe', 'Basketball', '2015-02-20', 9,  1),
+(3, 'Sophia Smith', 'Tennis', '2010-11-01', 14,  2),
+(4, 'Oliver Johnson', 'Soccer', '2013-04-10', 11,  2),
+(5, 'Ava Brown', 'Dancing', '2011-06-25', 13,  1);
 
 INSERT INTO ProgramType (TypeID, TypeDesc)
 VALUES
@@ -181,3 +182,17 @@ VALUES
 (2, 93157026, 988, '2024-10-10 12:00:00', 'Pending', 'path/to/invoice-93157026.pdf', 2, 2, NULL, NULL),
 (3, 67491350, 1388, '2024-10-15 12:00:00', 'Approved', 'path/to/invoice-67491350.pdf', 3, 3, 1, 'Approved by Admin 1'),
 (4, 28653104, 388, '2024-10-20 12:00:00', 'Pending', 'path/to/invoice-28653104.pdf', 4, 4, NULL, NULL);
+
+-- Trigger
+
+DELIMITER //
+
+CREATE TRIGGER update_age
+BEFORE INSERT ON Child
+FOR EACH ROW
+BEGIN
+    SET NEW.Age = YEAR(CURDATE()) - YEAR(NEW.DOB);
+END;
+//
+
+DELIMITER ;
