@@ -1,20 +1,34 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, Nav, Card } from 'react-bootstrap';
 
 const AdminViewPayment = () => {
   const [activeTab, setActiveTab] = useState('pending');
+  const [pendingPayments, setPendingPayments] = useState([]);
+  const [confirmedPayments, setConfirmedPayments] = useState([]);
 
-  const pendingPayments = [
-    { id: '12345678', name: 'John Doe', contact: '8123 4567' },
-    { id: '12345678', name: 'John Doe', contact: '8123 4567' },
-    { id: '12345678', name: 'John Doe', contact: '8123 4567' },
-    { id: '12345678', name: 'John Doe', contact: '8123 4567' },
-  ];
+  // Fetch payments from backend
+  useEffect(() => {
+    const fetchPayments = async () => {
+      try {
+        const response = await fetch('http://localhost:8000/payment'); // Adjust the URL if needed
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        const payments = await response.json();
 
-  const confirmedPayments = [
-    { id: '87654321', name: 'Jane Smith', contact: '8123 4568' },
-    { id: '87654321', name: 'Jane Smith', contact: '8123 4568' },
-  ];
+        // Filter payments by approval status
+        const pending = payments.filter(payment => payment.ApprovedStatus === 0);
+        const confirmed = payments.filter(payment => payment.ApprovedStatus === 1);
+
+        setPendingPayments(pending);
+        setConfirmedPayments(confirmed);
+      } catch (error) {
+        console.error("Error fetching payments:", error);
+      }
+    };
+
+    fetchPayments();
+  }, []);
 
   const handleSelect = (selectedTab) => {
     setActiveTab(selectedTab);
@@ -24,9 +38,9 @@ const AdminViewPayment = () => {
     payments.map((payment, index) => (
       <Card key={index} className="admin-payment-card mb-3 p-3">
         <Card.Body>
-          <Card.Title className="admin-payment-order-id">Invoice ID: {payment.id}</Card.Title>
-          <Card.Text className="admin-payment-text">{payment.name}</Card.Text>
-          <Card.Text className="admin-payment-text">{payment.contact}</Card.Text>
+          <Card.Title className="admin-payment-order-id">Invoice ID: {payment.InvoiceID}</Card.Title>
+          <Card.Text className="admin-payment-text">Amount: ${payment.Amount}</Card.Text>
+          <Card.Text className="admin-payment-text">Contact: {payment.PaidBy}</Card.Text>
         </Card.Body>
       </Card>
     ))
@@ -36,7 +50,6 @@ const AdminViewPayment = () => {
     <Container fluid className="admin-payments-page p-4">
       <h2 className="admin-payments-title">Incoming Payments</h2>
       <hr className="admin-payments-divider mb-4" />
-
 
       <Nav variant="tabs" activeKey={activeTab} onSelect={handleSelect} className="mb-3">
         <Nav.Item>
