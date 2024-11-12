@@ -43,6 +43,7 @@ CREATE TABLE Program (
     ProgramName  VARCHAR(50) NOT NULL,
     ProgramDesc VARCHAR(100) NOT NULL,
     Cost INT NOT NULL,
+    DiscountedCost INT NOT NULL DEFAULT 0,
     LunchProvided BOOL NOT NULL,
     Duration INT NOT NULL,
     ClassSize INT NOT NULL,
@@ -138,13 +139,13 @@ VALUES
 (4, 'Professional'),
 (5, 'Webinar');
 
-INSERT INTO Program (ProgramName, ProgramDesc, Cost, LunchProvided, Duration, ClassSize, TypeID)
+INSERT INTO Program (ProgramName, ProgramDesc, Cost, DiscountedCost, LunchProvided, Duration, ClassSize, TypeID)
 VALUES
-('Public Speaking Workshop - Beginner', 'Learn the basics of public speaking', 788, TRUE, 8, 15, 1),
-('Public Speaking Workshop - Intermediate', 'Improve your public speaking skills', 988, TRUE, 8, 15, 1),
-('Public Speaking Workshop - Advanced', 'Master the art of public speaking', 1388, TRUE, 8, 10, 1),
-('PSLE Power Up Camp - PSLE Power Up', 'Comprehensive PSLE revision', 388, FALSE, 2, 20, 2),
-('PSLE Power Up Camp - PSLE Chinese Oral Booster', 'Boost your Chinese oral skills', 488, FALSE, 2, 15, 2);
+('Public Speaking Workshop - Beginner', 'Learn the basics of public speaking', 788, 709.2, TRUE, 8, 15, 1),
+('Public Speaking Workshop - Intermediate', 'Improve your public speaking skills', 988, 889.2, TRUE, 8, 15, 1),
+('Public Speaking Workshop - Advanced', 'Master the art of public speaking', 1388, 1249.2, TRUE, 8, 10, 1),
+('PSLE Power Up Camp - PSLE Power Up', 'Comprehensive PSLE revision', 388, 349.2, FALSE, 2, 20, 2),
+('PSLE Power Up Camp - PSLE Chinese Oral Booster', 'Boost your Chinese oral skills', 488, 439.2, FALSE, 2, 15, 2);
 
 INSERT INTO Session (SessionID, StartDate, EndDate, Time, Location, ProgramID)
 VALUES
@@ -192,6 +193,18 @@ BEFORE INSERT ON Child
 FOR EACH ROW
 BEGIN
     SET NEW.Age = YEAR(CURDATE()) - YEAR(NEW.DOB);
+END;
+//
+
+DELIMITER ;
+
+DELIMITER //
+
+CREATE TRIGGER update_discount_cost
+BEFORE INSERT ON Program
+FOR EACH ROW
+BEGIN
+    SET NEW.DiscountedCost = NEW.Cost * 0.9;
 END;
 //
 
