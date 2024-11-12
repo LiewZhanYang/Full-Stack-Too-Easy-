@@ -15,7 +15,7 @@ const AdminEditSession = () => {
   };
 
   const handleCancel = () => {
-    navigate("/admin-programs");
+    navigate("/admin-view-program");
   };
 
   return (
