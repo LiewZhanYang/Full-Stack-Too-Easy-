@@ -132,7 +132,7 @@ function Profile() {
     <div className="flex-1 p-8 -ml-30">
       <h1 className="text-2xl font-semibold mb-8">My Profile</h1>
 
-      {/* Profile Information */}
+      {/* Profile Info */}
       <div className="bg-white rounded-lg p-6 shadow-sm mb-8">
         <div className="flex items-center mb-8">
           <div className="w-24 h-24 bg-gray-200 rounded-full flex items-center justify-center">
