@@ -32,13 +32,15 @@ import AdminCreateProgram from "./components/AdminCreateProgram.js";
 import AdminEditProgram from "./components/AdminEditProgram.js";
 import AdminEditTiming from "./components/AdminEditTiming.js";
 import Chatbot from "./components/Chatbot.js";
+import AdminSideBar from './components/AdminSidebar.js';
 import "./App.css";
-import axios from "axios";
+
 
 // Layout component to handle conditional rendering
 function Layout({ children }) {
   const location = useLocation();
   const isLoginPage = location.pathname.toLowerCase() === "/login";
+  const isAdminPage = location.pathname.toLowerCase().startsWith("/admin");
 
   if (isLoginPage) {
     return (
@@ -51,7 +53,7 @@ function Layout({ children }) {
 
   return (
     <div className="d-flex min-vh-100">
-      <Sidebar />
+      {isAdminPage ? <AdminSideBar /> : <Sidebar />}
       <main className="main-content">
         <div className="container-fluid p-4">{children}</div>
       </main>
