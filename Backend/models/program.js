@@ -9,11 +9,27 @@ class Program {
     this.TypeID = TypeID;
   }
 
+  static async getProgramById(id) {
+    const connection = await mysql.createConnection(dbConfig);
+    const sqlQuery = `
+        SELECT * FROM program WHERE ProgramID = ?
+    `;
+    const [rows] = await connection.execute(sqlQuery, [id]);
+    connection.end();
+
+    if (rows.length === 0) {
+      return null; // Return null if no program found with the given ID
+    }
+
+    const row = rows[0];
+    return new Program(row.ProgramID, row.ProgramName, row.Cost, row.TypeID);
+  }
+
   static async getAllPrograms() {
     const connection = await mysql.createConnection(dbConfig);
 
     const sqlQuery = `
-        SELECT * FROM Program
+        SELECT * FROM program
         `;
     const [result] = await connection.execute(sqlQuery);
 
@@ -26,7 +42,7 @@ class Program {
   static async postProgram(programDetails) {
     const connection = await mysql.createConnection(dbConfig);
     const sqlQuery = `
-            INSERT INTO Program (ProgramName, Cost, TypeID)
+            INSERT INTO program (ProgramName, Cost, TypeID)
             VALUES (?, ?, ?)`;
 
     const values = [
@@ -50,7 +66,7 @@ class Program {
     values.push(id); // Add the ID at the end for the WHERE clause
 
     const sqlQuery = `
-            UPDATE Program
+            UPDATE program
             SET ${fields}
             WHERE ProgramID = ?
         `;
