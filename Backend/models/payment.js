@@ -57,12 +57,15 @@ class Payment {
     });
   }
 
-  static async postPayment(id, paymentDetails) {
+  static async postPayment(id, paymentDetails, file) {
     const connection = await mysql.createConnection(dbConfig);
     const sqlQuery = `
             INSERT INTO Payment (InvoiceID, Amount, CreatedAt, Status, InvoicePath, SessionID, PaidBy, ApprovedBy, Reason)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);`;
 
+    // For Darling Leong Kai Jie
+    console.log(file)
+    
     const values = [
       paymentDetails.InvoiceID,
       paymentDetails.Amount,
