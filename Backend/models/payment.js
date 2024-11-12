@@ -8,7 +8,7 @@ class Payment {
     InvoiceID,
     Amount,
     CreatedAt,
-    ApprovedStatus,
+    Status,
     InvoicePath,
     SessionID,
     PaidBy,
@@ -19,7 +19,7 @@ class Payment {
     this.InvoiceID = InvoiceID;
     this.Amount = Amount;
     this.CreatedAt = CreatedAt;
-    this.ApprovedStatus = ApprovedStatus;
+    this.Status = Status;
     this.InvoicePath = InvoicePath;
     this.SessionID = SessionID;
     this.PaidBy = PaidBy;
@@ -42,7 +42,7 @@ class Payment {
         row.InvoiceID,
         row.Amount,
         row.CreatedAt,
-        row.ApprovedStatus,
+        row.Status,
         row.InvoicePath,
         row.SessionID,
         row.PaidBy,
@@ -55,7 +55,7 @@ class Payment {
   static async postPayment(id, paymentDetails) {
     const connection = await mysql.createConnection(dbConfig);
     const sqlQuery = `
-            INSERT INTO Payment (InvoiceID, Amount, CreatedAt, ApprovedStatus, InvoicePath, SessionID, PaidBy, ApprovedBy, Reason)
+            INSERT INTO Payment (InvoiceID, Amount, CreatedAt, Status, InvoicePath, SessionID, PaidBy, ApprovedBy, Reason)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);`;
 
     const values = [
@@ -63,7 +63,7 @@ class Payment {
       paymentDetails.Amount,
       paymentDetails.CreatedAt,
       // filename: /orderID/(original.name)
-      paymentDetails.ApprovedStatus,
+      paymentDetails.Status,
       paymentDetails.InvoicePath,
       paymentDetails.SessionID,
       id,
