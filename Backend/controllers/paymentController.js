@@ -16,8 +16,9 @@ const getAllPayment = async (req, res) => {
 const postPayment = async (req, res) => {
   const id = req.params.id;
   const paymentDetails = req.body;
+  const file = req.file;
   try {
-    const newPayment = await Payment.postPayment(id, paymentDetails);
+    const newPayment = await Payment.postPayment(id, paymentDetails, file);
     res.status(201).json(newPayment);
     console.log("Successfully posted Payment");
   } catch (error) {

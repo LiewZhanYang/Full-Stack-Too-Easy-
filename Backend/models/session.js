@@ -48,6 +48,38 @@ class Session {
         const [result] = await connection.execute(sqlQuery, values);
         connection.end();        
     }
+
+    static async updateSession(SessionID, SessionDetails) {
+        const connection = await mysql.createConnection(dbConfig);
+
+        const sqlQuery = `
+            UPDATE Session 
+            SET StartDate = ?, EndDate = ?, Time = ?, Location = ?
+            WHERE SessionID = ?
+        `;
+
+        const values = [
+            SessionDetails.StartDate,
+            SessionDetails.EndDate,
+            SessionDetails.Time,
+            SessionDetails.Location,
+            SessionID
+        ];
+
+        const [result] = await connection.execute(sqlQuery, values);
+        connection.end();
+
+        return result.affectedRows > 0; // Return true if the signup was updated
+    }
+
+    static async deleteSession(SessionID) {
+        const connection = await mysql.createConnection(dbConfig);
+        const sqlQuery = `
+            DELETE FROM Session WHERE SessionID = ?;`;
+
+        const [result] = await connection.execute(sqlQuery, [SessionID]);
+        connection.end();
+    }
 }
 
 module.exports = Session
