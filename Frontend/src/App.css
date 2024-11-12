@@ -567,6 +567,25 @@ code {
   background-color: #b8921f;
 }
 
+.admin-program-edit-session-button {
+  align-self: flex-start;
+  background-color: #2F455B;
+  color: white;
+  border: none;
+  font-weight: 500;
+  padding: 5px 10px;
+  border-radius: 5px;
+  font-size: 0.9rem;
+  margin-top: auto;
+  display: flex;
+  align-items: center;
+}
+
+.admin-program-edit-session-button:hover {
+  background-color: #4c6d8d;
+  color: white;
+}
+
 .admin-create-program-button {
   position: fixed;
   bottom: 20px;
