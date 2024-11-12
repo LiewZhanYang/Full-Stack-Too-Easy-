@@ -15,12 +15,12 @@ import Camps from "./components/Camps";
 import Labs from "./components/Labs";
 import Professionals from "./components/Professionals";
 import Webinars from "./components/Webinars";
-import Coaching from "./components/PreCoaching.js";
 import Profile from "./components/Profile";
 import Payment from "./components/Payment";
 import Login from "./components/Login.js";
 import Booking from "./components/Booking.js";
 import PreCoaching from "./components/PreCoaching.js";
+import Coaching from "./components/Coaching.js";
 import AdminHome from "./components/AdminHome.js";
 import AdminViewProgram from "./components/AdminViewProgram.js";
 import AdminViewSession from "./components/AdminViewSession.js";
@@ -31,6 +31,7 @@ import AdminConfirmPayment from "./components/AdminConfirmPayment.js";
 import AdminCreateProgram from "./components/AdminCreateProgram.js";
 import AdminEditProgram from "./components/AdminEditProgram.js";
 import AdminEditTiming from "./components/AdminEditTiming.js";
+import AdminCoaching from "./components/AdminCoaching.js";
 import Chatbot from "./components/Chatbot.js";
 import AdminSideBar from './components/AdminSidebar.js';
 import "./App.css";
@@ -87,13 +88,14 @@ function App() {
                   <Route path="/labs" element={<Labs />} />
                   <Route path="/professionals" element={<Professionals />} />
                   <Route path="/webinars" element={<Webinars />} />
-                  <Route path="/coaching" element={<Coaching />} />
                   <Route path="/profile" element={<Profile />} />
                   <Route path="/booking" element={<Booking />} />
                   <Route path="/preCoaching" element={<PreCoaching />} />
+                  <Route path="/coaching" element={<Coaching />} />
                   <Route path="/chatbot" element={<Chatbot />} />
                   {/* Admin routes */}
                   <Route path="/adminhome" element={<AdminHome />} />
+                  <Route path="/admin-coaching" element={<AdminCoaching />} />
                   <Route
                     path="/admin-view-program"
                     element={<AdminViewProgram />}
