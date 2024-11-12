@@ -14,7 +14,8 @@ class Payment {
     Reason,
     ApprovedBy,
     Name,
-    ContactNo
+    ContactNo,
+    ProgramID
   ) {
     this.OrderID = OrderID;
     this.InvoiceID = InvoiceID;
@@ -57,13 +58,14 @@ class Payment {
     });
   }
 
-  static async postPayment(id, paymentDetails, file) {
+  static async postPayment(id, paymentDetails) {
     const connection = await mysql.createConnection(dbConfig);
     const sqlQuery = `
             INSERT INTO Payment (InvoiceID, Amount, CreatedAt, Status, InvoicePath, SessionID, PaidBy, ApprovedBy, Reason)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);`;
 
     // For Darling Leong Kai Jie
+    const file = paymentDetails.File
     console.log(file)
     
     const values = [
