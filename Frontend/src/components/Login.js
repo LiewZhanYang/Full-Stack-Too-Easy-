@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from 'axios';
+import axios from "axios";
 
 function Login() {
   const navigate = useNavigate();
@@ -34,13 +34,15 @@ function Login() {
         });
 
         const { token, user } = response.data;
+        
 
         // Store the token in localStorage or sessionStorage
         localStorage.setItem("token", token);
+        localStorage.setItem("userId", user.id); // Store user.id in localStorage
 
         // Navigate to the appropriate dashboard
         if (user.userType === "admin") {
-          navigate("/adminHome");
+          navigate("/AdminHome");
         } else {
           navigate("/dashboard");
         }
@@ -50,6 +52,27 @@ function Login() {
       }
     } else {
       // Handle user signup logic (if implemented)
+      try {
+        const response = await axios.post(
+          "http://localhost:8000/customer",
+          {
+            Name: `${formData.firstName} ${formData.lastName}`,
+            EmailAddr: formData.email,
+            ContactNo: formData.phoneNumber,
+            Password: formData.password,
+            MemberStatus: "active", // Default status
+            PfpPath: "", // Profile path
+          }
+        );
+
+        if (response.status === 201) {
+          alert("Signup successful! You can now log in.");
+          setIsLogin(true);
+        }
+      } catch (error) {
+        console.error("Signup error:", error);
+        alert("Error during signup. Please try again.");
+      }
     }
   };
 
@@ -94,22 +117,11 @@ function Login() {
                   <div className="flex-1">
                     <input
                       type="text"
-                      name="firstName"
-                      value={formData.firstName}
-                      onChange={handleInputChange}
-                      className="w-full px-4 py-3 rounded-lg bg-[#f8f8f8] focus:outline-none text-sm"
-                      placeholder="First Name"
-                      required
-                    />
-                  </div>
-                  <div className="flex-1">
-                    <input
-                      type="text"
                       name="lastName"
-                      value={formData.lastName}
+                      value={formData.Username}
                       onChange={handleInputChange}
                       className="w-full px-4 py-3 rounded-lg bg-[#f8f8f8] focus:outline-none text-sm"
-                      placeholder="Last Name"
+                      placeholder="Username"
                       required
                     />
                   </div>

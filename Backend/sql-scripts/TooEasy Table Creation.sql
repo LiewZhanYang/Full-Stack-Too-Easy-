@@ -39,8 +39,12 @@ CREATE TABLE ProgramType (
 
 CREATE TABLE Program (
 	ProgramID INT PRIMARY KEY AUTO_INCREMENT,
-    ProgramName  VARCHAR(50) NOT NULL NOT NULL,
+    ProgramName  VARCHAR(50) NOT NULL,
+    ProgramDesc VARCHAR(100) NOT NULL,
     Cost INT NOT NULL,
+    LunchProvided BOOL NOT NULL,
+    Duration INT NOT NULL,
+    ClassSize INT NOT NULL,
     TypeID INT NOT NULL,
     
     FOREIGN KEY (TypeID) REFERENCES ProgramType(TypeID)
@@ -88,7 +92,7 @@ CREATE TABLE Payment (
 	InvoiceID INT NOT NULL,
     Amount INT NOT NULL,
 	CreatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP, 
-    ApprovedStatus BOOL NOT NULL, 
+    Status ENUM('Pending', 'Approved', 'Rejected') NOT NULL DEFAULT 'Pending',
     InvoicePath VARCHAR(100) NOT NULL,
     SessionID INT NOT NULL,
     PaidBy INT NOT NULL, 
@@ -132,13 +136,13 @@ VALUES
 (4, 'Professional'),
 (5, 'Webinar');
 
-INSERT INTO Program (ProgramID, ProgramName, Cost, TypeID)
+INSERT INTO Program (ProgramName, ProgramDesc, Cost, LunchProvided, Duration, ClassSize, TypeID)
 VALUES
-(1, 'Public Speaking Workshop - Beginner', 788, 1),
-(2, 'Public Speaking Workshop - Intermediate', 988, 1),
-(3, 'Public Speaking Workshop - Advanced', 1388, 1),
-(4, 'PSLE Power Up Camp - PSLE Power Up', 388, 1),
-(5, 'PSLE Power Up Camp - PSLE Chinese Oral Booster', 488, 1);
+('Public Speaking Workshop - Beginner', 'Learn the basics of public speaking', 788, TRUE, 8, 15, 1),
+('Public Speaking Workshop - Intermediate', 'Improve your public speaking skills', 988, TRUE, 8, 15, 1),
+('Public Speaking Workshop - Advanced', 'Master the art of public speaking', 1388, TRUE, 8, 10, 1),
+('PSLE Power Up Camp - PSLE Power Up', 'Comprehensive PSLE revision', 388, FALSE, 2, 20, 2),
+('PSLE Power Up Camp - PSLE Chinese Oral Booster', 'Boost your Chinese oral skills', 488, FALSE, 2, 15, 2);
 
 INSERT INTO Session (SessionID, Date, Time, Location, ProgramID)
 VALUES
@@ -170,9 +174,9 @@ VALUES
 (4, '15:00:00', '2025-01-18', 4),
 (5, '17:00:00', '2025-01-19', 5);
 
-INSERT INTO Payment (OrderID, InvoiceID, Amount, CreatedAt, ApprovedStatus, InvoicePath, SessionID, PaidBy, ApprovedBy, Reason)
+INSERT INTO Payment (OrderID, InvoiceID, Amount, CreatedAt, Status, InvoicePath, SessionID, PaidBy, ApprovedBy, Reason)
 VALUES
-(1, 46382751, 788, '2024-10-02 12:00:00', TRUE, 'path/to/invoice-46382751.pdf', 1, 1, NULL, NULL),
-(2, 93157026, 988, '2024-10-10 12:00:00', TRUE, 'path/to/invoice-93157026.pdf', 2, 2, NULL, NULL),
-(3, 67491350, 1388, '2024-10-15 12:00:00', TRUE, 'path/to/invoice-67491350.pdf', 3, 3, NULL, NULL),
-(4, 28653104, 388, '2024-10-20 12:00:00', TRUE, 'path/to/invoice-28653104.pdf', 4, 4, NULL, NULL);
+(1, 46382751, 788, '2024-10-02 12:00:00', 'Pending', 'path/to/invoice-46382751.pdf', 1, 1, NULL, NULL),
+(2, 93157026, 988, '2024-10-10 12:00:00', 'Pending', 'path/to/invoice-93157026.pdf', 2, 2, NULL, NULL),
+(3, 67491350, 1388, '2024-10-15 12:00:00', 'Approved', 'path/to/invoice-67491350.pdf', 3, 3, 1, 'Approved by Admin 1'),
+(4, 28653104, 388, '2024-10-20 12:00:00', 'Pending', 'path/to/invoice-28653104.pdf', 4, 4, NULL, NULL);

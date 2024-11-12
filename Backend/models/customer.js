@@ -76,24 +76,26 @@ class Customer {
   static async postCustomer(postCustomer) {
     const connection = await mysql.createConnection(dbConfig);
     const sqlQuery = `
-      INSERT INTO Customer (Name, EmailAddr, ContactNo, MemberStatus, MembershipExpiry, DateJoined, PfpPath, Password)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?)`;
+      INSERT INTO Customer (Name, EmailAddr, ContactNo, MemberStatus, DateJoined, Password)
+      VALUES (?, ?, ?, 0, NOW(), ?)
+    `;
 
-    console.log(postCustomer.Name);
-    const today = new Date();
     const values = [
       postCustomer.Name,
       postCustomer.EmailAddr,
       postCustomer.ContactNo,
-      postCustomer.MemberStatus,
-      new Date(today.getFullYear() + 1, today.getMonth(), today.getDate()),
-      today,
-      postCustomer.PfpPath,
       postCustomer.Password,
     ];
 
-    const [result] = await connection.execute(sqlQuery, values);
-    connection.end();
+    try {
+      const [result] = await connection.execute(sqlQuery, values);
+      connection.end();
+      return result;
+    } catch (error) {
+      console.error("Error creating customer:", error);
+      connection.end();
+      throw error;
+    }
   }
 
   static async findCustomerByEmailOrUsername(emailOrUsername) {
@@ -149,6 +151,35 @@ class Customer {
       return result;
     } catch (error) {
       console.error("Error updating customer:", error);
+      connection.end();
+      throw error;
+    }
+  }
+
+  static async getAllCustomers() {
+    const connection = await mysql.createConnection(dbConfig);
+
+    try {
+      const sqlQuery = `SELECT * FROM Customer`;
+      const [results] = await connection.execute(sqlQuery);
+      connection.end();
+
+      return results.map(
+        (row) =>
+          new Customer(
+            row.AccountID,
+            row.Name,
+            row.EmailAddr,
+            row.ContactNo,
+            row.Password,
+            row.MemberStatus,
+            row.MembershipExpiry,
+            row.DateJoined,
+            row.PfpPath
+          )
+      );
+    } catch (error) {
+      console.error("Error retrieving customers:", error);
       connection.end();
       throw error;
     }
