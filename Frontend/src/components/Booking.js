@@ -66,8 +66,45 @@ function Booking() {
     setSelectedTimeSlot(timeSlot.label);
   };
 
-  const handleConfirmBooking = () => {
-    setShowModal(true);
+  const handleConfirmBooking = async () => {
+    const accountId = localStorage.getItem("userId"); 
+    if (accountId && selectedSlot && selectedTimeSlot) {
+      const formattedDate = `${selectedSlot.getFullYear()}-${String(
+        selectedSlot.getMonth() + 1
+      ).padStart(2, "0")}-${String(selectedSlot.getDate()).padStart(2, "0")}`;
+
+      const bookingDetails = {
+        Date: formattedDate,
+        Time: timeSlots.find((slot) => slot.label === selectedTimeSlot).start,
+        AccountID: accountId,
+      };
+
+      try {
+        const response = await fetch("http://localhost:8000/booking", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(bookingDetails),
+        });
+
+        if (response.ok) {
+          const contentType = response.headers.get("content-type");
+          const data =
+            contentType && contentType.includes("application/json")
+              ? await response.json()
+              : {};
+
+          console.log("Booking created successfully:", data);
+          setBookings([...bookings, data]);
+          setShowModal(true); 
+        } else {
+          console.error("Failed to create booking. Status:", response.status);
+        }
+      } catch (error) {
+        console.error("Error creating booking:", error);
+      }
+    }
   };
 
   const handleCloseModal = () => {
@@ -160,7 +197,7 @@ function Booking() {
           <ListGroup className="mb-3">
             {selectedSlot ? (
               <ListGroup.Item className="selected-time">
-                Selected Time: {format(selectedSlot, "MMMM do, yyyy")}{" "}
+                Selected Date: {format(selectedSlot, "MMMM do, yyyy")}{" "}
                 {selectedTimeSlot ? `- ${selectedTimeSlot}` : ""}
               </ListGroup.Item>
             ) : (
@@ -201,7 +238,7 @@ function Booking() {
           </Button>
         </Col>
       </Row>
-
+      {console.log("showModal value: ", showModal)}
       <Modal show={showModal} onHide={handleCloseModal} centered>
         <Modal.Header closeButton>
           <Modal.Title>Booking Confirmed</Modal.Title>
