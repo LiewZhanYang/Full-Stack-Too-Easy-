@@ -1,6 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Container, Row, Col, Button, Form } from "react-bootstrap";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
 const AdminEditSession = () => {
   const [startDate, setStartDate] = useState("");
@@ -8,19 +8,75 @@ const AdminEditSession = () => {
   const [time, setTime] = useState("");
   const [location, setLocation] = useState("");
   const navigate = useNavigate();
+  const { id } = useParams(); // Session ID from the route params
 
-  const handleCreateSession = () => {
-    // Add logic to handle session creation
-    console.log("Session Created:", { startDate, endDate, time, location });
+  useEffect(() => {
+    const fetchSessionDetails = async () => {
+      try {
+        const response = await fetch(`http://localhost:8000/session/${id}`);
+        if (!response.ok) {
+          throw new Error("Failed to fetch session details");
+        }
+        const data = await response.json();
+
+        // If data is an array, find the session with the matching ID
+        const session = Array.isArray(data)
+          ? data.find((item) => item.SessionID === parseInt(id))
+          : data;
+
+        if (session) {
+          // Log the specific session object
+          console.log("Fetched session details:", session);
+
+          // Populate form fields with fetched data
+          setStartDate(session.StartDate);
+          setEndDate(session.EndDate);
+          setTime(session.Time);
+          setLocation(session.Location);
+        } else {
+          console.error("Session not found");
+        }
+      } catch (error) {
+        console.error("Error fetching session details:", error);
+      }
+    };
+
+    fetchSessionDetails();
+  }, [id]);
+
+  const handleSaveSession = async () => {
+    try {
+      const response = await fetch(`http://localhost:8000/session/${id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          StartDate: startDate,
+          EndDate: endDate,
+          Time: time,
+          Location: location,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to save session");
+      }
+
+      console.log("Session saved successfully");
+      navigate("/admin-programs");
+    } catch (error) {
+      console.error("Error saving session:", error);
+    }
   };
 
   const handleCancel = () => {
-    navigate("/admin-programs");
+    navigate("/admin-view-program");
   };
 
   return (
     <Container fluid className="admin-edit-session-page p-4">
-      <h2 className="page-title">Public Speaking Workshop - Edit Session</h2>
+      <h2 className="page-title">Edit Session</h2>
       <hr className="divider-line mb-4" />
 
       <Form>
@@ -71,13 +127,13 @@ const AdminEditSession = () => {
         <div className="button-group">
           <Button
             variant="warning"
-            className="create-session-button"
-            onClick={handleCreateSession}
+            className="save-button"
+            onClick={handleSaveSession}
           >
             Save
           </Button>
           <Button
-            variant="danger"
+            variant="secondary"
             className="cancel-button ms-2"
             onClick={handleCancel}
           >

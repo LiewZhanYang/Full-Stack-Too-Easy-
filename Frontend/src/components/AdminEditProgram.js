@@ -89,7 +89,7 @@ const AdminEditProgram = () => {
   };
 
   const handleCancel = () => {
-    navigate('/admin-programs');
+    navigate('/admin-view-program');
   };
 
   return (
