@@ -51,7 +51,7 @@ class Program {
 
     const values = [
       programDetails.ProgramName,
-      programDetails.programDesc,
+      programDetails.ProgramDesc,
       programDetails.Cost,
       programDetails.LunchProvided,
       programDetails.Duration,

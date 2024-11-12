@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Container, Row, Col, Button, Form } from "react-bootstrap";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
 const AdminCreateSession = () => {
   const [startDate, setStartDate] = useState("");
@@ -8,10 +8,35 @@ const AdminCreateSession = () => {
   const [time, setTime] = useState("");
   const [location, setLocation] = useState("");
   const navigate = useNavigate();
+  const { id: programID } = useParams(); // Get ProgramID from URL params
 
-  const handleCreateSession = () => {
-    // Add logic to handle session creation
-    console.log("Session Created:", { startDate, endDate, time, location });
+  const handleCreateSession = async () => {
+    const sessionDetails = {
+      StartDate: startDate,
+      EndDate: endDate,
+      Time: time,
+      Location: location,
+      ProgramID: programID,
+    };
+
+    try {
+      const response = await fetch("http://localhost:8000/session", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(sessionDetails),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to create session");
+      }
+
+      console.log("Session Created:", sessionDetails);
+      navigate(`/admin-programs/${programID}/sessions`); // Redirect to the sessions list for the program
+    } catch (error) {
+      console.error("Error creating session:", error);
+    }
   };
 
   const handleCancel = () => {
@@ -20,7 +45,7 @@ const AdminCreateSession = () => {
 
   return (
     <Container fluid className="admin-edit-session-page p-4">
-      <h2 className="page-title">Public Speaking Workshop - Edit Session</h2>
+      <h2 className="page-title">Public Speaking Workshop - Create Session</h2>
       <hr className="divider-line mb-4" />
 
       <Form>

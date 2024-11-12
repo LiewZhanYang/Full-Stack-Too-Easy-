@@ -1,26 +1,59 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Container, Row, Col, Button, Table } from "react-bootstrap";
 import { FaEdit, FaTrash } from "react-icons/fa";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
 const AdminViewSession = () => {
+  const [sessions, setSessions] = useState([]);
   const navigate = useNavigate();
+  const { id: programID } = useParams(); 
 
-  const sessions = [
-    {
-      id: 1,
-      date: "April 4th-7th",
-      time: "10:00-18:00",
-      location: "1 Clarke Quay",
-    },
-  ];
+  useEffect(() => {
+    const fetchSessions = async () => {
+      try {
+        const response = await fetch(`http://localhost:8000/session/${programID}`);
+        if (!response.ok) {
+          throw new Error("Failed to fetch sessions");
+        }
+        const data = await response.json();
+        setSessions(data);
+      } catch (error) {
+        console.error("Error fetching sessions:", error);
+      }
+    };
+
+    fetchSessions();
+  }, [programID]);
 
   const handleEditClick = (sessionId) => {
     navigate(`/admin-edit-session/${sessionId}`);
   };
 
   const handleCreateSessionClick = () => {
-    navigate("/admin-create-session");
+    navigate(`/admin-create-session/${programID}`);
+  };
+
+  const handleDeleteClick = async (sessionId) => {
+    try {
+      const response = await fetch(`http://localhost:8000/session/${sessionId}`, {
+        method: "DELETE",
+      });
+      if (!response.ok) {
+        throw new Error("Failed to delete session");
+      }
+      setSessions((prevSessions) => prevSessions.filter((session) => session.SessionID !== sessionId));
+    } catch (error) {
+      console.error("Error deleting session:", error);
+    }
+  };
+
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString("en-GB", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+    });
   };
 
   return (
@@ -33,26 +66,30 @@ const AdminViewSession = () => {
           <thead>
             <tr>
               <th>Date</th>
-              <th>Time (for all days)</th>
+              <th>Time</th>
               <th>Location</th>
               <th className="text-end">Actions</th>
             </tr>
           </thead>
           <tbody>
             {sessions.map((session) => (
-              <tr key={session.id}>
-                <td>{session.date}</td>
-                <td>{session.time}</td>
-                <td>{session.location}</td>
+              <tr key={session.SessionID}>
+                <td>{`${formatDate(session.StartDate)} - ${formatDate(session.EndDate)}`}</td>
+                <td>{session.Time}</td>
+                <td>{session.Location}</td>
                 <td className="text-end">
                   <Button
                     variant="link"
                     className="action-icon"
-                    onClick={() => handleEditClick(session.id)}
+                    onClick={() => handleEditClick(session.SessionID)}
                   >
                     <FaEdit />
                   </Button>
-                  <Button variant="link" className="action-icon">
+                  <Button
+                    variant="link"
+                    className="action-icon"
+                    onClick={() => handleDeleteClick(session.SessionID)}
+                  >
                     <FaTrash />
                   </Button>
                 </td>

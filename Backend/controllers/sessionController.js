@@ -42,7 +42,7 @@ const updateSession = async (req, res) => {
     console.error("Error updating Session:", error);
     res.status(500).json({ message: "Error updating Session" });
   }
-}
+};
 
 const deleteSession = async (req, res) => {
   const SessionID = req.params.id;
@@ -54,6 +54,29 @@ const deleteSession = async (req, res) => {
     console.error(error);
     res.status(403).send("Unable to delete session as it has payments for it");
   }
-}
+};
 
-module.exports = { getSessionsByProgramID, postSession, updateSession, deleteSession };
+const getSessionBySessionID = async (req, res) => {
+  const sessionID = req.params.sessionID;
+
+  try {
+    const session = await Session.getSessionBySessionID(sessionID);
+
+    if (!session) {
+      return res.status(404).json({ message: "Session not found" });
+    }
+
+    res.json(session);
+  } catch (error) {
+    console.error("Error fetching session:", error);
+    res.status(500).json({ message: "Error fetching session" });
+  }
+};
+
+module.exports = {
+  getSessionsByProgramID,
+  postSession,
+  updateSession,
+  deleteSession,
+  getSessionBySessionID,
+};
