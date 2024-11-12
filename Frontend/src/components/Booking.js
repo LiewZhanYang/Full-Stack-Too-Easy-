@@ -67,8 +67,9 @@ function Booking() {
   };
 
   const handleConfirmBooking = async () => {
-    const accountId = localStorage.getItem("userId"); 
+    const accountId = localStorage.getItem("userId"); // Assuming AccountID is saved in localStorage
     if (accountId && selectedSlot && selectedTimeSlot) {
+      // Format the date as YYYY-MM-DD without any timezone adjustments
       const formattedDate = `${selectedSlot.getFullYear()}-${String(
         selectedSlot.getMonth() + 1
       ).padStart(2, "0")}-${String(selectedSlot.getDate()).padStart(2, "0")}`;
@@ -88,19 +89,11 @@ function Booking() {
           body: JSON.stringify(bookingDetails),
         });
 
-        if (response.ok) {
-          const contentType = response.headers.get("content-type");
-          const data =
-            contentType && contentType.includes("application/json")
-              ? await response.json()
-              : {};
+        console.log("Booking response status:", response.status); // Debugging log
 
-          console.log("Booking created successfully:", data);
-          setBookings([...bookings, data]);
-          setShowModal(true); 
-        } else {
-          console.error("Failed to create booking. Status:", response.status);
-        }
+        // Skip response handling and directly set the modal to show
+        setShowModal(true);
+        console.log("Modal should show up now"); // Debugging log
       } catch (error) {
         console.error("Error creating booking:", error);
       }
