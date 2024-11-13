@@ -355,17 +355,41 @@ function Payment() {
               <span>Total Amount:</span>
               <span>${totalPrice.toFixed(2)}</span>
             </div>
+            <button onClick={() => setShowPaynow(true)} className="btn btn-outline-secondary w-100 mt-3">Show PayNow QR</button>
+            
           </div>
+          
         </div>
-
-        <button
-          onClick={() => setShowPaynow(true)}
-          className="btn btn-outline-secondary w-100 mt-3"
-        >
-          Show PayNow QR
-        </button>
       </div>
     </div>
+      {/* QR Code Modal */}  
+      {showPaynow && (  
+        <>  
+          <div className="modal-backdrop fade show" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}></div>  
+          <div className="modal fade show d-block" style={{ zIndex: 1056 }}>  
+            <div className="modal-dialog modal-dialog-centered" style={{ maxWidth: '400px' }}>  
+              <div className="modal-content">  
+                <div className="modal-body p-4">  
+                  <h5 className="text-center mb-3">Pay via PayNow</h5>  
+                  <p className="text-center small text-muted mb-4">  
+                    Please include the order ID in the payment reference or it may be rejected.  
+                  </p>  
+                  <div className="text-center mb-4">  
+                    <div className="mx-auto" style={{ width: '200px', height: '200px', border: '1px solid #dee2e6', borderRadius: '8px' }}>  
+                      <img src="/qrcode.png" alt="PayNow QR Code" style={{ width: '100%', height: '100%' }} />  
+                    </div>  
+                  </div>  
+                  <p className="text-center fw-bold">Total Amount: ${totalPrice.toFixed(2)}</p>  
+                  <button onClick={handleCloseModal} className="btn w-100 mt-3" style={{ backgroundColor: '#FFC107', color: '#000' }}>  
+                    Close Window  
+                  </button>  
+                </div>  
+              </div>  
+            </div>  
+          </div>  
+        </>  
+      )}  
+
 
     <div className="col-md-6">
       <div className="mb-4">
