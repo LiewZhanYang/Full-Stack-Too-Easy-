@@ -26,7 +26,7 @@ const Webinars = () => {
   }, []);
 
   const handleViewDetailsClick = (webinarId) => {
-    navigate(`/admin-view-webinar/${webinarId}`);
+    navigate(`/webinar-details/${webinarId}`);
   };
 
   return (

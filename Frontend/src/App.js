@@ -15,6 +15,7 @@ import Camps from "./components/Camps";
 import Labs from "./components/Labs";
 import Professionals from "./components/Professionals";
 import Webinars from "./components/Webinars";
+import WebinarDetails from "./components/WebinarDetails";
 import Coaching from "./components/PreCoaching.js";
 import Profile from "./components/Profile";
 import Payment from "./components/Payment";
@@ -87,6 +88,7 @@ function App() {
                   <Route path="/labs" element={<Labs />} />
                   <Route path="/professionals" element={<Professionals />} />
                   <Route path="/webinars" element={<Webinars />} />
+                  <Route path="/webinar-details/:id" element={<WebinarDetails />} />
                   <Route path="/coaching" element={<Coaching />} />
                   <Route path="/profile" element={<Profile />} />
                   <Route path="/booking" element={<Booking />} />
