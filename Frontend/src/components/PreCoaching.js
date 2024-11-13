@@ -12,8 +12,8 @@ function Precoaching() {
     navigate("/booking");
   };
 
-  const handleNavigateToCoaching = () => {
-    navigate("/coaching"); // Ensure this route corresponds to Coaching.js
+  const handleNavigateToCoaching = (bookingID) => {
+    navigate(`/coaching/${bookingID}`); // Navigates to coaching with bookingID
   };
 
   useEffect(() => {
@@ -111,7 +111,9 @@ function Precoaching() {
                 <button
                   className="btn btn-warning me-3 px-4 join-button"
                   style={{ fontWeight: 500 }}
-                  onClick={handleNavigateToCoaching} // Call the navigation function
+                  onClick={() =>
+                    handleNavigateToCoaching(bookingData.BookingID)
+                  } // Pass bookingID
                 >
                   Let's go!
                 </button>
