@@ -52,6 +52,17 @@ CREATE TABLE Program (
     FOREIGN KEY (TypeID) REFERENCES ProgramType(TypeID)
 );
 
+CREATE TABLE Webinar (
+	WebinarID INT PRIMARY KEY AUTO_INCREMENT,
+    WebinarName VARCHAR(50) NOT NULL,
+    WebinarDesc VARCHAR(100) NOT NULL,
+    Link VARCHAR(100) NOT NULL,
+    Date DATE NOT NULL,
+    StartTime TIME NOT NULL,
+    EndTime TIME NOT NULL, 
+    Speaker VARCHAR(50) NOT NULL
+);
+
 CREATE TABLE Session (
 	SessionID INT PRIMARY KEY AUTO_INCREMENT,
     StartDate DATE NOT NULL,
@@ -138,8 +149,7 @@ VALUES
 (1, 'Workshop'),
 (2, 'Camps'),
 (3, 'Labs'),
-(4, 'Professional'),
-(5, 'Webinar');
+(4, 'Professional');
 
 INSERT INTO Program (ProgramName, ProgramDesc, Cost, DiscountedCost, LunchProvided, Duration, ClassSize, TypeID)
 VALUES
@@ -147,9 +157,15 @@ VALUES
 ('Public Speaking Workshop - Intermediate', 'Improve your public speaking skills', 988, 889.2, TRUE, 8, 15, 1),
 ('Public Speaking Workshop - Advanced', 'Master the art of public speaking', 1388, 1249.2, TRUE, 8, 10, 1),
 ('PSLE Power Up Camp - PSLE Power Up', 'Comprehensive PSLE revision', 388, 349.2, FALSE, 2, 20, 2),
-('PSLE Power Up Camp - PSLE Chinese Oral Booster', 'Boost your Chinese oral skills', 488, 439.2, FALSE, 2, 15, 2),
-('How To Talk To Anyone', 'Learn to talk to anyone through this webinar', 0, 0, FALSE, 2, 100, 5),
-('The Art of Negotiation', 'Never settle for less, where you learn to negotiate when stakes are high', 0, 0, FALSE, 2, 100, 5);
+('PSLE Power Up Camp - PSLE Chinese Oral Booster', 'Boost your Chinese oral skills', 488, 439.2, FALSE, 2, 15, 2);
+
+INSERT INTO Webinar (WebinarName, WebinarDesc, Link, Date, StartTime, EndTime, Speaker)
+VALUES
+('Mastering Python', 'Learn the fundamentals of Python programming', 'https://www.python.org/about/gettingstarted/', '2024-11-13', '10:00:00', '12:00:00', 'Dr. Python'),
+('Data Science 101', 'Introduction to data science concepts and tools', 'https://www.datasciencecentral.com/', '2024-11-20', '13:30:00', '15:30:00', 'Prof. Data'),
+('Web Development Workshop', 'Build dynamic web applications with HTML, CSS, and JavaScript', 'https://www.w3schools.com/', '2024-11-27', '09:00:00', '11:00:00', 'Mr. Web'),
+('AI and Machine Learning', 'Explore the world of artificial intelligence and machine learning', 'https://www.machinelearningmastery.com/', '2024-12-04', '14:00:00', '16:00:00', 'Ms. AI'),
+('Cybersecurity Basics', 'Learn how to protect your digital assets', 'https://www.cybersecurityventures.com/', '2024-12-11', '11:00:00', '13:00:00', 'Captain Cyber');
 
 INSERT INTO Session (SessionID, StartDate, EndDate, Time, Location, Vacancy, ProgramID)
 VALUES
