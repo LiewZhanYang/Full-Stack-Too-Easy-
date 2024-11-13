@@ -1,21 +1,39 @@
 import React, { useState, useEffect } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
+import { useParams } from "react-router-dom";
 
 const Coaching = () => {
   const [roomUrl, setRoomUrl] = useState("");
+  const { bookingID } = useParams();
 
   useEffect(() => {
-    const fetchRoomUrl = () => {
-      const savedRoomUrl = localStorage.getItem("roomUrl");
-      if (savedRoomUrl) {
-        setRoomUrl(savedRoomUrl);
+    const fetchRoomUrl = async () => {
+      if (!bookingID) return;
+      try {
+        const response = await fetch(
+          `http://localhost:8000/booking/${bookingID}`
+        );
+
+        if (!response.ok) {
+          throw new Error(`Error fetching meeting URL: ${response.statusText}`);
+        }
+
+        const bookingData = await response.json();
+        console.log("Fetched booking data:", bookingData);
+
+        // Extract URL from the booking data array (assuming the first item is the relevant booking)
+        if (bookingData.length > 0 && bookingData[0].URL) {
+          setRoomUrl(bookingData[0].URL);
+        } else {
+          console.error("No URL found for this booking.");
+        }
+      } catch (error) {
+        console.error("Error fetching meeting URL:", error);
       }
     };
-    fetchRoomUrl();
 
-    const fetchInterval = setInterval(fetchRoomUrl, 15000);
-    return () => clearInterval(fetchInterval);
-  }, []);
+    fetchRoomUrl();
+  }, [bookingID]);
 
   return (
     <div className="container mt-1 precoaching-container p-4">

@@ -36,6 +36,7 @@ import AdminCoaching from "./components/AdminCoaching.js";
 import AdminCreateWebinar from "./components/AdminCreateWebinar.js";
 import AdminEditWebinar from "./components/AdminEditWebinar.js";
 import AdminViewWebinars from "./components/AdminViewWebinars.js";
+import AdminViewBooking from "./components/AdminViewBooking.js";
 import Chatbot from "./components/Chatbot.js";
 import AdminSideBar from "./components/AdminSidebar.js";
 import "./App.css";
@@ -99,11 +100,11 @@ function App() {
                   <Route path="/profile" element={<Profile />} />
                   <Route path="/booking" element={<Booking />} />
                   <Route path="/preCoaching" element={<PreCoaching />} />
-                  <Route path="/coaching" element={<Coaching />} />
+                  <Route path="/coaching/:bookingID" element={<Coaching />} />
                   <Route path="/chatbot" element={<Chatbot />} />
                   {/* Admin routes */}
                   <Route path="/adminhome" element={<AdminHome />} />
-                  <Route path="/admin-coaching" element={<AdminCoaching />} />
+                  <Route path="/admin-coaching/:bookingID" element={<AdminCoaching />} />
                   <Route
                     path="/admin-view-program"
                     element={<AdminViewProgram />}
@@ -151,6 +152,10 @@ function App() {
                   <Route
                     path="/admin-view-webinars"
                     element={<AdminViewWebinars />}
+                  />
+                  <Route
+                    path="/admin-view-booking"
+                    element={<AdminViewBooking />}
                   />
                   {/* Logout route redirects to login */}
                   <Route

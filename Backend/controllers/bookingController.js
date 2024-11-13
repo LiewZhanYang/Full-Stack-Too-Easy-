@@ -49,9 +49,28 @@ const deleteBookingByBookingID = async (req, res) => {
   }
 };
 
+const addMeetingUrl = async (req, res) => {
+  const id = parseInt(req.params.id);
+  const URL = req.body; 
+
+  try {
+    const result = await Booking.addMeetingUrl(id, URL);
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ message: "Booking not found" });
+    }
+    res.status(200).json({ message: "Meeting URL added successfully" });
+    console.log("Successfully added Meeting URL");
+  } catch (error) {
+    console.error("Error adding Meeting URL:", error);
+    res.status(500).json({ message: "Error adding Meeting URL" });
+  }
+};
+
+
 module.exports = {
   postBooking,
   getBookingByAccountID,
   deleteBookingByBookingID,
-  getAllBooking
+  getAllBooking,
+  addMeetingUrl
 };

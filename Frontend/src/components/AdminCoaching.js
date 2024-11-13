@@ -1,29 +1,47 @@
-// AdminCoaching.js
 import React, { useState, useEffect } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
+import { useParams } from "react-router-dom";
 
 const AdminCoaching = () => {
+  const { bookingID } = useParams();
   const [roomUrl, setRoomUrl] = useState("");
-
-  useEffect(() => {
-    localStorage.removeItem("roomUrl");
-  }, []);
 
   const createMeeting = async () => {
     try {
+      console.log("Creating Meeting...");
       const response = await fetch(
         "http://localhost:8000/meeting/create-meeting"
       );
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      const data = await response.json();
 
-      console.log("Meeting Data:", data);
+      if (!response.ok)
+        throw new Error(`HTTP error! status: ${response.status}`);
+
+      const data = await response.json();
+      console.log("Meeting URL created:", data.roomUrl);
+
       setRoomUrl(data.roomUrl);
-      localStorage.setItem("roomUrl", data.roomUrl);
+
+      // Update the booking with the new room URL
+      console.log(
+        `Updating Booking ID: ${bookingID} with URL: ${data.roomUrl}`
+      );
+      const updateResponse = await fetch(
+        `http://localhost:8000/booking/${bookingID}`,
+        {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ URL: data.roomUrl }),
+        }
+      );
+
+      if (updateResponse.ok) {
+        console.log("Successfully updated booking URL in database.");
+      } else {
+        const errorText = await updateResponse.text();
+        console.error("Failed to update booking URL in database:", errorText);
+      }
     } catch (error) {
-      console.error("Error starting meeting:", error);
+      console.error("Error starting meeting or updating URL:", error);
     }
   };
 
