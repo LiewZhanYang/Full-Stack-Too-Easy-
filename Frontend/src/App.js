@@ -33,6 +33,7 @@ import AdminEditProgram from "./components/AdminEditProgram.js";
 import AdminEditTiming from "./components/AdminEditTiming.js";
 import Chatbot from "./components/Chatbot.js";
 import AdminSideBar from './components/AdminSidebar.js';
+import Workshopvm from "./components/Workshopvm.js"
 import "./App.css";
 
 
@@ -92,6 +93,8 @@ function App() {
                   <Route path="/booking" element={<Booking />} />
                   <Route path="/preCoaching" element={<PreCoaching />} />
                   <Route path="/chatbot" element={<Chatbot />} />
+                  <Route path="/workshopvm" element={<Workshopvm/>} />
+
                   {/* Admin routes */}
                   <Route path="/adminhome" element={<AdminHome />} />
                   <Route
