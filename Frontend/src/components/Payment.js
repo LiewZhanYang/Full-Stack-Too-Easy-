@@ -69,22 +69,27 @@ function Payment() {
     fetchProgramName();  
   }, [programId]);  
 
-  useEffect(() => {  
-    const numChildren = childrenCount === '1 Child' ? 1 : 2;  
-    const pricePerChild = parseFloat(price?.replace('$', '') || 0);  
-    setTotalPrice(pricePerChild * numChildren);  
-  }, [childrenCount, price]);  
-
+  useEffect(() => {
+    const pricePerChild = parseFloat(price?.replace('$', '') || 0);
+    setTotalPrice(pricePerChild * selectedChildren.length);
+  }, [selectedChildren, price]);
+  
 
   const handleChildSelection = (childId) => {
-    setSelectedChildren((prevSelected) =>
-      prevSelected.includes(childId)
-        ? prevSelected.filter((id) => id !== childId)
-        : [...prevSelected, childId]
-    );
+    setSelectedChildren((prevSelected) => {
+      if (prevSelected.some((child) => child.ChildID === childId)) {
+        // Remove child if already selected
+        return prevSelected.filter((child) => child.ChildID !== childId);
+      }
+      if (prevSelected.length >= 2) {
+        alert('You can only select a maximum of 2 children.');
+        return prevSelected;
+      }
+      // Add new child with default lunch option
+      return [...prevSelected, { ChildID: childId, lunchOption: '' }];
+    });
   };
-
-
+  
   const handleLunchOptionChange = (childId, lunchOption) => {
     setSelectedChildren((prevSelected) =>
       prevSelected.map((child) =>
@@ -161,8 +166,13 @@ function Payment() {
         PaidBy: userId,
         ApprovedBy: null,
         Reason: null,
+        SelectedChildren: selectedChildren.map((child) => ({
+          ChildID: child.ChildID,
+          lunchOption: child.lunchOption || 'No lunch selected', // Include lunch option
+        })),
       };
-  
+      
+      
       console.log("Sending payment data:", paymentData);
   
       // Send the request
@@ -264,38 +274,40 @@ function Payment() {
 
           <h3 className="fs-5 mb-3">Select Children Attending</h3>
           <div className="mb-4">
-            {children.map((child) => (
-              <div key={child.ChildID} className="form-check mb-3">
-                <input
-                  type="checkbox"
-                  className="form-check-input"
-                  id={`child-${child.ChildID}`}
-                  checked={selectedChildren.some((c) => c.ChildID === child.ChildID)}
-                  onChange={() => handleChildSelection(child)}
-                />
-                <label className="form-check-label" htmlFor={`child-${child.ChildID}`}>
-                  {child.Name} ({child.DOB ? child.DOB.split('T')[0] : 'Date of Birth not provided'})
-                </label>
+          {children.map((child) => (
+          <div key={child.ChildID} className="form-check mb-3">
+            <input
+              type="checkbox"
+              className="form-check-input"
+              id={`child-${child.ChildID}`}
+              checked={selectedChildren.some((c) => c.ChildID === child.ChildID)}
+              onChange={() => handleChildSelection(child.ChildID)}
+              disabled={
+                !selectedChildren.some((c) => c.ChildID === child.ChildID) &&
+                selectedChildren.length >= 2
+              }
+            />
+            <label className="form-check-label" htmlFor={`child-${child.ChildID}`}>
+              {child.Name} ({child.DOB ? child.DOB.split('T')[0] : 'Date of Birth not provided'})
+            </label>
 
-                {selectedChildren.some((c) => c.ChildID === child.ChildID) && (
-                  <div className="mt-2">
-                    <label className="form-label">Lunch Option:</label>
-                    <select
-                      className="form-select"
-                      value={
-                        selectedChildren.find((c) => c.ChildID === child.ChildID)?.lunchOption || ''
-                      }
-                      onChange={(e) =>
-                        handleLunchOptionChange(child.ChildID, e.target.value)
-                      }
-                    >
-                      <option value="">Select lunch option</option>
-                      <option value="chicken">Chicken Rice</option>
-                      <option value="fish">Fish & Chips</option>
-                      <option value="veggie">Vegetarian</option>
-                    </select>
-                  </div>
-                )}
+            {selectedChildren.some((c) => c.ChildID === child.ChildID) && (
+              <div className="mt-2">
+                <label className="form-label">Lunch Option:</label>
+                <select
+                  className="form-select"
+                  value={
+                    selectedChildren.find((c) => c.ChildID === child.ChildID)?.lunchOption || ''
+                  }
+                  onChange={(e) => handleLunchOptionChange(child.ChildID, e.target.value)}
+                >
+                  <option value="">Select lunch option</option>
+                  <option value="chicken">Chicken Rice</option>
+                  <option value="fish">Fish & Chips</option>
+                  <option value="veggie">Vegetarian</option>
+                </select>
+              </div>
+            )}
               </div>
             ))}
           </div>
@@ -337,7 +349,7 @@ function Payment() {
 
         <div className="mb-3">
           <small className="text-muted">Programme</small>
-          <p className="mb-0">{programName} x {childrenCount === '1 Child' ? '1' : '2'}</p>
+          <p className="mb-0">{programName} x {selectedChildren.length}</p>
         </div>
 
         <div className="mb-3">
@@ -349,7 +361,7 @@ function Payment() {
             </div>
             <div className="d-flex justify-content-between mb-2">
               <span>Number of children:</span>
-              <span>{childrenCount === '1 Child' ? '1' : '2'}</span>
+              <span>{selectedChildren.length}</span> 
             </div>
             <div className="d-flex justify-content-between fw-bold pt-2 border-top">
               <span>Total Amount:</span>
