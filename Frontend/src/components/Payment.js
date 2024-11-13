@@ -25,8 +25,26 @@ function Payment() {
   const [isConfirmed, setIsConfirmed] = useState(false);  
   const [orderId, setOrderId] = useState(null);  
   const [activeTab, setActiveTab] = useState('Overview');  
+  const [isMemberActive, setIsMemberActive] = useState(false);
 
   useEffect(() => {  
+
+    const fetchMembershipStatus = async () => {
+      const userId = localStorage.getItem("userId");
+      if (!userId) return;
+
+      try {
+        const response = await axios.get(
+          `http://localhost:8000/customer/id/${userId}`
+        );
+        if (response.data && response.data.length > 0) {
+          setIsMemberActive(response.data[0].MemberStatus === 1);
+        }
+      } catch (error) {
+        console.error("Error fetching membership status:", error);
+      }
+    };
+
     const fetchSessions = async () => {  
       try {  
         const response = await axios.get(`http://localhost:8000/session/${programId}`);  
@@ -230,6 +248,9 @@ function Payment() {
   };
   
   
+  const discountedPrice = isMemberActive
+    ? `$${(parseFloat(price.replace("$", "")) * 0.9).toFixed(2)}`
+    : price;
 
   
 
@@ -379,12 +400,33 @@ function Payment() {
           <div className="p-3 bg-light rounded">
             <div className="d-flex justify-content-between mb-2">
               <span>Price per child:</span>
-              <span>{price}</span>
+              <span>
+                {isMemberActive && (
+                  <span
+                    style={{
+                      textDecoration: "line-through",
+                      color: "red",
+                      marginRight: "10px",
+                    }}
+                  >
+                    {price}
+                  </span>
+                )}
+                {isMemberActive
+                  ? `$${(parseFloat(price.replace("$", "")) * 0.9).toFixed(2)}`
+                  : price}
+              </span>
             </div>
             <div className="d-flex justify-content-between mb-2">
               <span>Number of children:</span>
               <span>{selectedChildren.length}</span> 
             </div>
+            {isMemberActive && (
+              <div className="d-flex justify-content-between mb-2">
+                <span>Membership Discount:</span>
+                <span>-10%</span>
+              </div>
+            )}
             <div className="d-flex justify-content-between fw-bold pt-2 border-top">
               <span>Total Amount:</span>
               <span>${totalPrice.toFixed(2)}</span>
