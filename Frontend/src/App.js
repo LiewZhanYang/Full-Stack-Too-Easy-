@@ -32,10 +32,10 @@ import AdminConfirmPayment from "./components/AdminConfirmPayment.js";
 import AdminCreateProgram from "./components/AdminCreateProgram.js";
 import AdminEditProgram from "./components/AdminEditProgram.js";
 import AdminEditTiming from "./components/AdminEditTiming.js";
+import AdminCreateWebinar from "./components/AdminCreateWebinar.js";
 import Chatbot from "./components/Chatbot.js";
-import AdminSideBar from './components/AdminSidebar.js';
+import AdminSideBar from "./components/AdminSidebar.js";
 import "./App.css";
-
 
 // Layout component to handle conditional rendering
 function Layout({ children }) {
@@ -88,7 +88,10 @@ function App() {
                   <Route path="/labs" element={<Labs />} />
                   <Route path="/professionals" element={<Professionals />} />
                   <Route path="/webinars" element={<Webinars />} />
-                  <Route path="/webinar-details/:id" element={<WebinarDetails />} />
+                  <Route
+                    path="/webinar-details/:id"
+                    element={<WebinarDetails />}
+                  />
                   <Route path="/coaching" element={<Coaching />} />
                   <Route path="/profile" element={<Profile />} />
                   <Route path="/booking" element={<Booking />} />
@@ -131,6 +134,10 @@ function App() {
                   <Route
                     path="/admin-edit-timing"
                     element={<AdminEditTiming />}
+                  />
+                  <Route
+                    path="/admin-create-webinar"
+                    element={<AdminCreateWebinar />}
                   />
                   {/* Logout route redirects to login */}
                   <Route
