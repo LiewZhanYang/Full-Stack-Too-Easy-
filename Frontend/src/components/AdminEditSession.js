@@ -64,7 +64,7 @@ const AdminEditSession = () => {
       }
 
       console.log("Session saved successfully");
-      navigate("/admin-programs");
+      navigate("/admin-view-program");
     } catch (error) {
       console.error("Error saving session:", error);
     }
