@@ -15,12 +15,13 @@ import Camps from "./components/Camps";
 import Labs from "./components/Labs";
 import Professionals from "./components/Professionals";
 import Webinars from "./components/Webinars";
-import Coaching from "./components/PreCoaching.js";
+import WebinarDetails from "./components/WebinarDetails";
 import Profile from "./components/Profile";
 import Payment from "./components/Payment";
 import Login from "./components/Login.js";
 import Booking from "./components/Booking.js";
 import PreCoaching from "./components/PreCoaching.js";
+import Coaching from "./components/Coaching.js";
 import AdminHome from "./components/AdminHome.js";
 import AdminViewProgram from "./components/AdminViewProgram.js";
 import AdminViewSession from "./components/AdminViewSession.js";
@@ -31,14 +32,20 @@ import AdminConfirmPayment from "./components/AdminConfirmPayment.js";
 import AdminCreateProgram from "./components/AdminCreateProgram.js";
 import AdminEditProgram from "./components/AdminEditProgram.js";
 import AdminEditTiming from "./components/AdminEditTiming.js";
+import AdminCoaching from "./components/AdminCoaching.js";
+import AdminCreateWebinar from "./components/AdminCreateWebinar.js";
+import AdminEditWebinar from "./components/AdminEditWebinar.js";
+import AdminViewWebinars from "./components/AdminViewWebinars.js";
+import AdminViewBooking from "./components/AdminViewBooking.js";
 import Chatbot from "./components/Chatbot.js";
+import AdminSideBar from "./components/AdminSidebar.js";
 import "./App.css";
-import axios from "axios";
 
 // Layout component to handle conditional rendering
 function Layout({ children }) {
   const location = useLocation();
   const isLoginPage = location.pathname.toLowerCase() === "/login";
+  const isAdminPage = location.pathname.toLowerCase().startsWith("/admin");
 
   if (isLoginPage) {
     return (
@@ -51,7 +58,7 @@ function Layout({ children }) {
 
   return (
     <div className="d-flex min-vh-100">
-      <Sidebar />
+      {isAdminPage ? <AdminSideBar /> : <Sidebar />}
       <main className="main-content">
         <div className="container-fluid p-4">{children}</div>
       </main>
@@ -72,13 +79,11 @@ function App() {
                 <Routes>
                   {/* Login route */}
                   <Route path="/login" element={<Login />} />
-
                   {/* Redirect root to dashboard */}
                   <Route
                     path="/"
                     element={<Navigate to="/dashboard" replace />}
                   />
-
                   {/* Main routes */}
                   <Route path="/dashboard" element={<Dashboard />} />
                   <Route path="/workshopPrice" element={<WorkshopPrice />} />
@@ -87,14 +92,22 @@ function App() {
                   <Route path="/labs" element={<Labs />} />
                   <Route path="/professionals" element={<Professionals />} />
                   <Route path="/webinars" element={<Webinars />} />
+                  <Route
+                    path="/webinar-details/:id"
+                    element={<WebinarDetails />}
+                  />
                   <Route path="/coaching" element={<Coaching />} />
                   <Route path="/profile" element={<Profile />} />
                   <Route path="/booking" element={<Booking />} />
                   <Route path="/preCoaching" element={<PreCoaching />} />
+                  <Route path="/coaching/:id" element={<Coaching />} />
                   <Route path="/chatbot" element={<Chatbot />} />
-
                   {/* Admin routes */}
                   <Route path="/adminhome" element={<AdminHome />} />
+                  <Route
+                    path="/admin-coaching/:bookingID"
+                    element={<AdminCoaching />}
+                  />
                   <Route
                     path="/admin-view-program"
                     element={<AdminViewProgram />}
@@ -108,7 +121,7 @@ function App() {
                     element={<AdminEditSession />}
                   />
                   <Route
-                    path="/admin-create-session"
+                    path="/admin-create-session/:id"
                     element={<AdminCreateSession />}
                   />
                   <Route
@@ -116,7 +129,7 @@ function App() {
                     element={<AdminViewPayment />}
                   />
                   <Route
-                    path="/admin-confirm-payment"
+                    path="/admin-confirm-payment/:id"
                     element={<AdminConfirmPayment />}
                   />
                   <Route
@@ -131,13 +144,27 @@ function App() {
                     path="/admin-edit-timing"
                     element={<AdminEditTiming />}
                   />
-
+                  <Route
+                    path="/admin-create-webinar"
+                    element={<AdminCreateWebinar />}
+                  />
+                  <Route
+                    path="/admin-edit-webinar/:id"
+                    element={<AdminEditWebinar />}
+                  />
+                  <Route
+                    path="/admin-view-webinars"
+                    element={<AdminViewWebinars />}
+                  />
+                  <Route
+                    path="/admin-view-booking"
+                    element={<AdminViewBooking />}
+                  />
                   {/* Logout route redirects to login */}
                   <Route
                     path="/logout"
                     element={<Navigate to="/login" replace />}
                   />
-
                   {/* Fallback route for unmatched paths */}
                   <Route
                     path="*"

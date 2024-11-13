@@ -1,22 +1,74 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { Button } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 
 function Precoaching() {
   const [hasBooking, setHasBooking] = useState(false);
+  const [bookingData, setBookingData] = useState(null);
   const navigate = useNavigate();
 
   const handleNavigateToBooking = () => {
     navigate("/booking");
   };
 
+  const handleNavigateToCoaching = (id) => {
+    navigate(`/coaching/${id}`);
+  };
+
+  useEffect(() => {
+    const fetchBookingByAccountID = async () => {
+      const id = localStorage.getItem("userId"); // Retrieve AccountID from localStorage
+      console.log("Account ID:", id); // Log Account ID for debugging
+      if (id) {
+        try {
+          const response = await fetch(`http://localhost:8000/booking/${id}`);
+          const data = await response.json();
+          console.log("User Booking Data:", data); // Log booking data for debugging
+          if (data && data.length > 0) {
+            setBookingData(data[0]); // Assuming only one booking is allowed at a time
+            setHasBooking(true);
+          } else {
+            setHasBooking(false);
+          }
+        } catch (error) {
+          console.error("Error fetching booking:", error);
+        }
+      }
+    };
+
+    fetchBookingByAccountID();
+  }, []);
+
+  const formatTime = (time) => {
+    const [hours, minutes, seconds] = time.split(":").map(Number);
+    const date = new Date();
+    date.setHours(hours, minutes, seconds || 0);
+    return date.toLocaleTimeString([], {
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: true,
+    });
+  };
+
+  const getEndTime = (startTime) => {
+    const [hours, minutes, seconds] = startTime.split(":").map(Number);
+    const startDate = new Date();
+    startDate.setHours(hours, minutes, seconds || 0);
+    startDate.setHours(startDate.getHours() + 1); // Add one hour to start time
+    return startDate.toLocaleTimeString([], {
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: true,
+    });
+  };
+
   return (
-    <div className="container mt-5 precoaching-container p-4">
+    <div className="container mt-1 precoaching-container p-4">
       <h2 className="precoaching-title">1 to 1 Virtual Coaching Session</h2>
       <hr style={{ borderTop: "1px solid #ccc", marginBottom: "1rem" }} />
 
-      {hasBooking ? (
+      {hasBooking && bookingData ? (
         <>
           <p
             className="text-muted"
@@ -25,26 +77,28 @@ function Precoaching() {
             You have 1 upcoming session
           </p>
           <div className="mt-4">
-            <h6 style={{ fontWeight: 500, color: "#333" }}>1 April 2025</h6>
+            <h6 style={{ fontWeight: 500, color: "#333" }}>
+              {new Date(bookingData.Date).toLocaleDateString()}
+            </h6>
             <div className="card shadow-sm p-3 mb-3 bg-light rounded border-0 session-details-card">
               <div className="row g-2 mb-3">
                 <div className="col-4 text-start">
                   <p className="mb-1" style={{ fontWeight: 500 }}>
                     Starts
                   </p>
-                  <p>13:00</p>
+                  <p>{formatTime(bookingData.Time)}</p>
                 </div>
                 <div className="col-4 text-start">
                   <p className="mb-1" style={{ fontWeight: 500 }}>
                     End
                   </p>
-                  <p>14:00</p>
+                  <p>{getEndTime(bookingData.Time)}</p>
                 </div>
                 <div className="col-4 text-start">
                   <p className="mb-1" style={{ fontWeight: 500 }}>
                     Coach
                   </p>
-                  <p>aaaaaaa</p>
+                  <p>Josh Tan</p>
                 </div>
               </div>
               <p className="text-start" style={{ color: "#555" }}>
@@ -55,8 +109,11 @@ function Precoaching() {
                 <button
                   className="btn btn-warning me-3 px-4 join-button"
                   style={{ fontWeight: 500 }}
+                  onClick={() =>
+                    handleNavigateToCoaching(bookingData.AccountID)
+                  } 
                 >
-                  Join
+                  Let's go!
                 </button>
                 <button
                   className="btn btn-outline-secondary px-4 cancel-button"

@@ -45,7 +45,7 @@ function Sidebar() {
         <div className="offcanvas-body d-flex flex-column h-100 bg-white border-end">
           {/* Logo Section */}
           <div className="flex-shrink-0 text-center p-3 border-bottom">
-            <Link to="/dashboard">
+            <Link to="/AdminHome">
               <img
                 src="/mindsphere.png"
                 alt="mindsphere"
@@ -59,11 +59,11 @@ function Sidebar() {
           <div className="flex-grow-1 overflow-auto">
             <nav className="mt-3">
               <Link
-                to="/dashboard"
+                to="/AdminHome"
                 className="d-flex align-items-center px-3 py-2 text-dark fw-bold text-decoration-none"
               >
                 <i className="bi bi-columns-gap me-2"></i>
-                Dashboard
+                Home
               </Link>
 
               {/* Programmes Dropdown */}
@@ -85,78 +85,113 @@ function Sidebar() {
                 {expandedMenu === "programmes" && (
                   <div className="ps-4">
                     <Link
-                      to="/workshopPrice"
+                      to="/admin-view-program"
                       className="d-block py-1 text-dark text-decoration-none"
                     >
-                      Workshops
+                      View All
                     </Link>
                     <Link
-                      to="/camps"
+                      to="/admin-create-program"
                       className="d-block py-1 text-dark text-decoration-none"
                     >
-                      Camps
-                    </Link>
-                    <Link
-                      to="/labs"
-                      className="d-block py-1 text-dark text-decoration-none"
-                    >
-                      Labs
-                    </Link>
-                    <Link
-                      to="/professionals"
-                      className="d-block py-1 text-dark text-decoration-none"
-                    >
-                      Professionals
+                      Create
                     </Link>
                   </div>
                 )}
               </div>
 
-              {/* Events Dropdown */}
+              {/* Webinars Dropdown */}
               <div className="mt-3">
                 <button
-                  onClick={() => toggleMenu("events")}
+                  onClick={() => toggleMenu("webinars")}
                   className="btn d-flex align-items-center w-100 text-dark fw-bold px-3 py-2 border-0 bg-transparent"
                 >
-                  <i className="bi bi-calendar-event me-2"></i>
-                  Events
+                  <i className="bi bi-camera-video me-2"></i>
+                  Webinars
                   <i
                     className={`bi ${
-                      expandedMenu === "events"
+                      expandedMenu === "webinars"
                         ? "bi-chevron-up"
                         : "bi-chevron-down"
                     } ms-auto`}
                   ></i>
                 </button>
-                {expandedMenu === "events" && (
+                {expandedMenu === "webinars" && (
                   <div className="ps-4">
                     <Link
-                      to="/webinars"
+                      to="/admin-view-webinars"
                       className="d-block py-1 text-dark text-decoration-none"
                     >
-                      Webinars
+                      View All
                     </Link>
                     <Link
-                      to="/precoaching"
+                      to="/admin-create-webinar"
                       className="d-block py-1 text-dark text-decoration-none"
                     >
-                      1 to 1 Coaching
+                      Create
                     </Link>
                   </div>
                 )}
+              </div>
+              {/* Coaching Dropdown */}
+              <div className="mt-3">
+                <button
+                  onClick={() => toggleMenu("coaching")}
+                  className="btn d-flex align-items-center w-100 text-dark fw-bold px-3 py-2 border-0 bg-transparent"
+                >
+                  <i className="bi bi-people me-2"></i>
+                  Coaching
+                  <i
+                    className={`bi ${
+                      expandedMenu === "coaching"
+                        ? "bi-chevron-up"
+                        : "bi-chevron-down"
+                    } ms-auto`}
+                  ></i>
+                </button>
+                {expandedMenu === "coaching" && (
+                  <div className="ps-4">
+                    <Link
+                      to="/admin-view-booking"
+                      className="d-block py-1 text-dark text-decoration-none"
+                    >
+                      View All Bookings
+                    </Link>
+                  </div>
+                )}
+                {/* Registration Dropdown */}
+                <div className="mt-3">
+                  <button
+                    onClick={() => toggleMenu("events")}
+                    className="btn d-flex align-items-center w-100 text-dark fw-bold px-3 py-2 border-0 bg-transparent"
+                  >
+                    <i className="bi bi-calendar-event me-2"></i>
+                    Registration
+                    <i
+                      className={`bi ${
+                        expandedMenu === "events"
+                          ? "bi-chevron-up"
+                          : "bi-chevron-down"
+                      } ms-auto`}
+                    ></i>
+                  </button>
+                  {expandedMenu === "events" && (
+                    <div className="ps-4">
+                      <Link
+                        to="/admin-view-payment"
+                        className="d-block py-1 text-dark text-decoration-none"
+                      >
+                        Incoming Payments
+                      </Link>
+                    </div>
+                  )}
+                </div>
               </div>
             </nav>
           </div>
 
           {/* Bottom Profile and Logout Section */}
           <div className="flex-shrink-0 border-top mt-auto">
-            <Link
-              to="/profile"
-              className="d-flex align-items-center px-3 py-2 text-dark text-decoration-none"
-            >
-              <i className="bi bi-person me-2"></i>
-              Profile
-            </Link>
             <div
               onClick={handleLogout}
               className="d-flex align-items-center px-3 py-2 text-dark text-decoration-none"

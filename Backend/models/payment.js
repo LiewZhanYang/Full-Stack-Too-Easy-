@@ -1,6 +1,5 @@
 const dbConfig = require("../dbConfig");
 const mysql = require("mysql2/promise");
-const Admin = require("./admin");
 
 class Payment {
   constructor(
@@ -8,23 +7,28 @@ class Payment {
     InvoiceID,
     Amount,
     CreatedAt,
-    ApprovedStatus,
+    Status,
     InvoicePath,
     SessionID,
     PaidBy,
     Reason,
-    ApprovedBy
+    ApprovedBy,
+    Name,
+    ContactNo,
+    ProgramID
   ) {
     this.OrderID = OrderID;
     this.InvoiceID = InvoiceID;
     this.Amount = Amount;
     this.CreatedAt = CreatedAt;
-    this.ApprovedStatus = ApprovedStatus;
+    this.Status = Status;
     this.InvoicePath = InvoicePath;
     this.SessionID = SessionID;
     this.PaidBy = PaidBy;
     this.Reason = Reason;
     this.ApprovedBy = ApprovedBy;
+    this.Name = Name;
+    this.ContactNo = ContactNo;
   }
 
   static async getAllPayment() {
@@ -42,38 +46,62 @@ class Payment {
         row.InvoiceID,
         row.Amount,
         row.CreatedAt,
-        row.ApprovedStatus,
+        row.Status,
         row.InvoicePath,
         row.SessionID,
         row.PaidBy,
         row.Reason,
-        row.ApprovedBy
+        row.ApprovedBy,
+        null,
+        null
       );
     });
   }
 
-  static async postPayment(id, paymentDetails) {
-    const connection = await mysql.createConnection(dbConfig);
-    const sqlQuery = `
-            INSERT INTO Payment (InvoiceID, Amount, CreatedAt, ApprovedStatus, InvoicePath, SessionID, PaidBy, ApprovedBy, Reason)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);`;
+  static async postPayment(paymentDetails) {
+    let connection;
+    try {
+      connection = await mysql.createConnection(dbConfig);
 
-    const values = [
-      paymentDetails.InvoiceID,
-      paymentDetails.Amount,
-      paymentDetails.CreatedAt,
-      // filename: /orderID/(original.name)
-      paymentDetails.ApprovedStatus,
-      paymentDetails.InvoicePath,
-      paymentDetails.SessionID,
-      id,
-      paymentDetails.ApprovedBy,
-      paymentDetails.Reason,
-    ];
+      const sqlQuery = `
+        INSERT INTO Payment (InvoiceID, Amount, CreatedAt, Status, InvoicePath, SessionID, PaidBy, ApprovedBy, Reason)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);
+      `;
+      const values = [
+        paymentDetails.InvoiceID,
+        paymentDetails.Amount,
+        paymentDetails.CreatedAt,
+        paymentDetails.Status,
+        paymentDetails.InvoicePath,
+        paymentDetails.SessionID,
+        paymentDetails.PaidBy,
+        paymentDetails.ApprovedBy,
+        paymentDetails.Reason,
+      ];
 
-    const [result] = await connection.execute(sqlQuery, values);
-    const OrdID = result.insertId;
-    connection.end();
+      // For Darling Leong Kai Jie
+      const file = paymentDetails.File;
+      console.log(file);
+
+      // Execute the query and log the result
+      const [result] = await connection.execute(sqlQuery, values);
+      console.log("Insert result:", result);
+
+      // Check if insertId is available
+      if (!result.insertId) {
+        throw new Error("No order ID generated");
+      }
+
+      return { OrderID: result.insertId };
+    } catch (error) {
+      console.error(
+        "Error posting payment to the database:",
+        error.sqlMessage || error.message
+      );
+      throw error;
+    } finally {
+      if (connection) connection.end();
+    }
   }
 
   static async approvePayment(OrderID, ApproveDetails) {
@@ -103,7 +131,9 @@ class Payment {
   static async getPaymentById(orderID) {
     const connection = await mysql.createConnection(dbConfig);
     const sqlQuery = `
-            SELECT * FROM Payment WHERE OrderID = ?
+            SELECT p.*, c.Name, c.ContactNo FROM Payment p 
+            INNER JOIN Customer c ON p.PaidBy = c.AccountID
+            WHERE p.OrderID = ?
         `;
     const [result] = await connection.execute(sqlQuery, [orderID]);
     connection.end();
@@ -115,12 +145,14 @@ class Payment {
         row.InvoiceID,
         row.Amount,
         row.CreatedAt,
-        row.ApprovedStatus,
+        row.Status,
         row.InvoicePath,
         row.SessionID,
         row.PaidBy,
         row.Reason,
-        row.ApprovedBy
+        row.ApprovedBy,
+        row.Name,
+        row.ContactNo
       );
     } else {
       return null; // Return null if no payment is found with the given ID

@@ -3,73 +3,134 @@ import axios from 'axios';
 
 function Profile() {
   const [customerData, setCustomerData] = useState(null);
-  const [children, setChildren] = useState([
-    {
-      id: 1,
-      fullName: '',
-      dateOfBirth: '',
-      strengths: ''
-    }
-  ]);
-
+  const [children, setChildren] = useState([]);
+  const [isEditing, setIsEditing] = useState(false); // State for edit mode
   const userId = localStorage.getItem('userId');
 
+  const toggleEditMode = () => {
+    if (isEditing) {
+      handleSaveDetails(); // Save details when exiting edit mode
+    }
+    setIsEditing(!isEditing);
+  };
+
+  const handleSaveDetails = async () => {
+    try {
+      await axios.put(`http://localhost:8000/customer/id/${userId}`, {
+        Name: customerData.Name,
+        ContactNo: customerData.ContactNo,
+        EmailAddr: customerData.EmailAddr,
+        MembershipExpiry: customerData.MembershipExpiry,
+        MemberStatus: customerData.MemberStatus,
+      });
+      alert('Profile updated successfully!');
+    } catch (error) {
+      console.error('Error updating profile:', error);
+      alert('Failed to update profile.');
+    }
+  };
+
   useEffect(() => {
-    const fetchCustomerData = async () => {
+    const fetchCustomerData = async () => { //
       try {
         const response = await axios.get(`http://localhost:8000/customer/id/${userId}`);
         if (response.data && response.data.length > 0) {
-          setCustomerData(response.data[0]); // Set to the first item in the array
+          setCustomerData(response.data[0]);
         }
       } catch (error) {
         console.error('Error fetching customer data:', error);
       }
     };
 
+    const fetchChildrenData = async () => {
+      try {
+        const response = await axios.get(`http://localhost:8000/children/${userId}`);
+        if (response.data) {
+          setChildren(
+            response.data.map((child) => ({
+              id: child.ChildID,
+              fullName: child.Name,
+              dateOfBirth: child.DOB.split('T')[0],
+              strengths: child.Strength,
+            }))
+          );
+        }
+      } catch (error) {
+        console.error('Error fetching children data:', error);
+      }
+    };
+
     fetchCustomerData();
+    fetchChildrenData();
   }, [userId]);
 
   const handleInputChange = (field, value) => {
     setCustomerData((prevData) => ({
       ...prevData,
-      [field]: value
+      [field]: value,
     }));
   };
 
   const handleAddChild = () => {
-    if (children.length >= 2) {
-      alert("You can only add up to 2 children.");
-      return;
-    }
-    setChildren([...children, {
-      id: children.length + 1,
-      fullName: '',
-      dateOfBirth: '',
-      strengths: ''
-    }]);
+    setChildren([
+      ...children,
+      { id: null, fullName: '', dateOfBirth: '', strengths: '' },
+    ]);
   };
 
-  const handleRemoveChild = (id) => {
-    setChildren(children.filter(child => child.id !== id));
+  const handleChildInputChange = (index, field, value) => {
+    setChildren((prevChildren) =>
+      prevChildren.map((child, idx) =>
+        idx === index ? { ...child, [field]: value } : child
+      )
+    );
   };
 
-  const handleChildInputChange = (id, field, value) => {
-    setChildren(children.map(child =>
-      child.id === id ? { ...child, [field]: value } : child
-    ));
+  const calculateAge = (dateOfBirth) => {
+    const dob = new Date(dateOfBirth);
+    const ageDiff = Date.now() - dob.getTime();
+    const ageDate = new Date(ageDiff);
+    return Math.abs(ageDate.getUTCFullYear() - 1970);
   };
 
-  const handleConfirm = async () => {
+  const handleSaveChild = async (child, index) => {
+    const childData = {
+      Name: child.fullName,
+      Strength: child.strengths,
+      DOB: child.dateOfBirth,
+      Age: calculateAge(child.dateOfBirth),
+      AccountID: userId,
+    };
+
     try {
-      await axios.put(`http://localhost:8000/customer/id/${userId}`, {
-        Name: customerData.Name,
-        ContactNo: customerData.ContactNo,
-        EmailAddr: customerData.EmailAddr
-      });
-      alert("Profile updated successfully!");
+      if (child.id) {
+        await axios.put(`http://localhost:8000/children/${child.id}`, childData);
+        alert('Child updated successfully!');
+      } else {
+        const response = await axios.post(`http://localhost:8000/children`, childData);
+        if (response.data.child?.id) {
+          setChildren((prevChildren) => {
+            const newChildren = [...prevChildren];
+            newChildren[index] = { ...newChildren[index], id: response.data.child.id };
+            return newChildren;
+          });
+          alert('Child added successfully!');
+        }
+      }
     } catch (error) {
-      console.error("Error updating profile:", error);
-      alert("Failed to update profile.");
+      console.error('Error saving child information:', error);
+      alert('Failed to save child information.');
+    }
+  };
+
+  const handleDeleteChild = async (childId) => {
+    try {
+      await axios.delete(`http://localhost:8000/children/${childId}`);
+      setChildren((prevChildren) => prevChildren.filter((child) => child.id !== childId));
+      alert('Child deleted successfully!');
+    } catch (error) {
+      console.error('Error deleting child:', error);
+      alert('Failed to delete child.');
     }
   };
 
@@ -77,18 +138,26 @@ function Profile() {
     <div className="flex-1 p-8 -ml-30">
       <h1 className="text-2xl font-semibold mb-8">My Profile</h1>
 
-      {/* Profile Information */}
+      {/* Profile Info */}
       <div className="bg-white rounded-lg p-6 shadow-sm mb-8">
-        {/* Profile Avatar */}
         <div className="flex items-center mb-8">
           <div className="w-24 h-24 bg-gray-200 rounded-full flex items-center justify-center">
-            <svg className="w-10 h-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+            <svg
+              className="w-10 h-10 text-gray-400"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+              />
             </svg>
           </div>
         </div>
 
-        {/* Personal Information Form */}
         <div className="space-y-6">
           <div className="grid grid-cols-2 gap-6">
             <div>
@@ -99,7 +168,10 @@ function Profile() {
                 type="text"
                 value={customerData?.Name || ''}
                 onChange={(e) => handleInputChange('Name', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                disabled={!isEditing}
+                className={`w-full px-3 py-2 border ${
+                  isEditing ? 'border-gray-300' : 'border-transparent bg-gray-100'
+                } rounded-md`}
               />
             </div>
 
@@ -111,7 +183,10 @@ function Profile() {
                 type="tel"
                 value={customerData?.ContactNo || ''}
                 onChange={(e) => handleInputChange('ContactNo', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                disabled={!isEditing}
+                className={`w-full px-3 py-2 border ${
+                  isEditing ? 'border-gray-300' : 'border-transparent bg-gray-100'
+                } rounded-md`}
               />
             </div>
           </div>
@@ -124,16 +199,57 @@ function Profile() {
               type="email"
               value={customerData?.EmailAddr || ''}
               onChange={(e) => handleInputChange('EmailAddr', e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md"
+              disabled={!isEditing}
+              className={`w-full px-3 py-2 border ${
+                isEditing ? 'border-gray-300' : 'border-transparent bg-gray-100'
+              } rounded-md`}
             />
+          </div>
+
+          <div className="grid grid-cols-2 gap-6">
+          <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1"> 
+            Membership Expiry:
+          </label>
+          <input
+            type="date"
+            value={customerData?.MembershipExpiry
+              ? new Date(customerData.MembershipExpiry).toISOString().split('T')[0]
+              : ''}
+            onChange={(e) => handleInputChange('MembershipExpiry', e.target.value)}
+            disabled={!isEditing || customerData?.MemberStatus === 0}
+            className={`w-full px-3 py-2 border ${
+              isEditing ? 'border-gray-300' : 'border-transparent bg-gray-100'
+            } rounded-md`}
+          />
+        </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Member Status:
+              </label>
+              <select
+                 value={customerData?.MemberStatus !== undefined ? customerData.MemberStatus : 0}
+                onChange={(e) =>
+                  handleInputChange('MemberStatus', parseInt(e.target.value, 10))
+                }
+                disabled={!isEditing}
+                className={`w-full px-3 py-2 border ${
+                  isEditing ? 'border-gray-300' : 'border-transparent bg-gray-100'
+                } rounded-md`}
+              >
+                <option value="1">Active</option>
+                <option value="0">Inactive</option>
+              </select>
+            </div>
           </div>
 
           <div>
             <button
-              onClick={handleConfirm}
+              onClick={toggleEditMode}
               className="bg-yellow-500 text-white px-6 py-2 rounded-md hover:bg-yellow-600 transition-colors"
             >
-              Confirm
+              {isEditing ? 'Save' : 'Edit'}
             </button>
           </div>
         </div>
@@ -142,39 +258,24 @@ function Profile() {
       {/* Child Information Section */}
       <div className="bg-white rounded-lg p-6 shadow-sm">
         <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center gap-2">
-            <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
-            </svg>
-            <span className="font-medium">Add Child Details</span>
-          </div>
-          {children.length < 2 && (
-            <button
-              onClick={handleAddChild}
-              className="text-blue-600 text-sm hover:text-blue-700"
-            >
-              + Add Another Child
-            </button>
-          )}
+          <span className="font-medium">Add Child Details</span>
+          <button onClick={handleAddChild} className="text-blue-600 text-sm hover:text-blue-700">
+            + Add Another Child
+          </button>
         </div>
 
         <div className="space-y-8">
-          {children.map((child) => (
-            <div key={child.id} className="space-y-6">
-              {child.id > 1 && (
-                <div className="border-t pt-6"></div>
-              )}
+          {children.map((child, index) => (
+            <div key={index} className="space-y-6">
+              {index > 0 && <div className="border-t pt-6"></div>}
               <div className="flex justify-between items-center">
-                <h3 className="font-medium">Child {child.id}</h3>
-                {child.id !== 1 && (
+                <h3 className="font-medium">Child {index + 1}</h3>
+                {child.id && (
                   <button
-                    onClick={() => handleRemoveChild(child.id)}
-                    className="text-red-600 text-sm hover:text-red-700 flex items-center gap-1"
+                    onClick={() => handleDeleteChild(child.id)}
+                    className="text-red-600 text-sm hover:text-red-700"
                   >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                    </svg>
-                    Remove Child
+                    Delete Child
                   </button>
                 )}
               </div>
@@ -185,8 +286,8 @@ function Profile() {
                   </label>
                   <input
                     type="text"
-                    value={child.fullName}
-                    onChange={(e) => handleChildInputChange(child.id, 'fullName', e.target.value)}
+                    value={child.fullName || ''}
+                    onChange={(e) => handleChildInputChange(index, 'fullName', e.target.value)}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md"
                   />
                 </div>
@@ -197,8 +298,8 @@ function Profile() {
                   </label>
                   <input
                     type="date"
-                    value={child.dateOfBirth}
-                    onChange={(e) => handleChildInputChange(child.id, 'dateOfBirth', e.target.value)}
+                    value={child.dateOfBirth || ''}
+                    onChange={(e) => handleChildInputChange(index, 'dateOfBirth', e.target.value)}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md"
                   />
                 </div>
@@ -210,12 +311,19 @@ function Profile() {
                 </label>
                 <textarea
                   placeholder="Tell us more about your child"
-                  value={child.strengths}
-                  onChange={(e) => handleChildInputChange(child.id, 'strengths', e.target.value)}
+                  value={child.strengths || ''}
+                  onChange={(e) => handleChildInputChange(index, 'strengths', e.target.value)}
                   rows={4}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md"
                 />
               </div>
+
+              <button
+                onClick={() => handleSaveChild(child, index)}
+                className="bg-yellow-500 text-white px-6 py-2 rounded-md hover:bg-yellow-600 transition-colors"
+              >
+                {child.id ? 'Update Child' : 'Add Child'}
+              </button>
             </div>
           ))}
         </div>

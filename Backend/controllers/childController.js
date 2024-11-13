@@ -17,14 +17,21 @@ const getChildByAccountID = async (req, res) => {
 const postChild = async (req, res) => {
   const childDetails = req.body;
   try {
+    // The database will auto-generate the id, so we don’t need to include it here.
     const newChild = await Child.postChild(childDetails);
-    res.status(201).json(newChild);
+
+    // Assuming `postChild` in your model returns the full record, including the new id.
+    res.status(201).json({
+      message: "Child created successfully",
+      child: newChild, // This should include the auto-generated `id`.
+    });
     console.log("Successfully posted Child");
   } catch (error) {
-    console.error(error);
-    res.status(500).send("Error posting Child");
+    console.error("Error posting Child:", error);
+    res.status(500).json({ error: "Error posting Child" });
   }
 };
+
 
 const deleteChild = async (req, res) => {
   const childID = req.params.id;

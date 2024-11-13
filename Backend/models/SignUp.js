@@ -57,7 +57,7 @@ class Signup {
     const connection = await mysql.createConnection(dbConfig);
 
     const sqlQuery = `
-      SELECT * FROM signup WHERE SignUpID = ?
+      SELECT * FROM SignUp WHERE AccountID = ?
     `;
 
     const [result] = await connection.execute(sqlQuery, [signUpID]);
@@ -66,9 +66,8 @@ class Signup {
     if (result.length > 0) {
       const row = result[0];
       return new Signup(
-        row.SignUpID,
-        row.AccountID,
-        row.SessionID,
+        row.AccountID, 
+        row.SessionID, 
         row.LunchOptionID,
         row.ChildID
       );

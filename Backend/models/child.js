@@ -2,11 +2,12 @@ const dbConfig = require('../dbConfig');
 const mysql = require('mysql2/promise');
 
 class Child {
-    constructor(ChildID, Name, Strength, DOB, AccountID){
+    constructor(ChildID, Name, Strength, DOB, Age, AccountID){
         this.ChildID = ChildID;
         this.Name = Name;
         this.Strength = Strength;
         this.DOB = DOB;
+        this.Age = Age;
         this.AccountID = AccountID;
     }
 
@@ -14,7 +15,7 @@ class Child {
         const connection = await mysql.createConnection(dbConfig);
 
         const sqlQuery = `
-        SELECT * FROM Child WHERE AccountID = ?
+        SELECT * FROM child WHERE AccountID = ?
         `;
         const [result] = await connection.execute(sqlQuery, [AccountID]);
 
@@ -31,27 +32,54 @@ class Child {
 
     static async postChild(childDetails) {
         const connection = await mysql.createConnection(dbConfig);
+    
+        // Format the DOB to remove time and timezone
+        const formattedDOB = new Date(childDetails.DOB).toISOString().slice(0, 10); // Extracts YYYY-MM-DD
+    
         const sqlQuery = `
-            INSERT INTO Child (Name, Strength, DOB, AccountID)
-            VALUES (?, ?, ?, ?)`;
-
+            INSERT INTO child (Name, Strength, DOB, Age, AccountID)
+            VALUES (?, ?, ?, ?, ?)`;
+    
         const values = [
-            childDetails.Name, 
+            childDetails.Name,
             childDetails.Strength,
-            childDetails.DOB,
+            formattedDOB,  // Use the formatted date
+            childDetails.Age,
             childDetails.AccountID
         ];
-
-        const [result] = await connection.execute(sqlQuery, values);
-        connection.end();
+    
+        try {
+            console.log("Attempting to insert child with details:", values);  // Log the values being inserted
+            const [result] = await connection.execute(sqlQuery, values);
+            console.log("Child inserted successfully with ID:", result.insertId);  // Log success message
+    
+            connection.end();
+            return { id: result.insertId };  // Return inserted ID for confirmation
+        } catch (error) {
+            console.error("Error inserting child into database. Details:", error);
+    
+            if (error.code === 'ER_NO_REFERENCED_ROW_2') {
+                console.error("Foreign key constraint failed: Ensure AccountID exists in the referenced table.");
+            } else if (error.code === 'ER_TRUNCATED_WRONG_VALUE') {
+                console.error("Data type mismatch: Check that DOB, Age, and AccountID are correctly formatted.");
+            } else {
+                console.error("Unknown error occurred while inserting child.");
+            }
+            throw error;  // Re-throw error after logging
+        } finally {
+            if (connection) connection.end();
+        }
     }
+    
+   
+  
 
     static async deleteChild(id) {
         const connection = await mysql.createConnection(dbConfig);
         const deleteSignUpQuery = `
-            DELETE FROM SignUp WHERE ChildID = ?;`;
+            DELETE FROM signUp WHERE childID = ?;`;
         const deleteChildQuery = `
-            DELETE FROM Child WHERE ChildID = ?;`;
+            DELETE FROM child WHERE childID = ?;`;
         const [result] = await connection.execute(deleteSignUpQuery, [id]);
         const [result1] = await connection.execute(deleteChildQuery, [id]);
         connection.end();
@@ -60,9 +88,9 @@ class Child {
     static async updateChild(id, childDetails) {
         const connection = await mysql.createConnection(dbConfig);
         const sqlQuery = `
-            UPDATE Child
+            UPDATE child
             SET Name = ?, Strength = ?, DOB = ?
-            WHERE ChildID = ?`;
+            WHERE childID = ?`;
 
         const values = [
             childDetails.Name, 

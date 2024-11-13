@@ -1,24 +1,38 @@
-import React, { useState, useEffect } from 'react';
-import { Container, Row, Col, Nav, Card } from 'react-bootstrap';
+import React, { useState, useEffect } from "react";
+import { Container, Row, Col, Nav, Card } from "react-bootstrap";
+import { useNavigate } from "react-router-dom";
 
 const AdminViewPayment = () => {
-  const [activeTab, setActiveTab] = useState('pending');
+  const [activeTab, setActiveTab] = useState("pending");
   const [pendingPayments, setPendingPayments] = useState([]);
   const [confirmedPayments, setConfirmedPayments] = useState([]);
+  const navigate = useNavigate(); // Initialize useNavigate hook
 
   // Fetch payments from backend
   useEffect(() => {
     const fetchPayments = async () => {
       try {
-        const response = await fetch('http://localhost:8000/payment'); // Adjust the URL if needed
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
-        }
-        const payments = await response.json();
+        console.log("Attempting to fetch payments...");
+        const response = await fetch("http://localhost:8000/payment"); // GET request to backend
+        if (!response.ok)
+          throw new Error(
+            `Network response was not ok: ${response.statusText}`
+          );
 
-        // Filter payments by approval status
-        const pending = payments.filter(payment => payment.ApprovedStatus === 0);
-        const confirmed = payments.filter(payment => payment.ApprovedStatus === 1);
+        const payments = await response.json();
+        console.log("Fetched payments:", payments); // Log the fetched payments data
+
+        // Filter payments by status
+        const pending = payments.filter(
+          (payment) => payment.Status === "Pending"
+        );
+        const confirmed = payments.filter(
+          (payment) =>
+            payment.Status === "Approved" || payment.Status === "Rejected"
+        );
+
+        console.log("Pending payments (filtered):", pending); // Log filtered pending payments
+        console.log("Confirmed payments (filtered):", confirmed); // Log filtered confirmed payments
 
         setPendingPayments(pending);
         setConfirmedPayments(confirmed);
@@ -30,39 +44,68 @@ const AdminViewPayment = () => {
     fetchPayments();
   }, []);
 
+  // Handle tab selection
   const handleSelect = (selectedTab) => {
+    console.log("Selected tab:", selectedTab);
     setActiveTab(selectedTab);
   };
 
-  const renderPayments = (payments) => (
-    payments.map((payment, index) => (
-      <Card key={index} className="admin-payment-card mb-3 p-3">
+  // Navigate to confirmation page for a specific payment
+  const handleCardClick = (orderID) => {
+    navigate(`/admin-confirm-payment/${orderID}`);
+  };
+
+  // Render payments list
+  const renderPayments = (payments) => {
+    return payments.map((payment) => (
+      <Card
+        key={payment.OrderID}
+        className="admin-payment-card mb-3 p-3"
+        onClick={() => handleCardClick(payment.OrderID)} 
+        style={{ cursor: "pointer" }} 
+      >
         <Card.Body>
-          <Card.Title className="admin-payment-order-id">Invoice ID: {payment.InvoiceID}</Card.Title>
-          <Card.Text className="admin-payment-text">Amount: ${payment.Amount}</Card.Text>
-          <Card.Text className="admin-payment-text">Contact: {payment.PaidBy}</Card.Text>
+          <Card.Title className="admin-payment-order-id">
+            Invoice ID: {payment.InvoiceID}
+          </Card.Title>
+          <Card.Text className="admin-payment-text">
+            Amount: ${payment.Amount}
+          </Card.Text>
         </Card.Body>
       </Card>
-    ))
-  );
+    ));
+  };
 
   return (
     <Container fluid className="admin-payments-page p-4">
       <h2 className="admin-payments-title">Incoming Payments</h2>
       <hr className="admin-payments-divider mb-4" />
 
-      <Nav variant="tabs" activeKey={activeTab} onSelect={handleSelect} className="mb-3">
+      {/* Tabs for Pending and Confirmed Payments */}
+      <Nav
+        variant="tabs"
+        activeKey={activeTab}
+        onSelect={handleSelect}
+        className="mb-3"
+      >
         <Nav.Item>
-          <Nav.Link eventKey="pending" className="admin-payments-tab">Pending</Nav.Link>
+          <Nav.Link eventKey="pending" className="admin-payments-tab">
+            Pending
+          </Nav.Link>
         </Nav.Item>
         <Nav.Item>
-          <Nav.Link eventKey="confirmed" className="admin-payments-tab">Confirmed</Nav.Link>
+          <Nav.Link eventKey="confirmed" className="admin-payments-tab">
+            Confirmed
+          </Nav.Link>
         </Nav.Item>
       </Nav>
 
       <Row>
         <Col>
-          {activeTab === 'pending' ? renderPayments(pendingPayments) : renderPayments(confirmedPayments)}
+          {/* Display payments based on active tab */}
+          {activeTab === "pending"
+            ? renderPayments(pendingPayments)
+            : renderPayments(confirmedPayments)}
         </Col>
       </Row>
     </Container>

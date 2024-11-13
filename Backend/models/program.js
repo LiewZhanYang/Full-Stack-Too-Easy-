@@ -2,7 +2,7 @@ const dbConfig = require("../dbConfig");
 const mysql = require("mysql2/promise");
 
 class Program {
-  constructor(ProgramID, ProgrameName, ProgramDesc, Cost, LunchProvided, Duration, ClassSize, TypeID) {
+  constructor(ProgramID, ProgrameName, ProgramDesc, Cost, DiscountedCost, LunchProvided, Duration, ClassSize, TypeID) {
     this.ProgramID = ProgramID;
     this.ProgrameName = ProgrameName;
     this.ProgramDesc = ProgramDesc;
@@ -10,6 +10,7 @@ class Program {
     this.Duration = Duration;
     this.ClassSize = ClassSize;
     this.Cost = Cost;
+    this.DiscountedCost = DiscountedCost;
     this.TypeID = TypeID;
   }
 
@@ -26,7 +27,26 @@ class Program {
     }
 
     const row = rows[0];
-    return new Program(row.ProgramID, row.ProgramName, row.ProgramDesc, row.Cost, row.LunchProvided, row.Duration, row.ClassSize, row.TypeID);
+    return new Program(row.ProgramID, row.ProgramName, row.ProgramDesc, row.Cost, row.DiscountedCost, row.LunchProvided, row.Duration, row.ClassSize, row.TypeID);
+  }
+
+  static async getProgramBySignUp(AccountID) {
+    const connection = await mysql.createConnection(dbConfig);
+    const sqlQuery = `
+        SELECT * FROM Program WHERE ProgramID IN (
+        SELECT ProgramID FROM Session 
+        WHERE SessionID IN (SELECT SessionID FROM SignUp WHERE AccountID = ?));
+    `;
+    const [rows] = await connection.execute(sqlQuery, [AccountID]);
+    connection.end();
+
+    if (rows.length === 0) {
+      return null; // Return null if no program found with the given ID
+    }
+
+    return rows.map((row) => {
+      return new Program(row.ProgramID, row.ProgramName, row.ProgramDesc, row.Cost, row.DiscountedCost, row.LunchProvided, row.Duration, row.ClassSize, row.TypeID);
+    });
   }
 
   static async getAllPrograms() {
@@ -39,7 +59,7 @@ class Program {
 
     connection.end();
     return result.map((row) => {
-      return new Program(row.ProgramID, row.ProgramName, row.ProgramDesc, row.Cost, row.LunchProvided, row.Duration, row.ClassSize, row.TypeID);
+      return new Program(row.ProgramID, row.ProgramName, row.ProgramDesc, row.Cost, row.DiscountedCost, row.LunchProvided, row.Duration, row.ClassSize, row.TypeID);
     });
   }
 
@@ -51,7 +71,7 @@ class Program {
 
     const values = [
       programDetails.ProgramName,
-      programDetails.programDesc,
+      programDetails.ProgramDesc,
       programDetails.Cost,
       programDetails.LunchProvided,
       programDetails.Duration,

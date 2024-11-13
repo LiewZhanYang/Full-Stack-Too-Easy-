@@ -13,10 +13,31 @@ const getAllPrograms = async (req, res) => {
   }
 };
 
+// controllers/programController.js
 const getProgramById = async (req, res) => {
-  programID = req.params.id;
+  const { id } = req.params;
+  console.log("Received request to fetch program by ID:", id); // Log request details
+
   try {
-    const programs = await Program.getProgramById(programID);
+    const program = await Program.getProgramById(id);
+    console.log("Fetched program:", program); // Log program data received
+
+    if (!program) {
+      console.log("Program not found"); // Log if program is not found
+      return res.status(404).json({ message: "Program not found" });
+    }
+    res.json(program);
+  } catch (error) {
+    console.error("Error fetching program:", error);
+    res.status(500).json({ message: "Error retrieving program" });
+  }
+};
+
+
+const getProgramBySignUp = async (req, res) => {
+  const AccountID = req.params.id;
+  try {
+    const programs = await Program.getProgramBySignUp(AccountID);
     if (programs.length === 0) {
       return res.status(404).send("Programs not found");
     }
@@ -57,4 +78,4 @@ const updateProgram = async (req, res) => {
   }
 };
 
-module.exports = { getAllPrograms, postProgram, updateProgram, getProgramById};
+module.exports = { getAllPrograms, postProgram, updateProgram, getProgramById, getProgramBySignUp };
