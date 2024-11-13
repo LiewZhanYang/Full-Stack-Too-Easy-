@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import AnnouncementBoard from "./AnnouncementBoard";
 
 function Dashboard() {
   const [activeTab, setActiveTab] = useState("Programmes");
@@ -133,6 +134,9 @@ function Dashboard() {
         </div>
 
         <div className="w-80">
+          <div className="mt-[-50]">
+            <AnnouncementBoard />
+          </div>
           <div>
             <h2 className="text-lg font-semibold mb-4">{monthYear}</h2>
             <div className="grid grid-cols-4 gap-4 text-center">
