@@ -12,13 +12,19 @@ function Precoaching() {
     navigate("/booking");
   };
 
+  const handleNavigateToCoaching = () => {
+    navigate("/coaching"); // Ensure this route corresponds to Coaching.js
+  };
+
   useEffect(() => {
     const fetchBookingByAccountID = async () => {
       const accountId = localStorage.getItem("userId"); // Retrieve AccountID from localStorage
       console.log("Account ID:", accountId); // Log Account ID for debugging
       if (accountId) {
         try {
-          const response = await fetch(`http://localhost:8000/booking/${accountId}`);
+          const response = await fetch(
+            `http://localhost:8000/booking/${accountId}`
+          );
           const data = await response.json();
           console.log("User Booking Data:", data); // Log booking data for debugging
           if (data && data.length > 0) {
@@ -40,7 +46,11 @@ function Precoaching() {
     const [hours, minutes, seconds] = time.split(":").map(Number);
     const date = new Date();
     date.setHours(hours, minutes, seconds || 0);
-    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true });
+    return date.toLocaleTimeString([], {
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: true,
+    });
   };
 
   const getEndTime = (startTime) => {
@@ -48,7 +58,11 @@ function Precoaching() {
     const startDate = new Date();
     startDate.setHours(hours, minutes, seconds || 0);
     startDate.setHours(startDate.getHours() + 1); // Add one hour to start time
-    return startDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true });
+    return startDate.toLocaleTimeString([], {
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: true,
+    });
   };
 
   return (
@@ -58,7 +72,10 @@ function Precoaching() {
 
       {hasBooking && bookingData ? (
         <>
-          <p className="text-muted" style={{ fontSize: "1rem", marginBottom: "1rem" }}>
+          <p
+            className="text-muted"
+            style={{ fontSize: "1rem", marginBottom: "1rem" }}
+          >
             You have 1 upcoming session
           </p>
           <div className="mt-4">
@@ -94,8 +111,9 @@ function Precoaching() {
                 <button
                   className="btn btn-warning me-3 px-4 join-button"
                   style={{ fontWeight: 500 }}
+                  onClick={handleNavigateToCoaching} // Call the navigation function
                 >
-                  Join
+                  Let's go!
                 </button>
                 <button
                   className="btn btn-outline-secondary px-4 cancel-button"
@@ -105,8 +123,12 @@ function Precoaching() {
                 </button>
               </div>
             </div>
-            <p className="text-muted text-center mt-3" style={{ fontSize: "0.85rem" }}>
-              <i className="bi bi-info-circle me-1"></i> Only one session may be booked at a time.
+            <p
+              className="text-muted text-center mt-3"
+              style={{ fontSize: "0.85rem" }}
+            >
+              <i className="bi bi-info-circle me-1"></i> Only one session may be
+              booked at a time.
             </p>
           </div>
         </>
@@ -116,7 +138,10 @@ function Precoaching() {
           <p style={{ fontSize: "1rem", color: "#555", marginBottom: "1rem" }}>
             No bookings have been made for 1 to 1 coaching.
           </p>
-          <Button onClick={handleNavigateToBooking} className="custom-booking-button">
+          <Button
+            onClick={handleNavigateToBooking}
+            className="custom-booking-button"
+          >
             Book a Session
           </Button>
         </div>
