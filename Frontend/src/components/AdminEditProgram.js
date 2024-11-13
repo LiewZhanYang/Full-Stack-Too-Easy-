@@ -82,7 +82,7 @@ const AdminEditProgram = () => {
       }
 
       console.log('Program saved successfully');
-      navigate('/admin-programs'); // Redirect after saving
+      navigate('/admin-view-program'); // Redirect after saving
     } catch (error) {
       console.error('Error saving program:', error);
     }

@@ -945,3 +945,38 @@ code {
   font-weight: bold;
   border-radius: 50px;
 }
+/* Announcements */
+.announcement-board {
+  padding: 16px;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  max-width: 300px;
+}
+
+.announcement-title {
+  font-weight: bold;
+  font-size: 1.2em;
+  margin-bottom: 10px;
+}
+
+.announcement-card {
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 16px;
+  background-color: #fff;
+}
+
+.announcement-card h4 {
+  margin: 0;
+  font-size: 1em;
+}
+
+.announcement-date {
+  font-size: 0.8em;
+  color: gray;
+}
+
+.announcement-card p {
+  margin-top: 8px;
+  font-size: 0.9em;
+}

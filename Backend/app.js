@@ -27,6 +27,7 @@ const signupRoutes = require("./routes/signUpRoutes");
 const authController = require("./controllers/authController");
 const uploadRoutes = require("./routes/uploadRoutes");
 const emailRoutes = require("./routes/emailRoutes");
+const announceRoutes = require("./routes/announcementRoutes")
 
 app.use("/customer", customerRoutes);
 app.use("/admin", adminRoutes);
@@ -41,6 +42,7 @@ app.use("/signup", signupRoutes);
 app.post("/login", authController.login);
 app.use("/upload", uploadRoutes);
 app.use("/email", emailRoutes);
+app.use("/announcement", announceRoutes);
 
 //const testController = require('./controllers/testController');
 

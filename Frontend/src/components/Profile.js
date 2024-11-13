@@ -4,10 +4,34 @@ import axios from 'axios';
 function Profile() {
   const [customerData, setCustomerData] = useState(null);
   const [children, setChildren] = useState([]);
+  const [isEditing, setIsEditing] = useState(false); // State for edit mode
   const userId = localStorage.getItem('userId');
 
+  const toggleEditMode = () => {
+    if (isEditing) {
+      handleSaveDetails(); // Save details when exiting edit mode
+    }
+    setIsEditing(!isEditing);
+  };
+
+  const handleSaveDetails = async () => {
+    try {
+      await axios.put(`http://localhost:8000/customer/id/${userId}`, {
+        Name: customerData.Name,
+        ContactNo: customerData.ContactNo,
+        EmailAddr: customerData.EmailAddr,
+        MembershipExpiry: customerData.MembershipExpiry,
+        MemberStatus: customerData.MemberStatus,
+      });
+      alert('Profile updated successfully!');
+    } catch (error) {
+      console.error('Error updating profile:', error);
+      alert('Failed to update profile.');
+    }
+  };
+
   useEffect(() => {
-    const fetchCustomerData = async () => {
+    const fetchCustomerData = async () => { //
       try {
         const response = await axios.get(`http://localhost:8000/customer/id/${userId}`);
         if (response.data && response.data.length > 0) {
@@ -22,7 +46,6 @@ function Profile() {
       try {
         const response = await axios.get(`http://localhost:8000/children/${userId}`);
         if (response.data) {
-          console.log('Fetched children data:', response.data);
           setChildren(
             response.data.map((child) => ({
               id: child.ChildID,
@@ -81,11 +104,9 @@ function Profile() {
 
     try {
       if (child.id) {
-        console.log('Updating child:', childData);
         await axios.put(`http://localhost:8000/children/${child.id}`, childData);
         alert('Child updated successfully!');
       } else {
-        console.log('Adding new child:', childData);
         const response = await axios.post(`http://localhost:8000/children`, childData);
         if (response.data.child?.id) {
           setChildren((prevChildren) => {
@@ -104,27 +125,12 @@ function Profile() {
 
   const handleDeleteChild = async (childId) => {
     try {
-      console.log('Deleting child with ID:', childId);
       await axios.delete(`http://localhost:8000/children/${childId}`);
       setChildren((prevChildren) => prevChildren.filter((child) => child.id !== childId));
       alert('Child deleted successfully!');
     } catch (error) {
       console.error('Error deleting child:', error);
       alert('Failed to delete child.');
-    }
-  };
-
-  const handleConfirm = async () => {
-    try {
-      await axios.put(`http://localhost:8000/customer/id/${userId}`, {
-        Name: customerData.Name,
-        ContactNo: customerData.ContactNo,
-        EmailAddr: customerData.EmailAddr,
-      });
-      alert('Profile updated successfully!');
-    } catch (error) {
-      console.error('Error updating profile:', error);
-      alert('Failed to update profile.');
     }
   };
 
@@ -136,8 +142,18 @@ function Profile() {
       <div className="bg-white rounded-lg p-6 shadow-sm mb-8">
         <div className="flex items-center mb-8">
           <div className="w-24 h-24 bg-gray-200 rounded-full flex items-center justify-center">
-            <svg className="w-10 h-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+            <svg
+              className="w-10 h-10 text-gray-400"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+              />
             </svg>
           </div>
         </div>
@@ -152,7 +168,10 @@ function Profile() {
                 type="text"
                 value={customerData?.Name || ''}
                 onChange={(e) => handleInputChange('Name', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                disabled={!isEditing}
+                className={`w-full px-3 py-2 border ${
+                  isEditing ? 'border-gray-300' : 'border-transparent bg-gray-100'
+                } rounded-md`}
               />
             </div>
 
@@ -164,7 +183,10 @@ function Profile() {
                 type="tel"
                 value={customerData?.ContactNo || ''}
                 onChange={(e) => handleInputChange('ContactNo', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                disabled={!isEditing}
+                className={`w-full px-3 py-2 border ${
+                  isEditing ? 'border-gray-300' : 'border-transparent bg-gray-100'
+                } rounded-md`}
               />
             </div>
           </div>
@@ -177,16 +199,57 @@ function Profile() {
               type="email"
               value={customerData?.EmailAddr || ''}
               onChange={(e) => handleInputChange('EmailAddr', e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md"
+              disabled={!isEditing}
+              className={`w-full px-3 py-2 border ${
+                isEditing ? 'border-gray-300' : 'border-transparent bg-gray-100'
+              } rounded-md`}
             />
+          </div>
+
+          <div className="grid grid-cols-2 gap-6">
+          <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1"> 
+            Membership Expiry:
+          </label>
+          <input
+            type="date"
+            value={customerData?.MembershipExpiry
+              ? new Date(customerData.MembershipExpiry).toISOString().split('T')[0]
+              : ''}
+            onChange={(e) => handleInputChange('MembershipExpiry', e.target.value)}
+            disabled={!isEditing || customerData?.MemberStatus === 0}
+            className={`w-full px-3 py-2 border ${
+              isEditing ? 'border-gray-300' : 'border-transparent bg-gray-100'
+            } rounded-md`}
+          />
+        </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Member Status:
+              </label>
+              <select
+                 value={customerData?.MemberStatus !== undefined ? customerData.MemberStatus : 0}
+                onChange={(e) =>
+                  handleInputChange('MemberStatus', parseInt(e.target.value, 10))
+                }
+                disabled={!isEditing}
+                className={`w-full px-3 py-2 border ${
+                  isEditing ? 'border-gray-300' : 'border-transparent bg-gray-100'
+                } rounded-md`}
+              >
+                <option value="1">Active</option>
+                <option value="0">Inactive</option>
+              </select>
+            </div>
           </div>
 
           <div>
             <button
-              onClick={handleConfirm}
+              onClick={toggleEditMode}
               className="bg-yellow-500 text-white px-6 py-2 rounded-md hover:bg-yellow-600 transition-colors"
             >
-              Confirm
+              {isEditing ? 'Save' : 'Edit'}
             </button>
           </div>
         </div>
