@@ -97,7 +97,7 @@ CREATE TABLE Booking (
 	BookingID INT PRIMARY KEY AUTO_INCREMENT,
     Time TIME NOT NULL,
     Date DATE NOT NULL,
-    URL VARCHAR(100) NOT NULL,
+    URL VARCHAR(100),
     AccountID INT,
     
     FOREIGN KEY (AccountID) REFERENCES Customer (AccountID)
