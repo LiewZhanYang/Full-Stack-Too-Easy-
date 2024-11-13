@@ -1,6 +1,3 @@
-// this page is to allow admin to view all bookings. they can click into a booking to view more details as well as from there press "join" to go to admincoaching.js
-// from there they can start a meeting, in which the url created will be PUT to the database. user side will then GET url and join from there
-
 import React, { useState, useEffect } from "react";
 import { Container, Row, Col, Card, Button } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
@@ -20,8 +17,12 @@ const AdminViewBooking = () => {
             `Network response was not ok: ${response.statusText}`
           );
 
-        const bookingData = await response.json();
+        let bookingData = await response.json();
         console.log("Fetched bookings:", bookingData);
+
+        // Sort bookings by nearest date
+        bookingData.sort((a, b) => new Date(a.Date) - new Date(b.Date));
+
         setBookings(bookingData);
       } catch (error) {
         console.error("Error fetching bookings:", error);
