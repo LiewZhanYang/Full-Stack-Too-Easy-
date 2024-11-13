@@ -33,6 +33,7 @@ import AdminCreateProgram from "./components/AdminCreateProgram.js";
 import AdminEditProgram from "./components/AdminEditProgram.js";
 import AdminEditTiming from "./components/AdminEditTiming.js";
 import AdminCreateWebinar from "./components/AdminCreateWebinar.js";
+import AdminEditWebinar from "./components/AdminEditWebinar.js";
 import Chatbot from "./components/Chatbot.js";
 import AdminSideBar from "./components/AdminSidebar.js";
 import "./App.css";
@@ -138,6 +139,10 @@ function App() {
                   <Route
                     path="/admin-create-webinar"
                     element={<AdminCreateWebinar />}
+                  />
+                  <Route
+                    path="/admin-edit-webinar/:id"
+                    element={<AdminEditWebinar />}
                   />
                   {/* Logout route redirects to login */}
                   <Route
