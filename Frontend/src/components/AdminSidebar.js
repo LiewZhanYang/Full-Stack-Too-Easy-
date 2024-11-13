@@ -99,6 +99,7 @@ function Sidebar() {
                   </div>
                 )}
               </div>
+
               {/* Webinars Dropdown */}
               <div className="mt-3">
                 <button
@@ -132,32 +133,59 @@ function Sidebar() {
                   </div>
                 )}
               </div>
-              {/* Events Dropdown */}
+              {/* Coaching Dropdown */}
               <div className="mt-3">
                 <button
-                  onClick={() => toggleMenu("events")}
+                  onClick={() => toggleMenu("coaching")}
                   className="btn d-flex align-items-center w-100 text-dark fw-bold px-3 py-2 border-0 bg-transparent"
                 >
-                  <i className="bi bi-calendar-event me-2"></i>
-                  Registration
+                  <i className="bi bi-people me-2"></i>
+                  Coaching
                   <i
                     className={`bi ${
-                      expandedMenu === "events"
+                      expandedMenu === "coaching"
                         ? "bi-chevron-up"
                         : "bi-chevron-down"
                     } ms-auto`}
                   ></i>
                 </button>
-                {expandedMenu === "events" && (
+                {expandedMenu === "coaching" && (
                   <div className="ps-4">
                     <Link
-                      to="/admin-view-payment"
+                      to="/admin-view-booking"
                       className="d-block py-1 text-dark text-decoration-none"
                     >
-                      Incoming Payments
+                      View All Bookings
                     </Link>
                   </div>
                 )}
+                {/* Registration Dropdown */}
+                <div className="mt-3">
+                  <button
+                    onClick={() => toggleMenu("events")}
+                    className="btn d-flex align-items-center w-100 text-dark fw-bold px-3 py-2 border-0 bg-transparent"
+                  >
+                    <i className="bi bi-calendar-event me-2"></i>
+                    Registration
+                    <i
+                      className={`bi ${
+                        expandedMenu === "events"
+                          ? "bi-chevron-up"
+                          : "bi-chevron-down"
+                      } ms-auto`}
+                    ></i>
+                  </button>
+                  {expandedMenu === "events" && (
+                    <div className="ps-4">
+                      <Link
+                        to="/admin-view-payment"
+                        className="d-block py-1 text-dark text-decoration-none"
+                      >
+                        Incoming Payments
+                      </Link>
+                    </div>
+                  )}
+                </div>
               </div>
             </nav>
           </div>
