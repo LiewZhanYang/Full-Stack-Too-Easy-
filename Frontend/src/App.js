@@ -16,7 +16,6 @@ import Labs from "./components/Labs";
 import Professionals from "./components/Professionals";
 import Webinars from "./components/Webinars";
 import WebinarDetails from "./components/WebinarDetails";
-import Coaching from "./components/PreCoaching.js";
 import Profile from "./components/Profile";
 import Payment from "./components/Payment";
 import Login from "./components/Login.js";

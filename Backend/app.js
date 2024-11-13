@@ -22,7 +22,6 @@ const paymentRoutes = require("./routes/paymentRoutes");
 const programRoutes = require("./routes/programRoutes");
 const programtypeRoutes = require("./routes/programtypeRoutes");
 const webinarRoutes = require("./routes/webinarRoutes");
-const programtypeRoutes = require("./routes/programtypeRoutes")
 const sessionRoutes = require("./routes/sessionRoutes");
 const signupRoutes = require("./routes/signUpRoutes");
 const authController = require("./controllers/authController");
@@ -76,7 +75,6 @@ app.put('/updatesignup/:id', testController.updateSignUp);
 app.delete('/deletesignup/:id',testController.deleteSignUp);*/
 
 const dbConfig = require("./dbConfig");
-const ProgramType = require("./models/programtype");
 /*
 
 app.listen(port, async () => {
