@@ -147,7 +147,9 @@ VALUES
 ('Public Speaking Workshop - Intermediate', 'Improve your public speaking skills', 988, 889.2, TRUE, 8, 15, 1),
 ('Public Speaking Workshop - Advanced', 'Master the art of public speaking', 1388, 1249.2, TRUE, 8, 10, 1),
 ('PSLE Power Up Camp - PSLE Power Up', 'Comprehensive PSLE revision', 388, 349.2, FALSE, 2, 20, 2),
-('PSLE Power Up Camp - PSLE Chinese Oral Booster', 'Boost your Chinese oral skills', 488, 439.2, FALSE, 2, 15, 2);
+('PSLE Power Up Camp - PSLE Chinese Oral Booster', 'Boost your Chinese oral skills', 488, 439.2, FALSE, 2, 15, 2),
+('How To Talk To Anyone', 'Learn to talk to anyone through this webinar', 0, 0, FALSE, 2, 100, 5),
+('The Art of Negotiation', 'Never settle for less, where you learn to negotiate when stakes are high', 0, 0, FALSE, 2, 100, 5);
 
 INSERT INTO Session (SessionID, StartDate, EndDate, Time, Location, Vacancy, ProgramID)
 VALUES
