@@ -935,6 +935,16 @@ code {
   color: white;
 }
 
+/* Admin View Webinar Page */
+.admin-create-webinar-button {
+  position: fixed;
+  bottom: 20px;
+  right: 80px;
+  z-index: 1000;
+  padding: 10px 20px;
+  font-weight: bold;
+  border-radius: 50px;
+}
 /* Announcements */
 .announcement-board {
   padding: 16px;

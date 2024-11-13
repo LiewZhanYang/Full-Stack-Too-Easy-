@@ -99,7 +99,39 @@ function Sidebar() {
                   </div>
                 )}
               </div>
-
+              {/* Webinars Dropdown */}
+              <div className="mt-3">
+                <button
+                  onClick={() => toggleMenu("webinars")}
+                  className="btn d-flex align-items-center w-100 text-dark fw-bold px-3 py-2 border-0 bg-transparent"
+                >
+                  <i className="bi bi-camera-video me-2"></i>
+                  Webinars
+                  <i
+                    className={`bi ${
+                      expandedMenu === "webinars"
+                        ? "bi-chevron-up"
+                        : "bi-chevron-down"
+                    } ms-auto`}
+                  ></i>
+                </button>
+                {expandedMenu === "webinars" && (
+                  <div className="ps-4">
+                    <Link
+                      to="/admin-view-webinars"
+                      className="d-block py-1 text-dark text-decoration-none"
+                    >
+                      View All
+                    </Link>
+                    <Link
+                      to="/admin-create-webinar"
+                      className="d-block py-1 text-dark text-decoration-none"
+                    >
+                      Create
+                    </Link>
+                  </div>
+                )}
+              </div>
               {/* Events Dropdown */}
               <div className="mt-3">
                 <button
