@@ -8,6 +8,9 @@ function Payment() {
   const { programId, price } = location.state || {};  
   console.log('Program ID:', programId);  
 
+
+  const [children, setChildren] = useState([]);
+  const [selectedChildren, setSelectedChildren] = useState([]);
   const [programName, setProgramName] = useState('');  
   const [sessions, setSessions] = useState([]);  
   const [selectedSession, setSelectedSession] = useState(null);  
@@ -44,7 +47,25 @@ function Payment() {
       }  
     };  
 
+    const fetchChildren = async () => {
+      const userId = localStorage.getItem('userId');
+      if (!userId) return;
+    
+      try {
+        const response = await axios.get(`http://localhost:8000/children/${userId}`);
+        setChildren(
+          response.data.map((child) => ({
+            ...child,
+            DOB: child.DOB || '', // Ensure DOB is at least an empty string
+          }))
+        );
+      } catch (error) {
+        console.error('Error fetching children:', error);
+      }
+    };
+
     fetchSessions();  
+    fetchChildren();
     fetchProgramName();  
   }, [programId]);  
 
@@ -53,6 +74,25 @@ function Payment() {
     const pricePerChild = parseFloat(price?.replace('$', '') || 0);  
     setTotalPrice(pricePerChild * numChildren);  
   }, [childrenCount, price]);  
+
+
+  const handleChildSelection = (childId) => {
+    setSelectedChildren((prevSelected) =>
+      prevSelected.includes(childId)
+        ? prevSelected.filter((id) => id !== childId)
+        : [...prevSelected, childId]
+    );
+  };
+
+
+  const handleLunchOptionChange = (childId, lunchOption) => {
+    setSelectedChildren((prevSelected) =>
+      prevSelected.map((child) =>
+        child.ChildID === childId ? { ...child, lunchOption } : child
+      )
+    );
+  };
+
 
   const handleBack = () => {  
     navigate(-1);  
@@ -78,6 +118,12 @@ function Payment() {
       alert("Please select a session.");
       return;
     }
+
+    if (selectedChildren.length === 0) {
+      alert('Please select at least one child.');
+      return;
+    }
+
   
     setShowProcessing(true);
     setIsProcessing(true);
@@ -188,90 +234,74 @@ function Payment() {
       </div>
 
       {activeTab === 'Overview' && (
-        <div className="mb-5">
-          <h3 className="fs-5 mb-3">Sessions</h3>
-          <div className="dropdown">
+        <div>
+          <h3 className="fs-5 mb-3">Select a Session</h3>
+          <div className="dropdown mb-4">
             <button
               className="btn btn-outline-secondary w-100 text-start"
               type="button"
               id="sessionDropdown"
               data-bs-toggle="dropdown"
               aria-expanded="false"
-              style={{
-                maxWidth: '300px',
-                textOverflow: 'ellipsis',
-                whiteSpace: 'nowrap',
-                overflow: 'hidden',
-                backgroundColor: '#f8f9fa',
-              }}
             >
-              <div className="fw-bold">
-                {selectedSession
-                  ? `${new Date(selectedSession.StartDate).toLocaleDateString()} - ${new Date(selectedSession.EndDate).toLocaleDateString()} - ${selectedSession.Time}`
-                  : 'Select a Session'}
-              </div>
+              {selectedSession
+                ? `${new Date(selectedSession.StartDate).toLocaleDateString()} - ${new Date(selectedSession.EndDate).toLocaleDateString()} - ${selectedSession.Time}`
+                : 'Select a Session'}
             </button>
-            <ul className="dropdown-menu w-100" aria-labelledby="sessionDropdown" style={{ maxHeight: '300px', overflowY: 'auto' }}>
+            <ul className="dropdown-menu">
               {sessions.map((session) => (
                 <li key={session.SessionID}>
-                  <a
+                  <button
                     className="dropdown-item"
-                    href="#"
-                    onClick={(e) => { e.preventDefault(); setSelectedSession(session); }}
+                    onClick={() => setSelectedSession(session)}
                   >
-                    {new Date(session.StartDate).toLocaleDateString()} - {new Date(session.EndDate).toLocaleDateString()} - {session.Time} ({session.Location})
-                  </a>
+                    {new Date(session.StartDate).toLocaleDateString()} - {new Date(session.EndDate).toLocaleDateString()} ({session.Location})
+                  </button>
                 </li>
               ))}
             </ul>
           </div>
 
+          <h3 className="fs-5 mb-3">Select Children Attending</h3>
           <div className="mb-4">
-            <div className="mb-2">Select child attending:</div>
-            <select
-              value={childrenCount}
-              onChange={(e) => setChildrenCount(e.target.value)}
-              className="form-select"
-              style={{ maxWidth: '300px' }}
-            >
-              <option value="1 Child">1 Child</option>
-              <option value="2 Children">2 Children</option>
-            </select>
-          </div>
+            {children.map((child) => (
+              <div key={child.ChildID} className="form-check mb-3">
+                <input
+                  type="checkbox"
+                  className="form-check-input"
+                  id={`child-${child.ChildID}`}
+                  checked={selectedChildren.some((c) => c.ChildID === child.ChildID)}
+                  onChange={() => handleChildSelection(child)}
+                />
+                <label className="form-check-label" htmlFor={`child-${child.ChildID}`}>
+                  {child.Name} ({child.DOB ? child.DOB.split('T')[0] : 'Date of Birth not provided'})
+                </label>
 
-          <div className="mb-3">
-            <div className="mb-2">Lunch option (1st Child):</div>
-            <select
-              value={firstChildLunch}
-              onChange={(e) => setFirstChildLunch(e.target.value)}
-              className="form-select"
-              style={{ maxWidth: '300px' }}
-            >
-              <option value="">Select lunch option</option>
-              <option value="chicken">Chicken Rice</option>
-              <option value="fish">Fish & Chips</option>
-              <option value="veggie">Vegetarian</option>
-            </select>
+                {selectedChildren.some((c) => c.ChildID === child.ChildID) && (
+                  <div className="mt-2">
+                    <label className="form-label">Lunch Option:</label>
+                    <select
+                      className="form-select"
+                      value={
+                        selectedChildren.find((c) => c.ChildID === child.ChildID)?.lunchOption || ''
+                      }
+                      onChange={(e) =>
+                        handleLunchOptionChange(child.ChildID, e.target.value)
+                      }
+                    >
+                      <option value="">Select lunch option</option>
+                      <option value="chicken">Chicken Rice</option>
+                      <option value="fish">Fish & Chips</option>
+                      <option value="veggie">Vegetarian</option>
+                    </select>
+                  </div>
+                )}
+              </div>
+            ))}
           </div>
-
-          {childrenCount === '2 Children' && (
-            <div className="mb-3">
-              <div className="mb-2">Lunch option (2nd Child):</div>
-              <select
-                value={secondChildLunch}
-                onChange={(e) => setSecondChildLunch(e.target.value)}
-                className="form-select"
-                style={{ maxWidth: '300px' }}
-              >
-                <option value="">Select lunch option</option>
-                <option value="chicken">Chicken Rice</option>
-                <option value="fish">Fish & Chips</option>
-                <option value="veggie">Vegetarian</option>
-              </select>
-            </div>
-          )}
         </div>
       )}
+
 
 {activeTab === 'Payment' && (
   <div className="row">

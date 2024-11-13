@@ -82,7 +82,7 @@ function WorkshopPrice() {
     <div className="workshop-container">  
       <div className="hero-section position-relative">  
         <img  
-          src={"/publickid.png"}  
+          src={"/img/workshops.jpg"}  
           alt="Public Speaking"  
           className="w-100"  
           style={{ minHeight: '600px', objectFit: 'cover' }}  
