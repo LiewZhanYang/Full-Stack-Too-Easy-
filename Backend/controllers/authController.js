@@ -20,11 +20,16 @@ async function login(req, res) {
   try {
     let user;
     let userType;
+    let MemberStatus = null;  // Initialize memberStatus to null or a default value
 
     // Check the Customer table first
     user = await Customer.findCustomerByEmailOrUsername(emailOrUsername);
     if (user) {
       userType = "customer";
+      // Check if customer has member_status 1 and assign it to memberStatus
+      if (user.MemberStatus === 1) {
+        MemberStatus = user.MemberStatus;
+      }
     } else {
       // If not found in Customer, check the Admin table
       user = await Admin.findAdminByEmailOrUsername(emailOrUsername);
@@ -47,11 +52,19 @@ async function login(req, res) {
         .json({ message: "Invalid email/username or password." });
     }
 
-    // Generate JWT token
-    const token = generateToken({
+    // Prepare payload for JWT token
+    const tokenPayload = {
       id: user.AccountID || user.AdminID,
       userType,
-    });
+    };
+
+    // Add memberStatus to payload if userType is customer and memberStatus is 1
+    if (userType === "customer" && MemberStatus === 1) {
+      tokenPayload.MemberStatus = MemberStatus;
+    }
+
+    // Generate JWT token
+    const token = generateToken(tokenPayload);
 
     // Respond with token and user info
     res.json({
@@ -61,6 +74,7 @@ async function login(req, res) {
         id: user.AccountID || user.AdminID,
         emailOrUsername: emailOrUsername,
         userType,
+        ...(userType === "customer" && MemberStatus === 1 && { MemberStatus }),
       },
     });
   } catch (error) {
