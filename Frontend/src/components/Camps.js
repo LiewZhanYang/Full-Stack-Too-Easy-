@@ -1,118 +1,152 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import '../App.css';
-import { useContext, useEffect } from 'react';
-import { AppContext } from '../AppContext';
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { useContext } from "react";
+import { AppContext } from "../AppContext";
+import axios from "axios";
+import "../App.css";
 
-function PslePowerCamp() {
-  const { sessionName, setSessionName } = useContext(AppContext); 
-  const [activeTab, setActiveTab] = useState('About');
+function Camps() {
+  const { sessionName, setSessionName } = useContext(AppContext);
+  const [activeTab, setActiveTab] = useState("About");
   const navigate = useNavigate();
-  useEffect(() => {  
-    // Set the session name to "Public Speaking Workshop"  
-    setSessionName('PSLE Speaking Workshop');  
-  }, [setSessionName]);  
-  const handleGetStarted = (tier) => {
-    navigate('/payment', {
-      state: {
-        tier: tier.level,
-        price: tier.price,
-        classSize: tier.classSize,
-        duration: tier.duration
+  const [isMemberActive, setIsMemberActive] = useState(false);
+
+  useEffect(() => {
+    setSessionName("PSLE Power Camp");
+
+    const userId = localStorage.getItem("userId");
+    const fetchMembershipStatus = async () => {
+      try {
+        const response = await axios.get(
+          `http://localhost:8000/customer/id/${userId}`
+        );
+        if (response.data && response.data.length > 0) {
+          setIsMemberActive(response.data[0].MemberStatus === 1);
+        }
+      } catch (error) {
+        console.error("Error fetching membership status:", error);
       }
+    };
+
+    fetchMembershipStatus();
+  }, [setSessionName]);
+
+  const handleGetStarted = (tier) => {
+    const discountedPrice = isMemberActive
+      ? parseFloat(tier.price.replace("$", "")) * 0.9
+      : parseFloat(tier.price.replace("$", ""));
+
+    navigate("/payment", {
+      state: {
+        programId: tier.programId,
+        tier: tier.level,
+        price: `$${discountedPrice.toFixed(2)}`, // Pass the formatted discounted price or original price
+        classSize: tier.classSize,
+        duration: tier.duration,
+      },
     });
   };
 
   const priceTiers = [
     {
-      level: "Beginner",
-      price: "$204",
+      level: "Foundation",
+      programId: 4,
+      programName: "PSLE Power Camp - Foundation",
+      price: "$250",
       classSize: "15-20",
-      duration: "3 days",
-      bgColor: "#e0f7fa"
-    },
-    {
-      level: "Intermediate",
-      price: "$275",
-      classSize: "10-15",
       duration: "4 days",
-      bgColor: "#e8f5e9"
+      lunchProvided: true,
+      bgColor: "#e8f5e9",
     },
     {
-      level: "Advanced",
-      price: "$340",
+      level: "Core",
+      programId: 5,
+      programName: "PSLE Power Camp - Core",
+      price: "$320",
+      classSize: "10-15",
+      duration: "5 days",
+      lunchProvided: true,
+      bgColor: "#e0f7fa",
+    },
+    {
+      level: "Elite",
+      programId: 3,
+      programName: "PSLE Power Camp - Elite",
+      price: "$400",
       classSize: "5-10",
       duration: "5 days",
-      bgColor: "#f3e5f5"
-    }
+      lunchProvided: true,
+      bgColor: "#f3e5f5",
+    },
   ];
 
   const skillDevelopmentData = [
     {
-      title: "PSLE Exam Preparation",
-      description: "Comprehensive coverage of PSLE subjects and exam strategies."
+      title: "Exam Strategies",
+      description: "Learn proven strategies to excel in PSLE exams.",
+    },
+    {
+      title: "Critical Thinking",
+      description: "Develop critical thinking skills to solve challenging problems.",
     },
     {
       title: "Time Management",
-      description: "Learn effective techniques to manage your time during the PSLE."
+      description: "Master effective time management for exams and study sessions.",
     },
     {
-      title: "Stress Management",
-      description: "Develop coping mechanisms to handle the pressure of the PSLE."
+      title: "Confidence Building",
+      description: "Boost self-confidence through mock exams and real-time feedback.",
     },
-    {
-      title: "Study Skills",
-      description: "Master proven study methods to maximize your PSLE performance."
-    }
   ];
 
   return (
     <div className="workshop-container">
       <div className="hero-section position-relative">
+        {/* Hero Section */}
         <img
-          src={"/psle-power.png"}
+          src={"/img/camps.jpg"}
           alt="PSLE Power Camp"
           className="w-100"
-          style={{ minHeight: '600px', objectFit: 'cover' }}
+          style={{ minHeight: "600px", objectFit: "cover" }}
         />
         <div
           className="position-absolute top-0 start-0 w-100 h-100"
           style={{
-            background: 'linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.5))',
+            background: "linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.5))",
           }}
         ></div>
         <div
           className="hero-content position-absolute"
           style={{
-            bottom: '100px',
-            left: '20px',
-            textAlign: 'left',
-            width: 'auto',
+            bottom: "100px",
+            left: "20px",
+            textAlign: "left",
+            width: "auto",
             padding: 0,
           }}
         >
           <h1
             className="text-white mb-3"
             style={{
-              fontSize: '2.5rem',
-              fontWeight: 'bold',
-              textShadow: '2px 2px 4px rgba(0,0,0,0.5)',
+              fontSize: "2.5rem",
+              fontWeight: "bold",
+              textShadow: "2px 2px 4px rgba(0,0,0,0.5)",
               marginLeft: 10,
-              transform: 'translateY(20px)'
+              transform: "translateY(20px)",
             }}
           >
-            PSLE Power Camp
+            {sessionName}
           </h1>
         </div>
 
         <div className="course-details-box position-absolute bg-white rounded-3 shadow-lg p-4">
           <ul className="list-unstyled mb-3">
-            <h2 className="text-center fw-bold mb-3">Join this Camp Today!</h2>
-            <li className="mb-2">• Comprehensive PSLE preparation</li>
-            <li className="mb-2">• Develop effective study skills</li>
-            <li className="mb-2">• Learn time and stress management</li>
-            <li className="mb-2">• Personalized guidance and support</li>
-            <li className="mb-2">• Boost your PSLE performance</li>
+            <h2 className="text-center fw-bold mb-3">Excel in PSLE with Us!</h2>
+            <li className="mb-2">• Master exam techniques.</li>
+            <li className="mb-2">• Improve problem-solving skills.</li>
+            <li className="mb-2">• Build your confidence.</li>
+            <li className="mb-2">• Get personalized guidance.</li>
+            <li className="mb-2">• Learn from experienced tutors.</li>
           </ul>
           <button className="btn btn-primary w-100 rounded-pill">Learn More</button>
         </div>
@@ -124,12 +158,21 @@ function PslePowerCamp() {
                 key={index}
                 className="skibidi-box bg-white p-3 flex-grow-1"
                 style={{
-                  borderRight: index !== skillDevelopmentData.length - 1 ? '1px solid #eee' : 'none',
-                  ...(index === 0 && { borderTopLeftRadius: '8px', borderBottomLeftRadius: '8px' }),
-                  ...(index === skillDevelopmentData.length - 1 && { borderTopRightRadius: '8px', borderBottomRightRadius: '8px' }),
+                  borderRight:
+                    index !== skillDevelopmentData.length - 1 ? "1px solid #eee" : "none",
+                  ...(index === 0 && {
+                    borderTopLeftRadius: "8px",
+                    borderBottomLeftRadius: "8px",
+                  }),
+                  ...(index === skillDevelopmentData.length - 1 && {
+                    borderTopRightRadius: "8px",
+                    borderBottomRightRadius: "8px",
+                  }),
                 }}
               >
-                <h6 className="mb-2" style={{ color: '#333' }}>{skill.title}</h6>
+                <h6 className="mb-2" style={{ color: "#333" }}>
+                  {skill.title}
+                </h6>
                 <p className="mb-0 small text-muted">{skill.description}</p>
               </div>
             ))}
@@ -140,14 +183,14 @@ function PslePowerCamp() {
       <div className="tabs-section mt-4">
         <div className="d-flex">
           <div
-            className={`tab-item ${activeTab === 'About' ? 'active' : ''}`}
-            onClick={() => setActiveTab('About')}
+            className={`tab-item ${activeTab === "About" ? "active" : ""}`}
+            onClick={() => setActiveTab("About")}
           >
             About
           </div>
           <div
-            className={`tab-item ${activeTab === 'Details' ? 'active' : ''}`}
-            onClick={() => setActiveTab('Details')}
+            className={`tab-item ${activeTab === "Details" ? "active" : ""}`}
+            onClick={() => setActiveTab("Details")}
           >
             Details
           </div>
@@ -155,40 +198,73 @@ function PslePowerCamp() {
         <hr className="mt-0" />
       </div>
 
+      {activeTab === "About"}
+
+      {activeTab === "Details" && (
+        <div className="details-section mt-4">
+          <h3>Camp Details</h3>
+          <p>
+            The camp spans 4-5 days and is available in Foundation, Core, and Elite levels.
+            Class sizes are kept small to ensure individualized attention.
+          </p>
+        </div>
+      )}
+
       <div className="price-tiers-section mt-4">
         <div className="row g-4">
-          {priceTiers.map((tier, index) => (
-            <div key={index} className="col-md-4">
-              <div
-                className="rounded-4 p-4 h-100 text-center shadow-sm"
-                style={{ backgroundColor: tier.bgColor }}
-              >
-                <h5>{tier.level}</h5>
-                <div className="price-amount my-3">{tier.price}</div>
-                <button className="btn btn-outline-primary rounded-pill w-100" onClick={() => handleGetStarted(tier)}>
-                  Get Started
-                </button>
-                <div className="tier-details mt-4 text-start">
-                  <div className="d-flex align-items-center mb-2">
-                    <i className="bi bi-people-fill me-2"></i>
-                    <span>Class size: {tier.classSize}</span>
+          {priceTiers.map((tier, index) => {
+            const discountedPrice = isMemberActive
+              ? parseFloat(tier.price.replace("$", "")) * 0.9
+              : parseFloat(tier.price.replace("$", ""));
+            return (
+              <div key={index} className="col-md-4">
+                <div
+                  className="rounded-4 p-4 h-100 text-center shadow-sm"
+                  style={{ backgroundColor: tier.bgColor }}
+                >
+                  <h5>{tier.level}</h5>
+                  <div className="price-amount my-3">
+                    {isMemberActive && (
+                      <span
+                        style={{
+                          textDecoration: "line-through",
+                          color: "red",
+                          marginRight: "10px",
+                        }}
+                      >
+                        {tier.price}
+                      </span>
+                    )}
+                    <span>${discountedPrice.toFixed(2)}</span>
                   </div>
-                  <div className="d-flex align-items-center mb-2">
-                    <i className="bi bi-clock-fill me-2"></i>
-                    <span>Duration: {tier.duration}</span>
+                  <div className="tier-details mt-4 text-start">
+                    <div className="d-flex align-items-center mb-2">
+                      <i className="bi bi-people-fill me-2"></i>
+                      <span>Class size: {tier.classSize}</span>
+                    </div>
+                    <div className="d-flex align-items-center mb-2">
+                      <i className="bi bi-clock-fill me-2"></i>
+                      <span>Duration: {tier.duration}</span>
+                    </div>
+                    <div className="d-flex align-items-center">
+                      <i className="bi bi-check2-circle me-2"></i>
+                      <span>{tier.lunchProvided ? "Lunch Provided" : "No Lunch"}</span>
+                    </div>
                   </div>
-                  <div className="d-flex align-items-center">
-                    <i className="bi bi-check2-circle me-2"></i>
-                    <span>Snacks Provided</span>
-                  </div>
+                  <button
+                    className="btn btn-outline-primary rounded-pill w-100 mt-3"
+                    onClick={() => handleGetStarted(tier)}
+                  >
+                    Get Started
+                  </button>
                 </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
     </div>
   );
 }
 
-export default PslePowerCamp;
+export default Camps;
