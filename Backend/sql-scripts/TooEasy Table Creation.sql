@@ -120,6 +120,13 @@ CREATE TABLE Payment (
     FOREIGN KEY (ApprovedBy) REFERENCES Admin (AdminID)
 );
 
+CREATE TABLE Announcement (
+	AnnouncementID INT PRIMARY KEY AUTO_INCREMENT,
+    Title VARCHAR(100) NOT NULL,
+    Body VARCHAR(400) NOT NULL,
+    PostedDate DATE NOT NULL
+);
+
 -- Data Insertion
 USE TooEasyDB;
 
@@ -204,7 +211,12 @@ VALUES
 (3, 67491350, 1388, '2024-10-15 12:00:00', 'Approved', 'path/to/invoice-67491350.pdf', 3, 3, 1, 'Approved by Admin 1'),
 (4, 28653104, 388, '2024-10-20 12:00:00', 'Pending', 'path/to/invoice-28653104.pdf', 4, 4, NULL, NULL);
 
--- Trigger
+INSERT INTO Announcement (AnnouncementID, Title, Body, PostedDate) 
+VALUES 
+(1, 'Release of new programs', 'To all our dear and valued customers, we are excited to announce that with the upcoming holidays, new programs are to be released soon! So Stay tune!', '2024-11-11'),
+(2, 'New promotions', 'In lieu of certain events and happenings, new promotions are to be rolled out! Members can await for the arrival soon!', '2024-11-13');
+
+Trigger
 
 -- Add Age On Insertion
 DELIMITER //
