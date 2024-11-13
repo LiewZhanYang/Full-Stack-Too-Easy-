@@ -90,10 +90,17 @@ function Payment() {
     });
   };
   
+  const lunchOptionMapping = {
+    chicken: 1,
+    fish: 2,
+    veggie: 3,
+  };
   const handleLunchOptionChange = (childId, lunchOption) => {
     setSelectedChildren((prevSelected) =>
       prevSelected.map((child) =>
-        child.ChildID === childId ? { ...child, lunchOption } : child
+        child.ChildID === childId
+          ? { ...child, lunchOption: lunchOptionMapping[lunchOption] }
+          : child
       )
     );
   };
@@ -123,36 +130,31 @@ function Payment() {
       alert("Please select a session.");
       return;
     }
-
+  
     if (selectedChildren.length === 0) {
       alert('Please select at least one child.');
       return;
     }
-
   
     setShowProcessing(true);
     setIsProcessing(true);
   
     try {
-      // Convert the file to base64 format, with error handling
+      // Convert the file to base64 format
       console.log("Starting file upload...");
       const fileBase64 = await new Promise((resolve, reject) => {
         const reader = new FileReader();
         reader.readAsDataURL(selectedFile);
         reader.onloadend = () => {
-          console.log("File converted to base64");
           resolve(reader.result.split(',')[1]);
         };
         reader.onerror = (error) => {
-          console.error("File conversion error:", error);
           reject(error);
         };
       });
   
       const generateNumericInvoiceId = () => {
-        const invoiceId = Math.floor(100000 + Math.random() * 900000);
-        console.log("Generated Invoice ID:", invoiceId);
-        return invoiceId;
+        return Math.floor(100000 + Math.random() * 900000);
       };
   
       const defaultInvoicePath = "default.png";
@@ -168,45 +170,63 @@ function Payment() {
         Reason: null,
         SelectedChildren: selectedChildren.map((child) => ({
           ChildID: child.ChildID,
-          lunchOption: child.lunchOption || 'No lunch selected', // Include lunch option
+          lunchOption: child.lunchOption || 'No lunch selected',
         })),
       };
-      
-      
+  
       console.log("Sending payment data:", paymentData);
   
-      // Send the request
-      const response = await axios.post(`http://localhost:8000/payment`, paymentData);
+      // Send payment request
+      const paymentResponse = await axios.post(`http://localhost:8000/payment`, paymentData);
   
-      // Verify response data structure
-      console.log("Server response:", response);
-  
-      if (response.data && response.data.OrderID) {
-        setOrderId(response.data.OrderID);
-        setIsConfirmed(true);
-        console.log("Payment submitted successfully. Order ID:", response.data.OrderID);
-      } else {
+      if (!paymentResponse.data || !paymentResponse.data.OrderID) {
         throw new Error("Order ID was not returned in the response data.");
       }
+  
+      console.log("Payment submitted successfully. Order ID:", paymentResponse.data.OrderID);
+  
+      // Create signups for selected children
+      for (const child of selectedChildren) {
+        const signUpDetails = {
+          AccountID: parseInt(userId), // Ensure AccountID is an integer
+          SessionID: selectedSession.SessionID,
+          LunchOptionID: child.lunchOption,
+          ChildID: child.ChildID,
+        };
+      
+        console.log("Creating signup for child:", signUpDetails);
+      
+        try {
+          const response = await axios.post(`http://localhost:8000/signup/`, signUpDetails);
+      
+          if (response.data && response.data.success) {
+            console.log("Signup created successfully:", response.data.signUpId);
+          } else {
+            throw new Error("Signup creation failed");
+          }
+        } catch (error) {
+          console.error("Error creating signup for child:", child.ChildID, error);
+          alert(`Failed to create signup for child: ${child.ChildID}.`);
+        }
+      }
+      
+  
+      alert("Payment submitted and signups created successfully!");
+      setOrderId(paymentResponse.data.OrderID);
+      setIsConfirmed(true);
     } catch (error) {
       if (error.response) {
         console.error("Error response from server:", error.response.data);
-        alert(`Failed to submit payment. Server responded with: ${error.response.data.message}`);
-      } else if (error.request) {
-        console.error("No response from server. Request was:", error.request);
-        alert("Failed to submit payment. No response from server.");
+        alert(`Failed to submit payment or create signup. Server responded with: ${error.response.data.message}`);
       } else {
         console.error("Unexpected error:", error.message);
-        alert(`Failed to submit payment. Error: ${error.message}`);
+        alert(`Failed to submit payment or create signup. Error: ${error.message}`);
       }
     } finally {
       setTimeout(() => {
         setIsProcessing(false);
-        setIsConfirmed(true);
-      }, 2000); // Increase this time (e.g., 5000 for 5 seconds) to make the spinner last longer
+      }, 2000);
     }
-
-
   };
   
   
@@ -295,17 +315,19 @@ function Payment() {
               <div className="mt-2">
                 <label className="form-label">Lunch Option:</label>
                 <select
-                  className="form-select"
-                  value={
-                    selectedChildren.find((c) => c.ChildID === child.ChildID)?.lunchOption || ''
-                  }
-                  onChange={(e) => handleLunchOptionChange(child.ChildID, e.target.value)}
-                >
-                  <option value="">Select lunch option</option>
-                  <option value="chicken">Chicken Rice</option>
-                  <option value="fish">Fish & Chips</option>
-                  <option value="veggie">Vegetarian</option>
-                </select>
+                className="form-select"
+                value={
+                  selectedChildren.find((c) => c.ChildID === child.ChildID)?.lunchOption || ''
+                }
+                onChange={(e) =>
+                  handleLunchOptionChange(child.ChildID, e.target.value)
+                }
+              >
+                <option value="">Select lunch option</option>
+                <option value="chicken">Chicken Rice</option>
+                <option value="fish">Fish & Chips</option>
+                <option value="veggie">Vegetarian</option>
+              </select>
               </div>
             )}
               </div>

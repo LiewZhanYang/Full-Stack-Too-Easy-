@@ -58,14 +58,16 @@ function Dashboard() {
   useEffect(() => {
     const fetchProgramsAndSessions = async () => {
       try {
+        // Fetch Signups
         const signUpResponse = await axios.get(
           `http://localhost:8000/signup/${userAccountID}`
         );
         const signUps = Array.isArray(signUpResponse.data)
           ? signUpResponse.data
           : [signUpResponse.data];
-        console.log("Processed SignUps:", signUps);
-
+        console.log("Fetched SignUps:", signUps);
+    
+        // Map Signups with Session Details
         const signUpsWithSessions = await Promise.all(
           signUps.map(async (signup) => {
             if (signup.SessionID) {
@@ -73,9 +75,16 @@ function Dashboard() {
                 const sessionResponse = await axios.get(
                   `http://localhost:8000/session/SessionID/${signup.SessionID}`
                 );
-                return { ...signup, session: sessionResponse.data, ProgramID: sessionResponse.data.ProgramID };
+                return {
+                  ...signup,
+                  session: sessionResponse.data,
+                  ProgramID: sessionResponse.data.ProgramID,
+                };
               } catch (err) {
-                console.error(`Failed to fetch session for SessionID: ${signup.SessionID}`, err);
+                console.error(
+                  `Failed to fetch session for SessionID: ${signup.SessionID}`,
+                  err
+                );
                 return { ...signup, session: null, ProgramID: null };
               }
             } else {
@@ -83,25 +92,30 @@ function Dashboard() {
             }
           })
         );
-
         console.log("SignUps with Session Details:", signUpsWithSessions);
-
-        const programResponse = await axios.get(`http://localhost:8000/program/signup/${userAccountID}`);
+    
+        // Fetch Programs
+        const programResponse = await axios.get(
+          `http://localhost:8000/program/signup/${userAccountID}`
+        );
         const programs = programResponse.data;
         console.log("Fetched Programs:", programs);
-
+    
+        // Combine Signups with Programs
         const combinedData = signUpsWithSessions.map((signup) => {
           const matchingProgram = programs.find(
             (program) => Number(program.ProgramID) === Number(signup.ProgramID)
           );
           if (!matchingProgram) {
-            console.warn(`No matching program found for ProgramID: ${signup.ProgramID}`);
+            console.warn(
+              `No matching program found for ProgramID: ${signup.ProgramID}`
+            );
           }
           return { ...signup, program: matchingProgram || null };
         });
-
-        console.log("Final Combined Data (Programs and Sessions):", combinedData);
-
+    
+        console.log("Final Combined Data:", combinedData);
+    
         setPrograms(combinedData);
       } catch (err) {
         setError("Failed to load programs and sessions.");
@@ -110,7 +124,6 @@ function Dashboard() {
         setLoading(false);
       }
     };
-
     fetchProgramsAndSessions();
   }, [userAccountID]);
 

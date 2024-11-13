@@ -30,51 +30,58 @@ class Signup {
     );
   }
 
-  // Create a new signup
   static async postSignUp(signUpDetails) {
     const connection = await mysql.createConnection(dbConfig);
-
+  
     const sqlQuery = `
       INSERT INTO signup (AccountID, SessionID, LunchOptionID, ChildID)
       VALUES (?, ?, ?, ?)
     `;
-
+  
     const values = [
       signUpDetails.AccountID,
       signUpDetails.SessionID,
       signUpDetails.LunchOptionID,
       signUpDetails.ChildID,
     ];
-
-    const [result] = await connection.execute(sqlQuery, values);
-    connection.end();
-
-    return result.insertId; // Return the ID of the newly created signup
-  }
-
-  // Retrieve a signup by ID
-  static async getSignUpById(signUpID) {
-    const connection = await mysql.createConnection(dbConfig);
-
-    const sqlQuery = `
-      SELECT * FROM SignUp WHERE AccountID = ?
-    `;
-
-    const [result] = await connection.execute(sqlQuery, [signUpID]);
-    connection.end();
-
-    if (result.length > 0) {
-      const row = result[0];
-      return new Signup(
-        row.AccountID, 
-        row.SessionID, 
-        row.LunchOptionID,
-        row.ChildID
-      );
+  
+    try {
+      console.log("Executing query:", sqlQuery);
+      console.log("With values:", values);
+  
+      const [result] = await connection.execute(sqlQuery, values);
+      console.log("Query result:", result);
+  
+      connection.end();
+  
+      return result.insertId; // Return the ID of the newly created signup
+    } catch (error) {
+      console.error("Database error during signup creation:", error.message);
+      connection.end();
+      throw error; // Rethrow to be caught in the controller
     }
-    return null; // Return null if no signup found
   }
+  
 
+  static async getSignUpById(accountID) {
+    const connection = await mysql.createConnection(dbConfig);
+  
+    const sqlQuery = `SELECT * FROM signup WHERE AccountID = ?`;
+    console.log("Executing query:", sqlQuery, "With AccountID:", accountID); // Debugging
+    const [result] = await connection.execute(sqlQuery, [accountID]);
+    connection.end();
+  
+    console.log("Query Result:", result); // Debug log
+  
+    return result.map((row) => new Signup(
+      row.SignUpID,
+      row.AccountID,
+      row.SessionID,
+      row.LunchOptionID,
+      row.ChildID
+    ));
+  }
+  
   // Update a signup
   static async updateSignUp(signUpID, signUpDetails) {
     const connection = await mysql.createConnection(dbConfig);
