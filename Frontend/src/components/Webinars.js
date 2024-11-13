@@ -4,31 +4,29 @@ import { FaInfoCircle } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 
 const Webinars = () => {
-  const [programs, setPrograms] = useState([]);
+  const [webinars, setWebinars] = useState([]);
   const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchPrograms = async () => {
+    const fetchWebinars = async () => {
       try {
-        const response = await fetch("http://localhost:8000/program");
+        const response = await fetch("http://localhost:8000/webinar");
         if (!response.ok) {
           throw new Error(`Error: ${response.statusText}`);
         }
         const data = await response.json();
-        console.log("Fetched programs:", data);
-
-        const webinars = data.filter((program) => program.TypeID === 5);
-        setPrograms(webinars);
+        console.log("Fetched webinars:", data);
+        setWebinars(data); 
       } catch (error) {
-        console.error("Error fetching programs:", error);
+        console.error("Error fetching webinars:", error);
       }
     };
 
-    fetchPrograms();
+    fetchWebinars();
   }, []);
 
-  const handleViewDetailsClick = (programId) => {
-    navigate(`/admin-view-program/${programId}`);
+  const handleViewDetailsClick = (webinarId) => {
+    navigate(`/admin-view-webinar/${webinarId}`);
   };
 
   return (
@@ -37,18 +35,18 @@ const Webinars = () => {
       <hr style={{ borderTop: "1px solid #ccc", marginBottom: "1rem" }} />
 
       <Row className="admin-program-cards-row">
-        {programs.map((program) => (
+        {webinars.map((webinar) => (
           <Col
             md={4}
-            key={program.ProgramID}
+            key={webinar.WebinarID}
             className="admin-program-card-col mb-4 d-flex align-items-stretch"
           >
             <Card className="admin-program-card shadow-sm h-100">
               <div className="admin-program-card-image-container">
                 <Card.Img
                   variant="top"
-                  src={program.image || "/img/default.jpg"}
-                  alt={program.ProgrameName}
+                  src={webinar.image || "/img/default.jpg"}
+                  alt={webinar.WebinarName}
                   className="admin-program-card-image"
                 />
               </div>
@@ -57,15 +55,19 @@ const Webinars = () => {
                   className="admin-program-card-title"
                   style={{ textAlign: "left" }}
                 >
-                  {program.ProgrameName}
+                  {webinar.WebinarName}
                 </Card.Title>
                 <Card.Text style={{ textAlign: "left" }}>
+                  Date: {new Date(webinar.Date).toLocaleDateString()}
+                </Card.Text>
+                <Card.Text style={{ textAlign: "left" }}>
+                  Speaker: {webinar.Speaker}
                 </Card.Text>
                 <div className="d-flex gap-2 mt-auto">
                   <Button
                     variant="warning"
                     className="admin-program-view-details-button d-flex align-items-center"
-                    onClick={() => handleViewDetailsClick(program.ProgramID)}
+                    onClick={() => handleViewDetailsClick(webinar.WebinarID)}
                   >
                     <FaInfoCircle className="me-1" /> <span>View Details</span>
                   </Button>
