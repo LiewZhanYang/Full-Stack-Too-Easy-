@@ -21,12 +21,12 @@ const AdminCoaching = () => {
 
       setRoomUrl(data.roomUrl);
 
-      // Update the booking with the new room URL
+      // Use the new method to update the booking with the room URL
       console.log(
         `Updating Booking ID: ${bookingID} with URL: ${data.roomUrl}`
       );
       const updateResponse = await fetch(
-        `http://localhost:8000/booking/${bookingID}`,
+        `http://localhost:8000/booking/${bookingID}`, 
         {
           method: "PUT",
           headers: { "Content-Type": "application/json" },

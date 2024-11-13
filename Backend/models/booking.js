@@ -54,12 +54,12 @@ class Booking {
     const connection = await mysql.createConnection(dbConfig);
     const sqlQuery = `
             INSERT INTO Booking (Time, Date, URL, AccountID)
-            VALUES (?, ?, ?)`;
+            VALUES (?, ?, ?, ?)`;
 
     const values = [
       bookingDetails.Time,
       bookingDetails.Date,
-      bookingDetails.URL,
+      bookingDetails.URL || null,
       bookingDetails.AccountID,
     ];
 
@@ -75,24 +75,17 @@ class Booking {
     connection.end();
   }
 
-  static async addMeetingUrl(id, updateData) {
+  static async updateMeetingUrlByBookingID(bookingID, URL) {
     const connection = await mysql.createConnection(dbConfig);
 
-    const fields = Object.keys(updateData)
-      .map((field) => `${field} = ?`)
-      .join(", ");
-    const values = Object.values(updateData);
-    values.push(id); // Add the BookingID for the WHERE clause
-
     const sqlQuery = `
-        UPDATE Booking
-        SET ${fields}
-        WHERE BookingID = ?
+      UPDATE Booking
+      SET URL = ?
+      WHERE BookingID = ?
     `;
 
     try {
-      const [result] = await connection.execute(sqlQuery, values);
-      console.log("Database Update Result:", result); // Added for debugging
+      const [result] = await connection.execute(sqlQuery, [URL, bookingID]);
       connection.end();
       return result;
     } catch (error) {

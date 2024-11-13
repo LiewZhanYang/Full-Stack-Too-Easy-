@@ -6,6 +6,6 @@ router.post("/", bookingController.postBooking);
 router.get("/:id", bookingController.getBookingByAccountID);
 router.delete("/:id", bookingController.deleteBookingByBookingID);
 router.get("/", bookingController.getAllBooking)
-router.put("/:id", bookingController.addMeetingUrl);
+router.put("/:bookingID", bookingController.updateMeetingUrlByBookingID);
 
 module.exports = router;

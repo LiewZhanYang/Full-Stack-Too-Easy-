@@ -100,11 +100,14 @@ function App() {
                   <Route path="/profile" element={<Profile />} />
                   <Route path="/booking" element={<Booking />} />
                   <Route path="/preCoaching" element={<PreCoaching />} />
-                  <Route path="/coaching/:bookingID" element={<Coaching />} />
+                  <Route path="/coaching/:id" element={<Coaching />} />
                   <Route path="/chatbot" element={<Chatbot />} />
                   {/* Admin routes */}
                   <Route path="/adminhome" element={<AdminHome />} />
-                  <Route path="/admin-coaching/:bookingID" element={<AdminCoaching />} />
+                  <Route
+                    path="/admin-coaching/:bookingID"
+                    element={<AdminCoaching />}
+                  />
                   <Route
                     path="/admin-view-program"
                     element={<AdminViewProgram />}

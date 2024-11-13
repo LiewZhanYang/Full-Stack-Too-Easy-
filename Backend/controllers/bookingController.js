@@ -21,7 +21,7 @@ const getAllBooking = async (req, res) => {
     console.error(error);
     res.status(500).send("Error getting Booking");
   }
-}
+};
 
 const getBookingByAccountID = async (req, res) => {
   const AccountID = req.params.id;
@@ -49,28 +49,27 @@ const deleteBookingByBookingID = async (req, res) => {
   }
 };
 
-const addMeetingUrl = async (req, res) => {
-  const id = parseInt(req.params.id);
-  const URL = req.body; 
+const updateMeetingUrlByBookingID = async (req, res) => {
+  const bookingID = parseInt(req.params.bookingID);
+  const { URL } = req.body;
 
   try {
-    const result = await Booking.addMeetingUrl(id, URL);
+    const result = await Booking.updateMeetingUrlByBookingID(bookingID, URL);
     if (result.affectedRows === 0) {
       return res.status(404).json({ message: "Booking not found" });
     }
-    res.status(200).json({ message: "Meeting URL added successfully" });
-    console.log("Successfully added Meeting URL");
+    res.status(200).json({ message: "Meeting URL updated successfully" });
+    console.log("Meeting URL updated successfully in the database.");
   } catch (error) {
-    console.error("Error adding Meeting URL:", error);
-    res.status(500).json({ message: "Error adding Meeting URL" });
+    console.error("Error updating Meeting URL:", error);
+    res.status(500).json({ message: "Error updating Meeting URL" });
   }
 };
-
 
 module.exports = {
   postBooking,
   getBookingByAccountID,
   deleteBookingByBookingID,
   getAllBooking,
-  addMeetingUrl
+  updateMeetingUrlByBookingID,
 };

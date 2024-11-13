@@ -12,19 +12,17 @@ function Precoaching() {
     navigate("/booking");
   };
 
-  const handleNavigateToCoaching = (bookingID) => {
-    navigate(`/coaching/${bookingID}`); // Navigates to coaching with bookingID
+  const handleNavigateToCoaching = (id) => {
+    navigate(`/coaching/${id}`);
   };
 
   useEffect(() => {
     const fetchBookingByAccountID = async () => {
-      const accountId = localStorage.getItem("userId"); // Retrieve AccountID from localStorage
-      console.log("Account ID:", accountId); // Log Account ID for debugging
-      if (accountId) {
+      const id = localStorage.getItem("userId"); // Retrieve AccountID from localStorage
+      console.log("Account ID:", id); // Log Account ID for debugging
+      if (id) {
         try {
-          const response = await fetch(
-            `http://localhost:8000/booking/${accountId}`
-          );
+          const response = await fetch(`http://localhost:8000/booking/${id}`);
           const data = await response.json();
           console.log("User Booking Data:", data); // Log booking data for debugging
           if (data && data.length > 0) {
@@ -112,8 +110,8 @@ function Precoaching() {
                   className="btn btn-warning me-3 px-4 join-button"
                   style={{ fontWeight: 500 }}
                   onClick={() =>
-                    handleNavigateToCoaching(bookingData.BookingID)
-                  } // Pass bookingID
+                    handleNavigateToCoaching(bookingData.AccountID)
+                  } 
                 >
                   Let's go!
                 </button>
