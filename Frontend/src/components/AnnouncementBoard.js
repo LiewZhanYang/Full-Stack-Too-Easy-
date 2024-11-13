@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 const AnnouncementBoard = () => {
   const [announcements, setAnnouncements] = useState([]);
 
-  // Fetch announcements from your backend (Replace URL with actual endpoint)
+  // Fetch announcements from your backend
   useEffect(() => {
     fetch("http://localhost:8000/announcement/") // Adjust the endpoint as per your backend setup
       .then((response) => response.json())
@@ -12,19 +12,77 @@ const AnnouncementBoard = () => {
   }, []);
 
   return (
-    <div className="announcement-board">
-      <h3 className="announcement-title">Latest Announcement</h3>
+    <div
+      style={{
+        backgroundColor: "#f9fafb", // Soft background for the announcement board
+        borderRadius: "12px",
+        padding: "16px",
+        boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+      }}
+    >
+      <h3
+        style={{
+          fontSize: "18px",
+          fontWeight: "bold",
+          color: "#374151", // Dark gray for the title
+          marginBottom: "12px",
+        }}
+      >
+        Latest Announcement
+      </h3>
       {announcements.length > 0 ? (
-        <div className="announcement-card">
-          <h4>{announcements[0].Title}</h4> {/* Displaying the title */}
-          <p className="announcement-date">
+        <div
+          style={{
+            backgroundColor: "#ffffff",
+            borderRadius: "8px",
+            padding: "16px",
+            border: "1px solid #e5e7eb",
+            boxShadow: "0 2px 4px rgba(0, 0, 0, 0.05)",
+          }}
+        >
+          <h4
+            style={{
+              fontSize: "16px",
+              fontWeight: "600",
+              color: "#111827", // Strong text color for the announcement title
+              marginBottom: "8px",
+            }}
+          >
+            {announcements[0].Title}
+          </h4>
+          <p
+            style={{
+              fontSize: "12px",
+              color: "#9ca3af", // Muted text color for the date
+              marginBottom: "8px",
+            }}
+          >
             Published on:{" "}
-            {new Date(announcements[0].PostedDate).toLocaleDateString()}
+            {new Date(announcements[0].PostedDate).toLocaleDateString("en-US", {
+              weekday: "short",
+              month: "long",
+              day: "numeric",
+              year: "numeric",
+            })}
           </p>
-          <p>{announcements[0].Body}</p> {/* Displaying the body */}
+          <p
+            style={{
+              fontSize: "14px",
+              color: "#4b5563", // Standard text color for the body
+            }}
+          >
+            {announcements[0].Body}
+          </p>
         </div>
       ) : (
-        <p>No announcements available.</p>
+        <p
+          style={{
+            fontSize: "14px",
+            color: "#9ca3af", // Muted color for empty state
+          }}
+        >
+          No announcements available.
+        </p>
       )}
     </div>
   );
