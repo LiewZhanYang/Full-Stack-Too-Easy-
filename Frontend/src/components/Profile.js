@@ -31,7 +31,7 @@ function Profile() {
   };
 
   useEffect(() => {
-    const fetchCustomerData = async () => {
+    const fetchCustomerData = async () => { //
       try {
         const response = await axios.get(`http://localhost:8000/customer/id/${userId}`);
         if (response.data && response.data.length > 0) {
@@ -208,7 +208,7 @@ function Profile() {
 
           <div className="grid grid-cols-2 gap-6">
           <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block text-sm font-medium text-gray-700 mb-1"> 
             Membership Expiry:
           </label>
           <input
