@@ -86,6 +86,7 @@ CREATE TABLE Booking (
 	BookingID INT PRIMARY KEY AUTO_INCREMENT,
     Time TIME NOT NULL,
     Date DATE NOT NULL,
+    URL VARCHAR(100) NOT NULL,
     AccountID INT,
     
     FOREIGN KEY (AccountID) REFERENCES Customer (AccountID)
@@ -170,13 +171,13 @@ VALUES
 (3, 3, 3, 3, 4),  -- Bob Johnson, Public Speaking Workshop - Advanced, Fruit Salad
 (4, 4, 4, 4, 2);  -- Alice Brown, PSLE Power Up Camp - PSLE Power Up, Turkey Burger
 
-INSERT INTO Booking (BookingID, Time, Date, AccountID)
+INSERT INTO Booking (BookingID, Time, Date, URL, AccountID)
 VALUES
-(1, '09:00:00', '2025-01-15', 1),
-(2, '11:00:00', '2025-01-16', 2),
-(3, '13:00:00', '2025-01-17', 3),
-(4, '15:00:00', '2025-01-18', 4),
-(5, '17:00:00', '2025-01-19', 5);
+(1, '09:00:00', '2025-01-15', 'https://mindsphere-too-easy.whereby.com/ced5223d-0b18-4cf5-af00-be75fd3c9d94', 1),
+(2, '11:00:00', '2025-01-16', 'https://mindsphere-too-easy.whereby.com/ced5223d-0b18-4cf5-af00-be75fd3c9d94',2),
+(3, '13:00:00', '2025-01-17', 'https://mindsphere-too-easy.whereby.com/ced5223d-0b18-4cf5-af00-be75fd3c9d94',3),
+(4, '15:00:00', '2025-01-18', 'https://mindsphere-too-easy.whereby.com/ced5223d-0b18-4cf5-af00-be75fd3c9d94',4),
+(5, '17:00:00', '2025-01-19', 'https://mindsphere-too-easy.whereby.com/ced5223d-0b18-4cf5-af00-be75fd3c9d94',5);
 
 INSERT INTO Payment (OrderID, InvoiceID, Amount, CreatedAt, Status, InvoicePath, SessionID, PaidBy, ApprovedBy, Reason)
 VALUES
