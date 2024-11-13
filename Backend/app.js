@@ -21,12 +21,15 @@ const bookingRoutes = require("./routes/bookingRoutes");
 const paymentRoutes = require("./routes/paymentRoutes");
 const programRoutes = require("./routes/programRoutes");
 const programtypeRoutes = require("./routes/programtypeRoutes");
+const webinarRoutes = require("./routes/webinarRoutes");
+const programtypeRoutes = require("./routes/programtypeRoutes")
 const sessionRoutes = require("./routes/sessionRoutes");
 const signupRoutes = require("./routes/signUpRoutes");
 const authController = require("./controllers/authController");
 const uploadRoutes = require("./routes/uploadRoutes");
 const emailRoutes = require("./routes/emailRoutes");
 const meetingRoutes = require("./routes/meetingRoutes");
+const announceRoutes = require("./routes/announcementRoutes")
 
 app.use("/customer", customerRoutes);
 app.use("/admin", adminRoutes);
@@ -35,12 +38,14 @@ app.use("/booking", bookingRoutes);
 app.use("/payment", paymentRoutes);
 app.use("/program", programRoutes);
 app.use("/type", programtypeRoutes);
+app.use("/webinar", webinarRoutes);
 app.use("/session", sessionRoutes);
 app.use("/signup", signupRoutes);
 app.post("/login", authController.login);
 app.use("/upload", uploadRoutes);
 app.use("/email", emailRoutes);
 app.use("/meeting", meetingRoutes);
+app.use("/announcement", announceRoutes);
 
 //const testController = require('./controllers/testController');
 

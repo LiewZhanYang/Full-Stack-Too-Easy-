@@ -2,10 +2,11 @@ const dbConfig = require('../dbConfig');
 const mysql = require('mysql2/promise');
 
 class Booking {
-    constructor(BookingID, Time, Date, AccountID){
+    constructor(BookingID, Time, Date, URL, AccountID){
         this.BookingID = BookingID;
         this.Time = Time;
         this.Date = Date;
+        this.URL = URL;
         this.AccountID = AccountID;
     }
 
@@ -23,6 +24,7 @@ class Booking {
             row.BookingID,
             row.Time, 
             row.Date,
+            row.URL,
             row.AccountID
         )});       
     }
@@ -41,6 +43,7 @@ class Booking {
             row.BookingID,
             row.Time, 
             row.Date,
+            row.URL,
             row.AccountID
         )});
     }
@@ -48,12 +51,13 @@ class Booking {
     static async postBooking(bookingDetails) {
         const connection = await mysql.createConnection(dbConfig);
         const sqlQuery = `
-            INSERT INTO Booking (Time, Date, AccountID)
+            INSERT INTO Booking (Time, Date, URL, AccountID)
             VALUES (?, ?, ?)`;
 
         const values = [
             bookingDetails.Time,
             bookingDetails.Date,
+            bookingDetails.URL,
             bookingDetails.AccountID
         ];
 

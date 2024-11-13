@@ -15,6 +15,8 @@ import Camps from "./components/Camps";
 import Labs from "./components/Labs";
 import Professionals from "./components/Professionals";
 import Webinars from "./components/Webinars";
+import WebinarDetails from "./components/WebinarDetails";
+import Coaching from "./components/PreCoaching.js";
 import Profile from "./components/Profile";
 import Payment from "./components/Payment";
 import Login from "./components/Login.js";
@@ -32,10 +34,12 @@ import AdminCreateProgram from "./components/AdminCreateProgram.js";
 import AdminEditProgram from "./components/AdminEditProgram.js";
 import AdminEditTiming from "./components/AdminEditTiming.js";
 import AdminCoaching from "./components/AdminCoaching.js";
+import AdminCreateWebinar from "./components/AdminCreateWebinar.js";
+import AdminEditWebinar from "./components/AdminEditWebinar.js";
+import AdminViewWebinars from "./components/AdminViewWebinars.js";
 import Chatbot from "./components/Chatbot.js";
-import AdminSideBar from './components/AdminSidebar.js';
+import AdminSideBar from "./components/AdminSidebar.js";
 import "./App.css";
-
 
 // Layout component to handle conditional rendering
 function Layout({ children }) {
@@ -88,6 +92,11 @@ function App() {
                   <Route path="/labs" element={<Labs />} />
                   <Route path="/professionals" element={<Professionals />} />
                   <Route path="/webinars" element={<Webinars />} />
+                  <Route
+                    path="/webinar-details/:id"
+                    element={<WebinarDetails />}
+                  />
+                  <Route path="/coaching" element={<Coaching />} />
                   <Route path="/profile" element={<Profile />} />
                   <Route path="/booking" element={<Booking />} />
                   <Route path="/preCoaching" element={<PreCoaching />} />
@@ -131,6 +140,18 @@ function App() {
                   <Route
                     path="/admin-edit-timing"
                     element={<AdminEditTiming />}
+                  />
+                  <Route
+                    path="/admin-create-webinar"
+                    element={<AdminCreateWebinar />}
+                  />
+                  <Route
+                    path="/admin-edit-webinar/:id"
+                    element={<AdminEditWebinar />}
+                  />
+                  <Route
+                    path="/admin-view-webinars"
+                    element={<AdminViewWebinars />}
                   />
                   {/* Logout route redirects to login */}
                   <Route

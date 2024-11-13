@@ -52,7 +52,7 @@ function Precoaching() {
   };
 
   return (
-    <div className="container mt-5 precoaching-container p-4">
+    <div className="container mt-1 precoaching-container p-4">
       <h2 className="precoaching-title">1 to 1 Virtual Coaching Session</h2>
       <hr style={{ borderTop: "1px solid #ccc", marginBottom: "1rem" }} />
 

@@ -52,6 +52,17 @@ CREATE TABLE Program (
     FOREIGN KEY (TypeID) REFERENCES ProgramType(TypeID)
 );
 
+CREATE TABLE Webinar (
+	WebinarID INT PRIMARY KEY AUTO_INCREMENT,
+    WebinarName VARCHAR(50) NOT NULL,
+    WebinarDesc VARCHAR(100) NOT NULL,
+    Link VARCHAR(100) NOT NULL,
+    Date DATE NOT NULL,
+    StartTime TIME NOT NULL,
+    EndTime TIME NOT NULL, 
+    Speaker VARCHAR(50) NOT NULL
+);
+
 CREATE TABLE Session (
 	SessionID INT PRIMARY KEY AUTO_INCREMENT,
     StartDate DATE NOT NULL,
@@ -86,6 +97,7 @@ CREATE TABLE Booking (
 	BookingID INT PRIMARY KEY AUTO_INCREMENT,
     Time TIME NOT NULL,
     Date DATE NOT NULL,
+    URL VARCHAR(100) NOT NULL,
     AccountID INT,
     
     FOREIGN KEY (AccountID) REFERENCES Customer (AccountID)
@@ -106,6 +118,13 @@ CREATE TABLE Payment (
     FOREIGN KEY(SessionID) REFERENCES Session(SessionID),
     FOREIGN KEY (PaidBy) REFERENCES Customer (AccountID),
     FOREIGN KEY (ApprovedBy) REFERENCES Admin (AdminID)
+);
+
+CREATE TABLE Announcement (
+	AnnouncementID INT PRIMARY KEY AUTO_INCREMENT,
+    Title VARCHAR(100) NOT NULL,
+    Body VARCHAR(400) NOT NULL,
+    PostedDate DATE NOT NULL
 );
 
 -- Data Insertion
@@ -137,8 +156,7 @@ VALUES
 (1, 'Workshop'),
 (2, 'Camps'),
 (3, 'Labs'),
-(4, 'Professional'),
-(5, 'Webinar');
+(4, 'Professional');
 
 INSERT INTO Program (ProgramName, ProgramDesc, Cost, DiscountedCost, LunchProvided, Duration, ClassSize, TypeID)
 VALUES
@@ -147,6 +165,14 @@ VALUES
 ('Public Speaking Workshop - Advanced', 'Master the art of public speaking', 1388, 1249.2, TRUE, 8, 10, 1),
 ('PSLE Power Up Camp - PSLE Power Up', 'Comprehensive PSLE revision', 388, 349.2, FALSE, 2, 20, 2),
 ('PSLE Power Up Camp - PSLE Chinese Oral Booster', 'Boost your Chinese oral skills', 488, 439.2, FALSE, 2, 15, 2);
+
+INSERT INTO Webinar (WebinarName, WebinarDesc, Link, Date, StartTime, EndTime, Speaker)
+VALUES
+('Mastering Python', 'Learn the fundamentals of Python programming', 'https://www.python.org/about/gettingstarted/', '2024-11-13', '10:00:00', '12:00:00', 'Dr. Python'),
+('Data Science 101', 'Introduction to data science concepts and tools', 'https://www.datasciencecentral.com/', '2024-11-20', '13:30:00', '15:30:00', 'Prof. Data'),
+('Web Development Workshop', 'Build dynamic web applications with HTML, CSS, and JavaScript', 'https://www.w3schools.com/', '2024-11-27', '09:00:00', '11:00:00', 'Mr. Web'),
+('AI and Machine Learning', 'Explore the world of artificial intelligence and machine learning', 'https://www.machinelearningmastery.com/', '2024-12-04', '14:00:00', '16:00:00', 'Ms. AI'),
+('Cybersecurity Basics', 'Learn how to protect your digital assets', 'https://www.cybersecurityventures.com/', '2024-12-11', '11:00:00', '13:00:00', 'Captain Cyber');
 
 INSERT INTO Session (SessionID, StartDate, EndDate, Time, Location, Vacancy, ProgramID)
 VALUES
@@ -170,13 +196,13 @@ VALUES
 (3, 3, 3, 3, 4),  -- Bob Johnson, Public Speaking Workshop - Advanced, Fruit Salad
 (4, 4, 4, 4, 2);  -- Alice Brown, PSLE Power Up Camp - PSLE Power Up, Turkey Burger
 
-INSERT INTO Booking (BookingID, Time, Date, AccountID)
+INSERT INTO Booking (BookingID, Time, Date, URL, AccountID)
 VALUES
-(1, '09:00:00', '2025-01-15', 1),
-(2, '11:00:00', '2025-01-16', 2),
-(3, '13:00:00', '2025-01-17', 3),
-(4, '15:00:00', '2025-01-18', 4),
-(5, '17:00:00', '2025-01-19', 5);
+(1, '09:00:00', '2025-01-15', 'https://mindsphere-too-easy.whereby.com/ced5223d-0b18-4cf5-af00-be75fd3c9d94', 1),
+(2, '11:00:00', '2025-01-16', 'https://mindsphere-too-easy.whereby.com/ced5223d-0b18-4cf5-af00-be75fd3c9d94',2),
+(3, '13:00:00', '2025-01-17', 'https://mindsphere-too-easy.whereby.com/ced5223d-0b18-4cf5-af00-be75fd3c9d94',3),
+(4, '15:00:00', '2025-01-18', 'https://mindsphere-too-easy.whereby.com/ced5223d-0b18-4cf5-af00-be75fd3c9d94',4),
+(5, '17:00:00', '2025-01-19', 'https://mindsphere-too-easy.whereby.com/ced5223d-0b18-4cf5-af00-be75fd3c9d94',5);
 
 INSERT INTO Payment (OrderID, InvoiceID, Amount, CreatedAt, Status, InvoicePath, SessionID, PaidBy, ApprovedBy, Reason)
 VALUES
@@ -185,7 +211,12 @@ VALUES
 (3, 67491350, 1388, '2024-10-15 12:00:00', 'Approved', 'path/to/invoice-67491350.pdf', 3, 3, 1, 'Approved by Admin 1'),
 (4, 28653104, 388, '2024-10-20 12:00:00', 'Pending', 'path/to/invoice-28653104.pdf', 4, 4, NULL, NULL);
 
--- Trigger
+INSERT INTO Announcement (AnnouncementID, Title, Body, PostedDate) 
+VALUES 
+(1, 'Release of new programs', 'To all our dear and valued customers, we are excited to announce that with the upcoming holidays, new programs are to be released soon! So Stay tune!', '2024-11-11'),
+(2, 'New promotions', 'In lieu of certain events and happenings, new promotions are to be rolled out! Members can await for the arrival soon!', '2024-11-13');
+
+Trigger
 
 -- Add Age On Insertion
 DELIMITER //
