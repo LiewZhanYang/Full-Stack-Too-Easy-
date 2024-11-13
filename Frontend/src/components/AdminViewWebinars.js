@@ -46,9 +46,12 @@ const AdminViewWebinars = () => {
   const handleDeleteClick = async (webinarId) => {
     if (window.confirm("Are you sure you want to delete this webinar?")) {
       try {
-        const response = await fetch(`http://localhost:8000/webinar/${webinarId}`, {
-          method: "DELETE",
-        });
+        const response = await fetch(
+          `http://localhost:8000/webinar/${webinarId}`,
+          {
+            method: "DELETE",
+          }
+        );
 
         if (response.ok) {
           console.log("Webinar deleted successfully");
@@ -146,7 +149,7 @@ const AdminViewWebinars = () => {
         ))}
       </Row>
 
-      {/* Create Webinar Button */}
+      {/* Create Webinar Button (Bottom Right) */}
       <Button
         variant="success"
         className="admin-create-webinar-button d-flex align-items-center"
