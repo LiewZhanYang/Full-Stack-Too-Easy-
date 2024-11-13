@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Container, Row, Col, Card, Button, Form } from "react-bootstrap";
-import { FaSearch, FaEdit, FaPlus } from "react-icons/fa";
+import { FaSearch, FaEdit, FaPlus, FaTrash } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 
 const AdminViewWebinars = () => {
@@ -41,6 +41,30 @@ const AdminViewWebinars = () => {
 
   const handleEditClick = (webinarId) => {
     navigate(`/admin-edit-webinar/${webinarId}`);
+  };
+
+  const handleDeleteClick = async (webinarId) => {
+    if (window.confirm("Are you sure you want to delete this webinar?")) {
+      try {
+        const response = await fetch(`http://localhost:8000/webinar/${webinarId}`, {
+          method: "DELETE",
+        });
+
+        if (response.ok) {
+          console.log("Webinar deleted successfully");
+          setWebinars((prevWebinars) =>
+            prevWebinars.filter((webinar) => webinar.WebinarID !== webinarId)
+          );
+          setFilteredWebinars((prevWebinars) =>
+            prevWebinars.filter((webinar) => webinar.WebinarID !== webinarId)
+          );
+        } else {
+          console.error("Failed to delete webinar");
+        }
+      } catch (error) {
+        console.error("Error deleting webinar:", error);
+      }
+    }
   };
 
   const handleCreateWebinarClick = () => {
@@ -106,7 +130,14 @@ const AdminViewWebinars = () => {
                     className="admin-webinar-edit-button d-flex align-items-center"
                     onClick={() => handleEditClick(webinar.WebinarID)}
                   >
-                    <FaEdit className="me-1" /> <span>Edit Details</span>
+                    <FaEdit className="me-1" /> <span>Edit</span>
+                  </Button>
+                  <Button
+                    variant="danger"
+                    className="admin-webinar-delete-button d-flex align-items-center"
+                    onClick={() => handleDeleteClick(webinar.WebinarID)}
+                  >
+                    <FaTrash className="me-1" /> <span>Delete</span>
                   </Button>
                 </div>
               </Card.Body>
