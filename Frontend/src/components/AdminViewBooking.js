@@ -81,8 +81,7 @@ const AdminViewBooking = () => {
   return (
     <Container fluid className="admin-bookings-page p-4">
       <h2 className="precoaching-title">All Bookings</h2>
-      <hr className="admin-bookings-divider mb-4" />
-
+      <br />
       <Row>
         <Col>{renderBookings()}</Col>
       </Row>
