@@ -159,6 +159,39 @@ function Sidebar() {
                     </Link>
                   </div>
                 )}
+                {/* Announcement Dropdown */}
+                <div className="mt-3">
+                  <button
+                    onClick={() => toggleMenu("announcement")}                
+                    className="btn d-flex align-items-center w-100 text-dark fw-bold px-3 py-2 border-0 bg-transparent"
+                  >
+                    <i className="bi bi-camera-video me-2"></i>
+                    Announcement
+                    <i
+                      className={`bi ${
+                        expandedMenu === "announcement"
+                          ? "bi-chevron-up"
+                          : "bi-chevron-down"
+                      } ms-auto`}
+                    ></i>
+                  </button>
+                  {expandedMenu === "announcement" && (
+                    <div className="ps-4">
+                      <Link
+                        to="/admin-view-announcement"
+                        className="d-block py-1 text-dark text-decoration-none"
+                      >
+                        View All
+                      </Link>
+                      <Link
+                        to="/admin-create-announcement"
+                        className="d-block py-1 text-dark text-decoration-none"
+                      >
+                        Create
+                      </Link>
+                    </div>
+                  )}
+                </div>
                 {/* Registration Dropdown */}
                 <div className="mt-3">
                   <button

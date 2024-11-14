@@ -43,6 +43,7 @@ import Workshopvm from "./components/Workshopvm.js";
 import AdminCreateAnnouncement from "./components/AdminCreateAnnouncement.js";
 import AdminViewAnnouncement from "./components/AdminViewAnnouncement.js";
 import AdminEditAnnouncement from "./components/AdminEditAnnouncement.js"; // Import the componen
+import AdminViewSingleAnnouncement from "./components/AdminViewSingleAnnouncement";
 import "./App.css";
 
 // Layout component to handle conditional rendering
@@ -160,6 +161,10 @@ function App() {
                   <Route
                     path="/admin-edit-announcement/:id"
                     element={<AdminEditAnnouncement />}
+                  />
+                  <Route
+                    path="/admin-view-single-announcement/:id"
+                    element={<AdminViewSingleAnnouncement />}
                   />
                   <Route
                     path="/admin-create-webinar"

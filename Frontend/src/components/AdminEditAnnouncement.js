@@ -12,11 +12,18 @@ const AdminEditAnnouncement = () => {
   useEffect(() => {
     const fetchAnnouncement = async () => {
       try {
-        const response = await axios.get(`http://localhost:8000/announcement/${id}`);
+        const response = await axios.get(
+          `http://localhost:8000/announcement/${id}`
+        );
         const announcement = response.data;
-        console.log(announcement); // Check the fetched data structure
-        setTitle(announcement.Title);
-        setDescription(announcement.Body);
+
+        // Check if the response contains the expected data structure
+        if (announcement && announcement.AnnouncementID === parseInt(id)) {
+          setTitle(announcement.Title);
+          setDescription(announcement.Body);
+        } else {
+          alert("Announcement not found or ID mismatch");
+        }
       } catch (error) {
         console.error("Error fetching announcement:", error);
         alert("There was an error fetching the announcement details.");
@@ -28,14 +35,17 @@ const AdminEditAnnouncement = () => {
 
   const handleUpdateAnnouncement = async () => {
     try {
-      const response = await axios.put(`http://localhost:8000/announcement/${id}`, {
-        Title: title,
-        Body: description,
-      });
+      const response = await axios.put(
+        `http://localhost:8000/announcement/${id}`,
+        {
+          Title: title,
+          Body: description,
+        }
+      );
 
       if (response.status === 200) {
         console.log("Announcement Updated:", response.data);
-        navigate("/AdminHome"); // Navigate to the dashboard after successful update
+        navigate("/admin-view-announcement"); // Redirect to the announcement list after updating
       }
     } catch (error) {
       console.error("Error updating announcement:", error);
@@ -44,7 +54,7 @@ const AdminEditAnnouncement = () => {
   };
 
   const handleCancel = () => {
-    navigate("/AdminHome");
+    navigate("/admin-view-announcement");
   };
 
   return (

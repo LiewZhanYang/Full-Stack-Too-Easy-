@@ -10,36 +10,42 @@ const AdminViewAnnouncement = () => {
   const [sortedAnnouncements, setSortedAnnouncements] = useState([]);
   const [sortOption, setSortOption] = useState("Latest");
 
+  const fetchAnnouncements = async () => {
+    try {
+      const response = await axios.get("http://localhost:8000/announcement/");
+      setAnnouncements(response.data);
+      setSortedAnnouncements(response.data);
+    } catch (error) {
+      console.error("Error fetching announcements:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchAnnouncements();
+  }, []);
+
+  const handleDeleteClick = async (id) => {
+    if (window.confirm("Are you sure you want to delete this announcement?")) {
+      try {
+        await axios.delete(`http://localhost:8000/announcement/${id}`);
+        alert("Announcement deleted successfully");
+
+        // Refresh the list after deletion
+        fetchAnnouncements();
+      } catch (error) {
+        console.error("Error deleting announcement:", error);
+        alert("There was an error deleting the announcement.");
+      }
+    }
+  };
+
   const handleViewClick = (id) => {
-    navigate(`/announcement/view/${id}`);
+    navigate(`/admin-view-single-announcement/${id}`);
   };
 
   const handleEditClick = (id) => {
     navigate(`/admin-edit-announcement/${id}`);
   };
-
-  const handleDeleteClick = (id) => {
-    // Optional: Implement a confirmation dialog
-    if (window.confirm("Are you sure you want to delete this announcement?")) {
-      // Implement delete functionality here
-      console.log("Deleting announcement with ID:", id);
-    }
-  };
-
-  useEffect(() => {
-    // Fetch all announcements from the API
-    const fetchAnnouncements = async () => {
-      try {
-        const response = await axios.get("http://localhost:8000/announcement/");
-        setAnnouncements(response.data);
-        setSortedAnnouncements(response.data); // Default to unsorted list
-      } catch (error) {
-        console.error("Error fetching announcements:", error);
-      }
-    };
-
-    fetchAnnouncements();
-  }, []);
 
   const handleSortChange = (event) => {
     const option = event.target.value;
@@ -50,13 +56,11 @@ const AdminViewAnnouncement = () => {
   const sortAnnouncements = (option) => {
     let sorted = [...announcements];
     if (option === "Month") {
-      // Sort by month (from January to December)
       sorted.sort(
         (a, b) =>
           new Date(a.PostedDate).getMonth() - new Date(b.PostedDate).getMonth()
       );
     } else if (option === "Year") {
-      // Sort by year (latest to oldest)
       sorted.sort(
         (a, b) =>
           new Date(b.PostedDate).getFullYear() -
