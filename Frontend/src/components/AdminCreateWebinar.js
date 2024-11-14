@@ -10,7 +10,15 @@ const AdminCreateWebinar = () => {
   const [startTime, setStartTime] = useState("");
   const [endTime, setEndTime] = useState("");
   const [speaker, setSpeaker] = useState("");
+  const [image, setImage] = useState(null);
   const navigate = useNavigate();
+
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setImage(URL.createObjectURL(file));
+    }
+  };
 
   const handleCreateWebinar = async () => {
     const webinarDetails = {
@@ -21,6 +29,7 @@ const AdminCreateWebinar = () => {
       StartTime: startTime,
       EndTime: endTime,
       Speaker: speaker,
+      // Optionally, add logic to upload the image file as part of the webinar data if needed
     };
 
     try {
@@ -62,6 +71,21 @@ const AdminCreateWebinar = () => {
             value={name}
             onChange={(e) => setName(e.target.value)}
           />
+        </Form.Group>
+
+        <Form.Group controlId="webinarImage" className="mb-3">
+          <Form.Label>Upload Image</Form.Label>
+          <Form.Control type="file" accept="image/*" onChange={handleImageChange} />
+          {image && (
+            <div className="image-preview mt-3">
+              <img
+                src={image}
+                alt="Webinar Preview"
+                className="img-fluid rounded"
+                style={{ maxHeight: "200px" }}
+              />
+            </div>
+          )}
         </Form.Group>
 
         <Form.Group controlId="webinarDescription" className="mb-3">
