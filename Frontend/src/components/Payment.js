@@ -6,6 +6,19 @@ const lunchOptionMapping = {
   fish: 2,
   veggie: 3,
 };
+// Helper function to calculate age from DOB
+const calculateAge = (dob) => {
+  if (!dob) return "Unknown";
+  const birthDate = new Date(dob);
+  const today = new Date();
+  let age = today.getFullYear() - birthDate.getFullYear();
+  const monthDifference = today.getMonth() - birthDate.getMonth();
+  if (monthDifference < 0 || (monthDifference === 0 && today.getDate() < birthDate.getDate())) {
+    age--;
+  }
+  return age;
+};
+
 
 function Payment() {
   const location = useLocation();
@@ -101,21 +114,18 @@ function Payment() {
     const pricePerChild = parseFloat(price?.replace("$", "") || 0);
     setTotalPrice(pricePerChild * selectedChildren.length);
   }, [selectedChildren, price]);
-
+  
   const handleChildSelection = (childId) => {
     setSelectedChildren((prevSelected) => {
       if (prevSelected.some((child) => child.ChildID === childId)) {
         // Remove child if already selected
         return prevSelected.filter((child) => child.ChildID !== childId);
       }
-      if (prevSelected.length >= 2) {
-        alert("You can only select a maximum of 2 children.");
-        return prevSelected;
-      }
       // Add new child with default lunch option
       return [...prevSelected, { ChildID: childId, lunchOption: "" }];
     });
   };
+  
 
 
   const handleLunchOptionChange = (childId, lunchOption) => {
@@ -287,7 +297,7 @@ function Payment() {
             style={{
               cursor: "pointer",
               borderBottom:
-                activeTab === "Overview" ? "2px solid #000" : "none",
+                activeTab === "Overview" ? "2px solid #FFC107" : "none",
               marginBottom: "-1px",
             }}
             onClick={() => setActiveTab("Overview")}
@@ -298,7 +308,7 @@ function Payment() {
             className={`pb-2`}
             style={{
               cursor: "pointer",
-              borderBottom: activeTab === "Payment" ? "2px solid #000" : "none",
+              borderBottom: activeTab === "Payment" ? "2px solid #FFC107" : "none",
               marginBottom: "-1px",
             }}
             onClick={() => setActiveTab("Payment")}
@@ -342,55 +352,42 @@ function Payment() {
               ))}
             </ul>
           </div>
-
+          
           <h3 className="fs-5 mb-3">Select Children Attending</h3>
           <div className="mb-4">
-            {children.map((child) => (
-              <div key={child.ChildID} className="form-check mb-3">
-                <input
-                  type="checkbox"
-                  className="form-check-input"
-                  id={`child-${child.ChildID}`}
-                  checked={selectedChildren.some(
-                    (c) => c.ChildID === child.ChildID
-                  )}
-                  onChange={() => handleChildSelection(child.ChildID)}
-                  disabled={
-                    !selectedChildren.some(
-                      (c) => c.ChildID === child.ChildID
-                    ) && selectedChildren.length >= 2
-                  }
-                />
-                <label
-                  className="form-check-label"
-                  htmlFor={`child-${child.ChildID}`}
-                >
-                  {child.Name} (
-                  {child.DOB
-                    ? child.DOB.split("T")[0]
-                    : "Date of Birth not provided"}
-                  )
-                </label>
+          {children.map((child) => (
+    <div key={child.ChildID} className="form-check mb-3">
+      <input
+        type="checkbox"
+        className="form-check-input"
+        id={`child-${child.ChildID}`}
+        checked={selectedChildren.some((c) => c.ChildID === child.ChildID)}
+        onChange={() => handleChildSelection(child.ChildID)}
+      />
+      <label
+        className="form-check-label"
+        htmlFor={`child-${child.ChildID}`}
+      >
+        {child.Name} (Age: {calculateAge(child.DOB)})
+      </label>
 
-                  
-                {selectedChildren.some((c) => c.ChildID === child.ChildID) && (
-                  <div className="mt-2">
-                    <label className="form-label">Lunch Option:</label>
-                    <select
-                    className="form-select"
-                    value={
-                      selectedChildren.find((c) => c.ChildID === child.ChildID)?.lunchOption || ""
-                    }
-                    onChange={(e) => handleLunchOptionChange(child.ChildID, e.target.value)}
-                  >
-                    <option value="">Select lunch option</option>
-                    <option value="chicken">Chicken Rice</option>
-                    <option value="fish">Fish & Chips</option>
-                    <option value="veggie">Vegetarian</option>
-                  </select>
-
-                  </div>
-                )}
+      {selectedChildren.some((c) => c.ChildID === child.ChildID) && (
+        <div className="mt-2">
+          <label className="form-label">Lunch Option:</label>
+          <select
+            className="form-select"
+            value={
+              selectedChildren.find((c) => c.ChildID === child.ChildID)?.lunchOption || ""
+            }
+            onChange={(e) => handleLunchOptionChange(child.ChildID, e.target.value)}
+          >
+            <option value="">Select lunch option</option>
+            <option value="chicken">Chicken Rice</option>
+            <option value="fish">Fish & Chips</option>
+            <option value="veggie">Vegetarian</option>
+          </select>
+        </div>
+      )}
               </div>
             ))}
           </div>
