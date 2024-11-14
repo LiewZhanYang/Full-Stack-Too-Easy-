@@ -37,6 +37,29 @@ exports.uploadFileToS3 = async (file, foldername) => {
     throw new Error("Error uploading file to S3");
   }
 };
+exports.uploadFileToS3 = async (file, foldername) => {
+  // Define a consistent filename, e.g., 'profile-picture' or 'main-image'
+  // This ensures that only one file is present per folder and replaces previous uploads.
+  const filename = "only-you"; // Fixed name or set a meaningful name for each context
+
+  const params = {
+    Bucket: process.env.AWS_BUCKET_NAME,
+    Key: `${foldername}/${filename}`, // S3 path including folder and filename
+    Body: file.buffer,
+    ContentType: file.mimetype,
+  };
+
+  try {
+    console.log("Uploading file to S3 with params:", params);
+    const command = new PutObjectCommand(params);
+    const result = await s3.send(command);
+    console.log("File uploaded successfully to S3:", result);
+    return { filename, s3Result: result };
+  } catch (error) {
+    console.error("Error uploading file to S3:", error);
+    throw new Error("Error uploading file to S3");
+  }
+};
 
 // Function to generate a signed URL for accessing a file in S3
 exports.getSignedUrlFromS3 = async (foldername, filename, expiresIn = 900) => {

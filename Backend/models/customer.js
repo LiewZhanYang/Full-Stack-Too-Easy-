@@ -136,14 +136,16 @@ class Customer {
     const fields = Object.keys(updateData)
       .map((field) => `${field} = ?`)
       .join(", ");
-    const values = Object.values(updateData);
+    const values = Object.values(updateData).map((value) =>
+      value !== undefined ? value : null
+    ); // Convert undefined to null
     values.push(id); // Add the ID at the end for the WHERE clause
 
     const sqlQuery = `
-      UPDATE Customer
-      SET ${fields}
-      WHERE AccountID = ?
-    `;
+    UPDATE Customer
+    SET ${fields}
+    WHERE AccountID = ?
+  `;
 
     try {
       const [result] = await connection.execute(sqlQuery, values);

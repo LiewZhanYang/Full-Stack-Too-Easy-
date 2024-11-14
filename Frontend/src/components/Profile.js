@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from "react"; //import
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 
 function Profile() {
   const [customerData, setCustomerData] = useState(null);
-  const [profilePicture, setProfilePicture] = useState(null); // For profile picture
+  const [profilePicture, setProfilePicture] = useState(null); // For new profile picture uploads
   const [children, setChildren] = useState([]);
   const [isEditing, setIsEditing] = useState(false); // State for edit mode
   const userId = localStorage.getItem("userId");
@@ -17,41 +17,59 @@ function Profile() {
 
   const handleSaveDetails = async () => {
     try {
-      // Update customer details via API
-      await axios.put(`http://localhost:8000/customer/id/${userId}`, {
-        Name: customerData.Name,
-        ContactNo: customerData.ContactNo,
-        EmailAddr: customerData.EmailAddr,
+      const formData = new FormData();
+      formData.append("Name", customerData.Name);
+      formData.append("ContactNo", customerData.ContactNo);
+      formData.append("EmailAddr", customerData.EmailAddr);
+
+      // Add profile picture if it exists
+      if (profilePicture) {
+        formData.append("file", profilePicture); // Append the profile picture
+      }
+
+      await axios.put(`http://localhost:8000/customer/id/${userId}`, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
       });
-  
+
       // Update profile picture preview if a new file is selected
       if (profilePicture) {
         const reader = new FileReader();
         reader.onload = () => {
           setCustomerData((prevData) => ({
             ...prevData,
-            ProfilePicturePreview: reader.result, // Update state with the image preview
+            ProfilePicturePreview: reader.result, // Update preview
           }));
         };
         reader.readAsDataURL(profilePicture);
       }
-  
+
       alert("Profile updated successfully!");
     } catch (error) {
       console.error("Error updating profile:", error);
       alert("Failed to update profile.");
     }
   };
-  
-  
 
   useEffect(() => {
     const fetchCustomerData = async () => {
       try {
-        const response = await axios.get(`http://localhost:8000/customer/id/${userId}`);
+        const response = await axios.get(
+          `http://localhost:8000/customer/id/${userId}`
+        );
         if (response.data && response.data.length > 0) {
-          setCustomerData(response.data[0]);
-          setProfilePicture(response.data[0].ProfilePicture || null); // Load profile picture if exists
+          const customer = response.data[0];
+          setCustomerData(customer);
+
+          // If a profile picture URL is available, set it for preview
+          if (customer.ProfilePictureURL) {
+            setCustomerData((prevData) => ({
+              ...prevData,
+              ProfilePicturePreview: customer.ProfilePictureURL,
+            }));
+          }
+          setProfilePicture(null); // Clear any previous profile picture
         }
       } catch (error) {
         console.error("Error fetching customer data:", error);
@@ -60,7 +78,9 @@ function Profile() {
 
     const fetchChildrenData = async () => {
       try {
-        const response = await axios.get(`http://localhost:8000/children/${userId}`);
+        const response = await axios.get(
+          `http://localhost:8000/children/${userId}`
+        );
         if (response.data) {
           setChildren(
             response.data.map((child) => ({
@@ -107,7 +127,10 @@ function Profile() {
   };
 
   const handleAddChild = () => {
-    setChildren([...children, { id: null, fullName: "", dateOfBirth: "", strengths: "" }]);
+    setChildren([
+      ...children,
+      { id: null, fullName: "", dateOfBirth: "", strengths: "" },
+    ]);
   };
 
   const handleChildInputChange = (index, field, value) => {
@@ -136,14 +159,23 @@ function Profile() {
 
     try {
       if (child.id) {
-        await axios.put(`http://localhost:8000/children/${child.id}`, childData);
+        await axios.put(
+          `http://localhost:8000/children/${child.id}`,
+          childData
+        );
         alert("Child updated successfully!");
       } else {
-        const response = await axios.post(`http://localhost:8000/children`, childData);
+        const response = await axios.post(
+          `http://localhost:8000/children`,
+          childData
+        );
         if (response.data.child?.id) {
           setChildren((prevChildren) => {
             const newChildren = [...prevChildren];
-            newChildren[index] = { ...newChildren[index], id: response.data.child.id };
+            newChildren[index] = {
+              ...newChildren[index],
+              id: response.data.child.id,
+            };
             return newChildren;
           });
           alert("Child added successfully!");
@@ -158,7 +190,9 @@ function Profile() {
   const handleDeleteChild = async (childId) => {
     try {
       await axios.delete(`http://localhost:8000/children/${childId}`);
-      setChildren((prevChildren) => prevChildren.filter((child) => child.id !== childId));
+      setChildren((prevChildren) =>
+        prevChildren.filter((child) => child.id !== childId)
+      );
       alert("Child deleted successfully!");
     } catch (error) {
       console.error("Error deleting child:", error);
@@ -209,7 +243,9 @@ function Profile() {
                 className={`bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition-colors ${
                   isEditing ? "" : "opacity-50 cursor-not-allowed"
                 }`}
-                onClick={() => document.getElementById("profilePictureInput").click()}
+                onClick={() =>
+                  document.getElementById("profilePictureInput").click()
+                }
                 disabled={!isEditing}
               >
                 Choose File
@@ -239,11 +275,12 @@ function Profile() {
                 onChange={(e) => handleInputChange("Name", e.target.value)}
                 disabled={!isEditing}
                 className={`w-full px-3 py-2 border ${
-                  isEditing ? "border-gray-300" : "border-transparent bg-gray-100"
+                  isEditing
+                    ? "border-gray-300"
+                    : "border-transparent bg-gray-100"
                 } rounded-md`}
               />
             </div>
-
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -255,7 +292,9 @@ function Profile() {
                 onChange={(e) => handleInputChange("ContactNo", e.target.value)}
                 disabled={!isEditing}
                 className={`w-full px-3 py-2 border ${
-                  isEditing ? "border-gray-300" : "border-transparent bg-gray-100"
+                  isEditing
+                    ? "border-gray-300"
+                    : "border-transparent bg-gray-100"
                 } rounded-md`}
               />
             </div>
@@ -266,11 +305,11 @@ function Profile() {
             </label>
             <input
               type="email"
-              value={customerData?.EmailAddr || ''}
-              onChange={(e) => handleInputChange('EmailAddr', e.target.value)}
+              value={customerData?.EmailAddr || ""}
+              onChange={(e) => handleInputChange("EmailAddr", e.target.value)}
               disabled={!isEditing}
               className={`w-full px-3 py-2 border ${
-                isEditing ? 'border-gray-300' : 'border-transparent bg-gray-100'
+                isEditing ? "border-gray-300" : "border-transparent bg-gray-100"
               } rounded-md`}
             />
           </div>
@@ -285,7 +324,9 @@ function Profile() {
                 type="date"
                 value={
                   customerData?.MembershipExpiry
-                    ? new Date(customerData.MembershipExpiry).toISOString().split("T")[0]
+                    ? new Date(customerData.MembershipExpiry)
+                        .toISOString()
+                        .split("T")[0]
                     : ""
                 }
                 disabled // Non-editable field
@@ -304,8 +345,7 @@ function Profile() {
                 className="w-full px-3 py-2 border border-transparent bg-gray-100 rounded-md"
               />
             </div>
-            
-            </div>
+          </div>
 
           <div>
             <button
@@ -322,7 +362,10 @@ function Profile() {
       <div className="bg-white rounded-lg p-6 shadow-sm">
         <div className="flex items-center justify-between mb-6">
           <span className="font-medium">Add Child Details</span>
-          <button onClick={handleAddChild} className="text-blue-600 text-sm hover:text-blue-700">
+          <button
+            onClick={handleAddChild}
+            className="text-blue-600 text-sm hover:text-blue-700"
+          >
             + Add Another Child
           </button>
         </div>
@@ -350,12 +393,12 @@ function Profile() {
                   <input
                     type="text"
                     value={child.fullName || ""}
-                    onChange={(e) => handleChildInputChange(index, "fullName", e.target.value)}
+                    onChange={(e) =>
+                      handleChildInputChange(index, "fullName", e.target.value)
+                    }
                     className="w-full px-3 py-2 border border-gray-300 rounded-md"
                   />
                 </div>
-
-                
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -364,7 +407,13 @@ function Profile() {
                   <input
                     type="date"
                     value={child.dateOfBirth || ""}
-                    onChange={(e) => handleChildInputChange(index, "dateOfBirth", e.target.value)}
+                    onChange={(e) =>
+                      handleChildInputChange(
+                        index,
+                        "dateOfBirth",
+                        e.target.value
+                      )
+                    }
                     className="w-full px-3 py-2 border border-gray-300 rounded-md"
                   />
                 </div>
@@ -377,7 +426,9 @@ function Profile() {
                 <textarea
                   placeholder="Tell us more about your child"
                   value={child.strengths || ""}
-                  onChange={(e) => handleChildInputChange(index, "strengths", e.target.value)}
+                  onChange={(e) =>
+                    handleChildInputChange(index, "strengths", e.target.value)
+                  }
                   rows={4}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md"
                 />
