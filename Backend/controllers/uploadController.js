@@ -38,78 +38,48 @@ exports.uploadFile = async (file, OrderID) => {
 };
 
 // Handle profile picture upload to S3
-exports.uploadProfilePic = async (req, res) => {
+exports.uploadProfilePic = async (file, AccountID) => {
+  if (!file) {
+    throw new Error("No profile picture provided for upload.");
+  }
+
+  if (!AccountID) {
+    throw new Error("AccountID is required for profile picture upload.");
+  }
+
   try {
-    const file = req.file;
-    const AccountID = req.body.AccountID;
-
-    if (!file) {
-      return res
-        .status(400)
-        .json({ error: "No profile picture uploaded. Please provide a file." });
-    }
-
-    if (!AccountID) {
-      return res
-        .status(400)
-        .json({ error: "AccountID is required for profile picture upload." });
-    }
-
-    try {
-      const data = await uploadFileToS3(file, `profile-pictures/${AccountID}`);
-      console.log("Profile picture uploaded successfully:", data);
-
-      res.status(200).json({
-        message: "Profile picture uploaded successfully!",
-        data,
-      });
-    } catch (error) {
-      console.error("Error during profile picture upload:", error);
-      res.status(500).json({ error: "Error uploading profile picture to S3." });
-    }
+    const data = await uploadFileToS3(file, `profile-pictures/${AccountID}`);
+    console.log("Profile picture uploaded successfully:", data);
+    return {
+      message: "Profile picture uploaded successfully!",
+      data,
+    };
   } catch (error) {
-    console.error("Unexpected error:", error);
-    res.status(500).json({
-      error: "Unexpected error occurred during profile picture upload.",
-    });
+    console.error("Error during profile picture upload:", error);
+    throw new Error("Error uploading profile picture to S3.");
   }
 };
 
 // Handle program picture upload to S3
-exports.uploadProgramPic = async (req, res) => {
+exports.uploadProgramPic = async (file, ProgramID) => {
+  if (!file) {
+    throw new Error("No program picture provided for upload.");
+  }
+
+  if (!ProgramID) {
+    throw new Error("ProgramID is required for program picture upload.");
+  }
+
   try {
-    const file = req.file;
-    const ProgramID = req.body.ProgramID;
-
-    if (!file) {
-      return res
-        .status(400)
-        .json({ error: "No program picture uploaded. Please provide a file." });
-    }
-
-    if (!ProgramID) {
-      return res
-        .status(400)
-        .json({ error: "ProgramID is required for program picture upload." });
-    }
-
-    try {
-      const data = await uploadFileToS3(file, `program-pics/${ProgramID}`);
-      console.log("Program picture uploaded successfully:", data);
-
-      res.status(200).json({
-        message: "Program picture uploaded successfully!",
-        data,
-      });
-    } catch (error) {
-      console.error("Error during program picture upload:", error);
-      res.status(500).json({ error: "Error uploading program picture to S3." });
-    }
+    const data = await uploadFileToS3(file, `program-pics/${ProgramID}`);
+    console.log("Program picture uploaded successfully:", data);
+    return {
+      message: "Program picture uploaded successfully!",
+      data,
+    };
   } catch (error) {
-    console.error("Unexpected error:", error);
-    res.status(500).json({
-      error: "Unexpected error occurred during program picture upload.",
-    });
+    console.error("Error during program picture upload:", error);
+    throw new Error("Error uploading program picture to S3.");
   }
 };
 
