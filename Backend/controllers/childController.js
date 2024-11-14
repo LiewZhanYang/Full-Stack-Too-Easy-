@@ -72,4 +72,16 @@ const getChildBySessionID = async (req, res) => {
   }
 };
 
-module.exports = { getChildByAccountID, postChild, deleteChild, updateChild, getChildBySessionID };
+const getCustomerByChildID = async (req, res) => {
+  const childID = req.params.childID;
+  try {
+    const customer = await Child.getCustomerByChildID(childID);
+    res.json(customer);
+  } catch (error) {
+    console.error("Error retrieving customer by ChildID:", error);
+    res.status(500).json({ error: "Error retrieving customer by ChildID" });
+  }
+};
+
+
+module.exports = { getChildByAccountID, postChild, deleteChild, updateChild, getChildBySessionID, getCustomerByChildID };

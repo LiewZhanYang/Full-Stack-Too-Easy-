@@ -8,5 +8,6 @@ router.post("/", childController.postChild);
 router.delete("/:id", childController.deleteChild);
 router.put("/:id", childController.updateChild);
 router.get("/session/:id", childController.getChildBySessionID)
+router.get("/customer-by-child/:childID", childController.getCustomerByChildID);
 
 module.exports = router;
