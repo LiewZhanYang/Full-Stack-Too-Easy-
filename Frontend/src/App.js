@@ -37,6 +37,7 @@ import AdminCreateWebinar from "./components/AdminCreateWebinar.js";
 import AdminEditWebinar from "./components/AdminEditWebinar.js";
 import AdminViewWebinars from "./components/AdminViewWebinars.js";
 import AdminViewBooking from "./components/AdminViewBooking.js";
+import AdminViewSessionDetails from "./components/AdminViewSessionDetails.js";
 import Chatbot from "./components/Chatbot.js";
 import AdminSideBar from "./components/AdminSidebar.js";
 import Workshopvm from "./components/Workshopvm.js";
@@ -181,6 +182,10 @@ function App() {
                   <Route
                     path="/admin-view-booking"
                     element={<AdminViewBooking />}
+                  />
+                  <Route
+                    path="/admin-view-session-details/:id"
+                    element={<AdminViewSessionDetails/>}
                   />
                   {/* Logout route redirects to login */}
                   <Route

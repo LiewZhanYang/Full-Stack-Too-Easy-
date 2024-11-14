@@ -26,6 +26,7 @@ class Child {
             row.Name, 
             row.Strength,
             row.DOB,
+            row.Age,
             row.AccountID
         )});
     } 
@@ -117,8 +118,29 @@ class Child {
             row.Name, 
             row.Strength,
             row.DOB,
+            row.Age,
             row.AccountID
         )});
+    }
+
+    static async getCustomerByChildID(childID) {
+        const connection = await mysql.createConnection(dbConfig);
+
+        const sqlQuery = `
+            SELECT Customer.*
+            FROM Customer
+            JOIN Child ON Customer.AccountID = Child.AccountID
+            WHERE Child.ChildID = ?
+        `;
+
+        const [result] = await connection.execute(sqlQuery, [childID]);
+        connection.end();
+
+        if (result.length === 0) {
+            throw new Error("No customer found for the given ChildID.");
+        }
+        
+        return result[0];
     }
 }
 

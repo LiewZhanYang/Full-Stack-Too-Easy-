@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Container, Button, Table, Modal } from "react-bootstrap";
-import { FaEdit, FaTrash } from "react-icons/fa";
+import { FaEdit, FaTrash, FaEye } from "react-icons/fa";
 import { useNavigate, useParams } from "react-router-dom";
 
 const AdminViewSession = () => {
@@ -32,6 +32,10 @@ const AdminViewSession = () => {
 
   const handleEditClick = (sessionId) => {
     navigate(`/admin-edit-session/${sessionId}`);
+  };
+
+  const handleViewDetailsClick = (sessionId) => {
+    navigate(`/admin-view-session-details/${sessionId}`);
   };
 
   const handleCreateSessionClick = () => {
@@ -103,6 +107,13 @@ const AdminViewSession = () => {
                   <td>{session.Time}</td>
                   <td>{session.Location}</td>
                   <td className="text-end">
+                    <Button
+                      variant="link"
+                      className="action-icon"
+                      onClick={() => handleViewDetailsClick(session.SessionID)}
+                    >
+                      <FaEye />
+                    </Button>
                     <Button
                       variant="link"
                       className="action-icon"
