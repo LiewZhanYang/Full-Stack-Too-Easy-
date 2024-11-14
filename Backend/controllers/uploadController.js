@@ -179,35 +179,30 @@ exports.getProfilePicByAccountID = async (req, res) => {
   }
 };
 
-// Retrieve a program picture by ProgramID
-exports.getProgramPicByProgramID = async (req, res) => {
+// Updated getProgramPicByProgramID function
+// In uploadController.js
+exports.getProgramPicByProgramID = async (programID) => {
+  if (!programID) {
+    throw new Error("ProgramID is required.");
+  }
+
+  const foldername = `program-pics/${programID}`;
   try {
-    const { programID } = req.params;
-    if (!programID) {
-      return res.status(400).json({ error: "ProgramID is required." });
+    const files = await listObjectsByPrefix(foldername);
+    if (files.length === 0) {
+      // Return a default image URL or null if no files are found
+      console.warn(`No images found for ProgramID: ${programID}`);
+      return { url: "/img/default.jpg" }; // Adjust this to your needs
     }
 
-    const foldername = `program-pics/${programID}`;
-    try {
-      const files = await listObjectsByPrefix(foldername);
-      if (files.length === 0) {
-        return res
-          .status(404)
-          .json({ error: "No program picture found for this ProgramID." });
-      }
-      const url = await getSignedUrlFromS3(
-        foldername,
-        files[0].split("/").pop()
-      );
-      res.status(200).json({ url });
-    } catch (error) {
-      console.error("Error retrieving program picture:", error);
-      res
-        .status(500)
-        .json({ error: "Error retrieving program picture from S3." });
-    }
+    // Generate the signed URL for the first file
+    const url = await getSignedUrlFromS3(foldername, files[0].split("/").pop());
+    return { url };
   } catch (error) {
-    console.error("Unexpected error:", error);
-    res.status(500).json({ error: "Unexpected error occurred." });
+    console.error(
+      `Error retrieving program picture for ProgramID ${programID}:`,
+      error
+    );
+    throw new Error("Error retrieving program picture from S3.");
   }
 };

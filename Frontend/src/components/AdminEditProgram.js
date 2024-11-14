@@ -11,6 +11,7 @@ const AdminEditProgram = () => {
   const [duration, setDuration] = useState("");
   const [lunchProvided, setLunchProvided] = useState(false);
   const [image, setImage] = useState(null);
+  const [imagePreview, setImagePreview] = useState(null); // New state for image preview
   const navigate = useNavigate();
   const { id } = useParams();
 
@@ -26,7 +27,7 @@ const AdminEditProgram = () => {
           );
         }
         const data = await response.json();
-        console.log("Fetched program details:", data); // Log fetched program data
+        console.log("Fetched program details:", data);
 
         // Populate form fields with fetched data
         setName(data.ProgrameName);
@@ -36,6 +37,7 @@ const AdminEditProgram = () => {
         setClassSize(data.ClassSize);
         setDuration(data.Duration);
         setLunchProvided(data.LunchProvided);
+        setImagePreview(data.imageUrl || null); // Load the existing image if available
       } catch (error) {
         console.error("Error fetching program details:", error);
       }
@@ -47,7 +49,8 @@ const AdminEditProgram = () => {
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      setImage(URL.createObjectURL(file));
+      setImage(file); // Save the actual file for upload
+      setImagePreview(URL.createObjectURL(file)); // Display the selected file
     }
   };
 
@@ -74,7 +77,6 @@ const AdminEditProgram = () => {
       if (image) {
         formData.append("file", image); // Attach the selected image file
       }
-      formData.append("ProgramID", id); // Include ProgramID for backend reference
 
       const response = await fetch(`http://localhost:8000/program/id/${id}`, {
         method: "PUT",
@@ -119,10 +121,10 @@ const AdminEditProgram = () => {
             accept="image/*"
             onChange={handleImageChange}
           />
-          {image && (
+          {imagePreview && (
             <div className="image-preview mt-3">
               <img
-                src={image}
+                src={imagePreview}
                 alt="Program Preview"
                 className="img-fluid rounded"
                 style={{ maxHeight: "200px" }}

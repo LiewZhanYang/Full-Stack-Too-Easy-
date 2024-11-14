@@ -1,87 +1,65 @@
 import React, { useState } from "react";
-import { Container, Row, Col, Button, Form, InputGroup } from "react-bootstrap";
+import { Container, Button, Form, Modal } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
-import { FaTrash } from "react-icons/fa";
 
 const AdminCreateProgram = () => {
   const [name, setName] = useState("");
   const [type, setType] = useState("");
   const [description, setDescription] = useState("");
-  const [costTiers, setCostTiers] = useState([{ id: 1, cost: "" }]);
+  const [cost, setCost] = useState("");
   const [classSize, setClassSize] = useState("");
   const [duration, setDuration] = useState("");
   const [lunchProvided, setLunchProvided] = useState(false);
-  const [lunchOptions, setLunchOptions] = useState([""]);
-  const [image, setImage] = useState(null);
+  const [image, setImage] = useState(null); // Store image file
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
   const navigate = useNavigate();
 
-  const handleAddTier = () => {
-    setCostTiers([...costTiers, { id: costTiers.length + 1, cost: "" }]);
-  };
-
-  const handleCostChange = (index, value) => {
-    const updatedTiers = costTiers.map((tier, idx) =>
-      idx === index ? { ...tier, cost: value } : tier
-    );
-    setCostTiers(updatedTiers);
-  };
-
-  const handleDeleteTier = (index) => {
-    setCostTiers(costTiers.filter((_, idx) => idx !== index));
-  };
-
-  const handleLunchOptionChange = (index, value) => {
-    const updatedOptions = lunchOptions.map((option, idx) =>
-      idx === index ? value : option
-    );
-    setLunchOptions(updatedOptions);
-  };
-
-  const handleAddLunchOption = () => {
-    setLunchOptions([...lunchOptions, ""]);
-  };
-
-  const handleDeleteLunchOption = (index) => {
-    setLunchOptions(lunchOptions.filter((_, idx) => idx !== index));
+  const programTypeMapping = {
+    Workshop: 1,
+    Camp: 2,
+    Lab: 3,
+    Professional: 4,
   };
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      setImage(file); // Store the file object for submission
+      setImage(file); // Store the file object instead of a URL
     }
   };
 
   const handleCreateProgram = async () => {
+    const typeId = programTypeMapping[type] || null;
+
+    // Create FormData object
+    const formData = new FormData();
+    formData.append("ProgramName", name);
+    formData.append("ProgramDesc", description);
+    formData.append("Cost", cost);
+    formData.append("ClassSize", classSize);
+    formData.append("Duration", duration);
+    formData.append("LunchProvided", lunchProvided ? 1 : 0); // Convert boolean to integer
+    formData.append("TypeID", typeId);
+
+    // Append the image file if available
+    if (image) {
+      formData.append("file", image); // Ensure field name matches backend expectation
+    }
+
     try {
-      // Prepare form data for submission
-      const formData = new FormData();
-      formData.append("ProgramName", name);
-      formData.append("ProgramDesc", description);
-      formData.append("Cost", costTiers.map((tier) => tier.cost).join(",")); // Assuming costs are comma-separated
-      formData.append("ClassSize", classSize);
-      formData.append("Duration", duration);
-      formData.append("LunchProvided", lunchProvided ? 1 : 0); // Convert boolean to integer (1 for true, 0 for false)
-      formData.append("TypeID", type); // This should match the TypeID or type value expected by the backend
-      formData.append("LunchOptions", lunchOptions.join(",")); // Comma-separated string for multiple options
-
-      // Append the image file if available
-      if (image) {
-        formData.append("file", image); // The field name "file" should match what the backend expects for file uploads
-      }
-
-      // Make the POST request to create the program
       const response = await fetch("http://localhost:8000/program", {
         method: "POST",
-        body: formData, // Send FormData as the request body
+        body: formData, // Use FormData as the request body
       });
 
-      if (response.ok) {
-        console.log("Program created successfully!");
-        navigate("/admin-view-program"); // Navigate to view programs page
-      } else {
-        console.error("Failed to create program");
+      if (!response.ok) {
+        throw new Error("Failed to create program");
       }
+
+      console.log("Program created successfully");
+      setShowConfirmModal(false); // Close the confirmation modal
+      setShowSuccessModal(true); // Open the success modal
     } catch (error) {
       console.error("Error creating program:", error);
     }
@@ -117,7 +95,7 @@ const AdminCreateProgram = () => {
           {image && (
             <div className="image-preview mt-3">
               <img
-                src={image}
+                src={URL.createObjectURL(image)}
                 alt="Program Preview"
                 className="img-fluid rounded"
                 style={{ maxHeight: "200px" }}
@@ -152,27 +130,15 @@ const AdminCreateProgram = () => {
           />
         </Form.Group>
 
-        <Form.Label>Cost Tiers</Form.Label>
-        {costTiers.map((tier, index) => (
-          <InputGroup className="mb-2" key={tier.id}>
-            <InputGroup.Text>$</InputGroup.Text>
-            <Form.Control
-              type="text"
-              placeholder="Enter cost"
-              value={tier.cost}
-              onChange={(e) => handleCostChange(index, e.target.value)}
-            />
-            <Button
-              variant="outline-danger"
-              onClick={() => handleDeleteTier(index)}
-            >
-              <FaTrash />
-            </Button>
-          </InputGroup>
-        ))}
-        <Button variant="outline-secondary" onClick={handleAddTier}>
-          Add Tier/Type
-        </Button>
+        <Form.Group controlId="programCost" className="mb-3">
+          <Form.Label>Cost</Form.Label>
+          <Form.Control
+            type="text"
+            placeholder="Enter cost"
+            value={cost}
+            onChange={(e) => setCost(e.target.value)}
+          />
+        </Form.Group>
 
         <Form.Group controlId="programClassSize" className="mt-3 mb-3">
           <Form.Label>Class Size</Form.Label>
@@ -203,40 +169,13 @@ const AdminCreateProgram = () => {
           />
         </Form.Group>
 
-        {lunchProvided && (
-          <div className="lunch-options">
-            <Form.Label>Lunch Options</Form.Label>
-            {lunchOptions.map((option, index) => (
-              <InputGroup className="mb-2" key={index}>
-                <Form.Control
-                  type="text"
-                  placeholder="Enter lunch option"
-                  value={option}
-                  onChange={(e) =>
-                    handleLunchOptionChange(index, e.target.value)
-                  }
-                />
-                <Button
-                  variant="outline-danger"
-                  onClick={() => handleDeleteLunchOption(index)}
-                >
-                  <FaTrash />
-                </Button>
-              </InputGroup>
-            ))}
-            <Button variant="outline-secondary" onClick={handleAddLunchOption}>
-              Add Lunch Option
-            </Button>
-          </div>
-        )}
-
         <div className="admin-create-button-group mt-4">
           <Button
             variant="warning"
             className="admin-create-confirm-button me-3"
-            onClick={handleCreateProgram}
+            onClick={() => setShowConfirmModal(true)} // Show confirmation modal
           >
-            Create Program
+            Create
           </Button>
           <Button
             variant="danger"
@@ -247,6 +186,52 @@ const AdminCreateProgram = () => {
           </Button>
         </div>
       </Form>
+
+      {/* Confirmation Modal */}
+      <Modal
+        show={showConfirmModal}
+        onHide={() => setShowConfirmModal(false)}
+        centered
+      >
+        <Modal.Header closeButton>
+          <Modal.Title>Confirm Program Creation</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>Are you sure you want to create this program?</Modal.Body>
+        <Modal.Footer>
+          <Button variant="primary" onClick={handleCreateProgram}>
+            Confirm
+          </Button>
+          <Button
+            variant="secondary"
+            onClick={() => setShowConfirmModal(false)}
+          >
+            Cancel
+          </Button>
+        </Modal.Footer>
+      </Modal>
+
+      {/* Success Modal */}
+      <Modal
+        show={showSuccessModal}
+        onHide={() => setShowSuccessModal(false)}
+        centered
+      >
+        <Modal.Header closeButton>
+          <Modal.Title>Program Created</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>The program has been created successfully.</Modal.Body>
+        <Modal.Footer>
+          <Button
+            variant="primary"
+            onClick={() => {
+              setShowSuccessModal(false);
+              navigate("/admin-view-program");
+            }}
+          >
+            Close
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </Container>
   );
 };
