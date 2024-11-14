@@ -147,40 +147,29 @@ exports.getFileByOrderID = async (orderID) => {
 };
 
 // Retrieve a profile picture by AccountID
-exports.getProfilePicByAccountID = async (req, res) => {
-  try {
-    const { accountID } = req.params;
-    if (!accountID) {
-      return res.status(400).json({ error: "AccountID is required." });
-    }
+exports.getProfilePicByAccountID = async (accountID) => {
+  if (!accountID) {
+    throw new Error("AccountID is required.");
+  }
 
-    const foldername = `profile-pictures/${accountID}`;
-    try {
-      const files = await listObjectsByPrefix(foldername);
-      if (files.length === 0) {
-        return res
-          .status(404)
-          .json({ error: "No profile picture found for this AccountID." });
-      }
-      const url = await getSignedUrlFromS3(
-        foldername,
-        files[0].split("/").pop()
-      );
-      res.status(200).json({ url });
-    } catch (error) {
-      console.error("Error retrieving profile picture:", error);
-      res
-        .status(500)
-        .json({ error: "Error retrieving profile picture from S3." });
+  const foldername = `profile-pictures/${accountID}`;
+  try {
+    const files = await listObjectsByPrefix(foldername);
+    if (files.length === 0) {
+      console.warn(`No profile picture found for AccountID: ${accountID}`);
+      return { url: "/img/default-profile.jpg" }; // Return a default image or null if no files are found
     }
+    const url = await getSignedUrlFromS3(foldername, files[0].split("/").pop());
+    return { url };
   } catch (error) {
-    console.error("Unexpected error:", error);
-    res.status(500).json({ error: "Unexpected error occurred." });
+    console.error(
+      `Error retrieving profile picture for AccountID ${accountID}:`,
+      error
+    );
+    throw new Error("Error retrieving profile picture from S3.");
   }
 };
-
 // Updated getProgramPicByProgramID function
-// In uploadController.js
 exports.getProgramPicByProgramID = async (programID) => {
   if (!programID) {
     throw new Error("ProgramID is required.");
