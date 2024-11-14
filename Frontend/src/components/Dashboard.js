@@ -233,19 +233,6 @@ function Dashboard() {
             >
               Programmes
             </button>
-            <button
-              onClick={() => setActiveTab("Webinars")}
-              style={{
-                fontSize: "16px",
-                fontWeight: activeTab === "Webinars" ? "bold" : "normal",
-                color: activeTab === "Webinars" ? "#f59e0b" : "#6b7280",
-                padding: "8px 16px",
-                borderBottom: activeTab === "Webinars" ? "2px solid #fbbf24" : "none",
-                cursor: "pointer",
-              }}
-            >
-              Webinars
-            </button>
           </div>
 
           {activeTab === "Programmes" && (
