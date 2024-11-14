@@ -1,72 +1,130 @@
-import React from "react";
-
+import React, { useEffect, useState } from "react";
+import { useLocation } from "react-router-dom";
+import axios from "axios";
 
 function Workshopvm() {
+  const location = useLocation();
+  const { signUpId } = location.state || {};
+  const [programDetails, setProgramDetails] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [childName, setChildName] = useState("");
+
+  const userAccountID = localStorage.getItem("userId"); // Assuming user ID is stored in localStorage
+
+  useEffect(() => {
+    const fetchDetails = async () => {
+      try {
+        if (!signUpId) throw new Error("No SignUpID provided.");
+
+        // Fetch the signup details
+        const signupResponse = await axios.get(`http://localhost:8000/signup/${userAccountID}`);
+        const signups = signupResponse.data;
+
+        // Find the signup entry that matches signUpId
+        const signup = signups.find((s) => s.SignUpID === signUpId);
+        if (!signup || !signup.SessionID) throw new Error("Signup or SessionID not found.");
+
+        // Fetch session details
+        const sessionResponse = await axios.get(`http://localhost:8000/session/SessionID/${signup.SessionID}`);
+        const session = sessionResponse.data;
+
+        // Fetch program details
+        const programResponse = await axios.get(`http://localhost:8000/program/${session.ProgramID}`);
+        const program = programResponse.data;
+
+        // Fetch children data to get the child's name
+        const childrenResponse = await axios.get(`http://localhost:8000/children/${userAccountID}`);
+        const children = childrenResponse.data;
+        const child = children.find((c) => c.ChildID === signup.ChildID);
+
+        setChildName(child ? child.Name : "Unknown Child");
+
+        setProgramDetails({
+          programName: program.ProgrameName,
+          programId: program.ProgramID,
+          location: session.Location,
+          date: `${new Date(session.StartDate).toLocaleDateString()} - ${new Date(session.EndDate).toLocaleDateString()}`,
+          time: session.Time,
+          lunchOption: signup.LunchOptionID === 1 ? "Vegetarian" : signup.LunchOptionID === 2 ? "Non-Vegetarian" : "Not Selected",
+        });
+
+        setLoading(false);
+      } catch (err) {
+        console.error("Error fetching program details:", err);
+        setError(err.message || "Failed to fetch program details.");
+        setLoading(false);
+      }
+    };
+
+    fetchDetails();
+  }, [signUpId, userAccountID]);
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  if (error) {
+    return <div>{error}</div>;
+  }
+
   return (
     <div style={styles.container}>
-      <h1 style={styles.title}>Public Speaking Workshop</h1>
-      <p style={styles.date}>4 April 2025</p>
+      <h1 style={styles.title}>{programDetails.programName}</h1>
+      <p style={styles.date}>{programDetails.date}</p>
       <hr style={styles.line} />
 
       <div style={styles.descriptionContainer}>
-        <h2 style={styles.subtitle}>Description</h2>
-        <p style={styles.description}>
-          We identify with what makes a speaker influential and his presence
-          compelling. Our tiered public speaking workshops are thoughtfully
-          designed to transform your child into a seasoned stage storyteller
-          through comprehensive training. From dynamic activities to stage
-          design, your ward will acquire the skills and confidence to shine
-          under the spotlight. Watch them take them on the art and science of
-          impactful speaking in a supportive and immersive environment. Get your
-          child a breakthrough in powerful communication today, reach out to us
-          for the programme synopsis and workshop content!
-        </p>
-        <h3 style={styles.keyPointsTitle}>Key Points</h3>
-        <ul style={styles.keyPointsList}>
-          <li>
-            <b>Stage Storytelling:</b> Focus on developing confident stage
-            storytellers through comprehensive training.
-          </li>
-          <li>
-            <b>Dynamic Learning:</b> Engage in dynamic activities and ample
-            stage time to enhance speaking abilities.
-          </li>
-          <li>
-            <b>Supportive Environment:</b> A nurturing atmosphere that fosters
-            confidence and effective communication.
-          </li>
-        </ul>
-
-        {/* Moved details inside descriptionContainer */}
+        {programDetails.programId === 1 || programDetails.programId === 2 || programDetails.programId === 3 ? (
+          <>
+            <h2 style={styles.subtitle}>Description</h2>
+            <p style={styles.description}>
+              We identify with what makes a speaker influential and his presence compelling. Our tiered public speaking
+              workshops are thoughtfully designed to transform your child into a seasoned stage storyteller through
+              comprehensive training. From dynamic activities to stage design, your ward will acquire the skills and
+              confidence to shine under the spotlight. Watch them take them on the art and science of impactful speaking
+              in a supportive and immersive environment. Get your child a breakthrough in powerful communication today,
+              reach out to us for the programme synopsis and workshop content!
+            </p>
+            <h3 style={styles.keyPointsTitle}>Key Points</h3>
+            <ul style={styles.keyPointsList}>
+              <li>
+                <b>Stage Storytelling:</b> Focus on developing confident stage storytellers through comprehensive
+                training.
+              </li>
+              <li>
+                <b>Dynamic Learning:</b> Engage in dynamic activities and ample stage time to enhance speaking abilities.
+              </li>
+              <li>
+                <b>Supportive Environment:</b> A nurturing atmosphere that fosters confidence and effective
+                communication.
+              </li>
+            </ul>
+          </>
+        ) : (
+          <h2 style={styles.subtitle}>Details</h2>
+        )}
         <div style={styles.detailsRow}>
           <div style={styles.detailsItem}>
-            <span style={styles.detailsLabel}>Date</span>
-            <span>4 April 2025</span>
+            <span style={styles.detailsLabel}>Location</span>
+            <span>{programDetails.location}</span>
           </div>
           <div style={styles.detailsItem}>
-            <span style={styles.detailsLabel}>Starts</span>
-            <span>13:00</span>
+            <span style={styles.detailsLabel}>Time</span>
+            <span>{programDetails.time}</span>
           </div>
           <div style={styles.detailsItem}>
-            <span style={styles.detailsLabel}>End</span>
-            <span>14:00</span>
-          </div>
-          <div style={styles.detailsItem}>
-            <span style={styles.detailsLabel}>Instructor</span>
-            <span>aaaaaaa</span>
-          </div>
-          <div style={styles.detailsItem}>
-            <span style={styles.detailsLabel}>Pax</span>
-            <span>1</span>
+            <span style={styles.detailsLabel}>Child Name</span>
+            <span>{childName}</span>
           </div>
           <div style={styles.detailsItem}>
             <span style={styles.detailsLabel}>Lunch Option</span>
-            <span>Vegetarian</span>
+            <span>{programDetails.lunchOption}</span>
           </div>
         </div>
-
-        <button style={styles.button}>Cancel Booking</button>
       </div>
+
+      <button style={styles.cancelButton}>Cancel Booking</button>
     </div>
   );
 }
@@ -83,6 +141,7 @@ const styles = {
   title: {
     fontSize: "24px",
     fontWeight: "bold",
+    color: "#333",
     marginBottom: "5px",
   },
   date: {
@@ -104,6 +163,7 @@ const styles = {
   subtitle: {
     fontSize: "18px",
     fontWeight: "bold",
+    color: "#333",
     marginBottom: "10px",
   },
   description: {
@@ -130,29 +190,29 @@ const styles = {
     justifyContent: "space-between",
     flexWrap: "wrap",
     marginTop: "20px",
-    padding: "10px 0",
   },
   detailsItem: {
-    textAlign: "center",
-    width: "16%",
+    textAlign: "left",
+    marginBottom: "10px",
+    width: "48%",
   },
   detailsLabel: {
     display: "block",
     fontWeight: "bold",
+    color: "#555",
     marginBottom: "5px",
-    color: "#333",
   },
-  button: {
+  cancelButton: {
     marginTop: "20px",
     width: "100%",
     padding: "10px",
     border: "none",
     borderRadius: "5px",
-    backgroundColor: "#ffcc00",
+    backgroundColor: "#FFC107",
     color: "#333",
     fontWeight: "bold",
-    cursor: "pointer",
     fontSize: "14px",
+    cursor: "pointer",
   },
 };
 

@@ -2,8 +2,11 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { FaChalkboardTeacher } from "react-icons/fa";
 import AnnouncementBoard from "./AnnouncementBoard"; // Import AnnouncementBoard
+import { useNavigate } from "react-router-dom";
 
 function Dashboard() {
+  const navigate = useNavigate();
+
   const [programs, setPrograms] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -192,8 +195,8 @@ function Dashboard() {
         </p>
       </div>
 
-      <a
-        href={`./workshopvm`}
+      <button
+        onClick={() => navigate("/workshopvm", { state: { signUpId: data.SignUpID } })}
         style={{
           backgroundColor: "#fbbf24",
           color: "white",
@@ -204,12 +207,14 @@ function Dashboard() {
           textDecoration: "none",
           transition: "background-color 0.2s ease-in-out",
           cursor: "pointer",
+          border: "none",
         }}
         onMouseOver={(e) => (e.target.style.backgroundColor = "#f59e0b")}
         onMouseOut={(e) => (e.target.style.backgroundColor = "#fbbf24")}
       >
         View More
-      </a>
+      </button>
+      
     </div>
   );
 
