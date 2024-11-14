@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from "react";
-import { Container, Row, Col, Button, Form } from "react-bootstrap";
+import { Container, Row, Col, Button, Form, Modal } from "react-bootstrap";
 import { useNavigate, useParams } from "react-router-dom";
 import { FaArrowLeft, FaImage } from "react-icons/fa";
 
 const AdminConfirmPayment = () => {
   const [paymentDetails, setPaymentDetails] = useState({});
   const [rejectionReason, setRejectionReason] = useState("");
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
   const navigate = useNavigate();
   const { id } = useParams(); // Get the payment ID from the URL
 
@@ -36,9 +38,7 @@ const AdminConfirmPayment = () => {
 
   const handleConfirmClick = async () => {
     try {
-      console.log("Starting payment confirmation process...");
-
-      // Step 1: Approve the payment
+      // Approve the payment
       const response = await fetch(
         `http://localhost:8000/payment/approvepayment/${id}`,
         {
@@ -46,19 +46,17 @@ const AdminConfirmPayment = () => {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ AdminID: 1 }), // Example AdminID, replace as needed
+          body: JSON.stringify({ AdminID: 1 }),
         }
       );
 
       if (!response.ok) {
         throw new Error("Failed to approve payment");
       }
-      console.log("Payment approved successfully");
+      console.log("Payment Confirmed");
 
-      // Step 2: Use PaidBy as AccountID for updating customer's membership status
-      const accountId = paymentDetails.PaidBy; // Use PaidBy instead of AccountID
-      console.log("AccountID for membership update (from PaidBy):", accountId);
-
+      // Update customer's membership status if payment is confirmed
+      const accountId = paymentDetails.PaidBy;
       if (accountId) {
         const membershipResponse = await fetch(
           `http://localhost:8000/customer/member/${accountId}`,
@@ -73,20 +71,13 @@ const AdminConfirmPayment = () => {
         if (!membershipResponse.ok) {
           throw new Error("Failed to update customer membership status");
         }
-
-        console.log("Customer membership status updated successfully");
-      } else {
-        console.error("AccountID (PaidBy) not found in payment details");
+        console.log("Customer membership status updated");
       }
 
-      // Step 3: Navigate back if all steps succeed
-      console.log("Navigating back to previous page...");
-      navigate(-1); // Navigate back after confirming
+      setShowConfirmModal(false); // Close the confirmation modal
+      setShowSuccessModal(true); // Show the success modal
     } catch (error) {
-      console.error(
-        "Error during payment confirmation or membership update:",
-        error
-      );
+      console.error("Error confirming payment or updating membership:", error);
     }
   };
 
@@ -112,18 +103,16 @@ const AdminConfirmPayment = () => {
     }
   };
 
-  // Determine the class for the status text based on the status
   const getStatusClass = (status) => {
-    if (status === "Approved") return "text-success"; // Green text for Approved
-    if (status === "Rejected") return "text-danger"; // Red text for Rejected
-    return ""; // Default text color for other statuses like "Pending"
+    if (status === "Approved") return "text-success"; 
+    if (status === "Rejected") return "text-danger";
+    return "";
   };
 
-  // Function to display status text based on the status value
   const getStatusText = (status) => {
     if (status === "Approved") return "Confirmed (Approved)";
     if (status === "Rejected") return "Confirmed (Rejected)";
-    return status; // Display the original status if it's not Approved or Rejected
+    return status; 
   };
 
   return (
@@ -167,7 +156,6 @@ const AdminConfirmPayment = () => {
               <br />${paymentDetails.Amount}
             </p>
 
-            {/* Status display with conditional styling */}
             <p>
               <strong>Status:</strong>
               <br />
@@ -176,7 +164,6 @@ const AdminConfirmPayment = () => {
               </span>
             </p>
 
-            {/* Show rejection reason field only if the status is "Pending" */}
             {paymentDetails.Status === "Pending" && (
               <Form.Group controlId="rejectionReason" className="mt-3">
                 <Form.Label>Reason (for rejection only):</Form.Label>
@@ -203,13 +190,12 @@ const AdminConfirmPayment = () => {
         </Col>
       </Row>
 
-      {/* Show Confirm and Reject buttons only if the status is "Pending" */}
       {paymentDetails.Status === "Pending" && (
         <div className="admin-confirm-button-group mt-4">
           <Button
             variant="warning"
             className="admin-confirm-confirm-button me-3"
-            onClick={handleConfirmClick}
+            onClick={() => setShowConfirmModal(true)} 
           >
             Confirm
           </Button>
@@ -222,6 +208,52 @@ const AdminConfirmPayment = () => {
           </Button>
         </div>
       )}
+
+      {/* Confirmation Modal */}
+      <Modal
+        show={showConfirmModal}
+        onHide={() => setShowConfirmModal(false)}
+        centered
+      >
+        <Modal.Header closeButton>
+          <Modal.Title>Confirm Payment Approval</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>Are you sure you want to approve this payment?</Modal.Body>
+        <Modal.Footer>
+          <Button variant="primary" onClick={handleConfirmClick}>
+            Confirm
+          </Button>
+          <Button
+            variant="secondary"
+            onClick={() => setShowConfirmModal(false)}
+          >
+            Cancel
+          </Button>
+        </Modal.Footer>
+      </Modal>
+
+      {/* Success Modal */}
+      <Modal
+        show={showSuccessModal}
+        onHide={() => setShowSuccessModal(false)}
+        centered
+      >
+        <Modal.Header closeButton>
+          <Modal.Title>Payment Approved</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>The payment has been approved successfully.</Modal.Body>
+        <Modal.Footer>
+          <Button
+            variant="primary"
+            onClick={() => {
+              setShowSuccessModal(false);
+              navigate(-1); 
+            }}
+          >
+            Close
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </Container>
   );
 };
