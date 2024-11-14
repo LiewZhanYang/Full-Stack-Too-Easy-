@@ -3,7 +3,7 @@ import { Container, Row, Col, Button, Form, Modal } from "react-bootstrap";
 import { useNavigate, useParams } from "react-router-dom";
 import { FaArrowLeft } from "react-icons/fa";
 
-const AdminConfirmPayment = () => {
+const AdminConfirmPayment = () => { // 
   const [paymentDetails, setPaymentDetails] = useState({});
   const [rejectionReason, setRejectionReason] = useState("");
   const [showConfirmModal, setShowConfirmModal] = useState(false);
