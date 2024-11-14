@@ -123,8 +123,7 @@ function Workshopvm() {
           </div>
         </div>
       </div>
-
-      <button style={styles.cancelButton}>Cancel Booking</button>
+      <button style={styles.cancelButton}>Cancel Booking</button> 
     </div>
   );
 }
