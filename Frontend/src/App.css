@@ -986,3 +986,23 @@ code {
   margin-top: 8px;
   font-size: 0.9em;
 }
+
+
+.admin-create-announcement-page {
+  background-color: #f5f5f5;
+  padding: 2rem;
+  border-radius: 8px;
+}
+
+.admin-create-title {
+  font-weight: bold;
+  font-size: 1.5em;
+}
+
+.admin-create-divider {
+  border-top: 1px solid #ddd;
+}
+
+.admin-create-button-group button {
+  width: 120px;
+}
