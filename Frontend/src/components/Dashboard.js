@@ -11,6 +11,7 @@ function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [activeTab, setActiveTab] = useState("Programmes");
+  const [customerName, setCustomerName] = useState("");
 
   const userAccountID = localStorage.getItem("userId"); // Assuming user ID is stored in localStorage
 
@@ -57,6 +58,22 @@ function Dashboard() {
 
   const calendarDays = generateCalendarDays();
   const upcomingEvents = generateUpcomingEvents();
+
+
+  useEffect(() => {
+    const fetchCustomerName = async () => {
+      try {
+        const response = await axios.get(`http://localhost:8000/customer/id/${userAccountID}`);
+        if (response.data && response.data.length > 0) {
+          setCustomerName(response.data[0].Name || "User");
+        }
+      } catch (error) {
+        console.error("Error fetching customer name:", error);
+      }
+    };
+
+    fetchCustomerName();
+  }, [userAccountID]);
 
   useEffect(() => {
     const fetchProgramsAndSessions = async () => {
@@ -222,7 +239,7 @@ function Dashboard() {
     <div className="p-4">
       <div className="flex space-x-8">
         <div className="flex-1">
-          <h1 className="text-2xl font-bold mb-6">Welcome Back, User</h1>
+          <h1 className="text-2xl font-bold mb-6">Welcome Back, {customerName}</h1>
 
           <div className="flex space-x-4 mb-4 border-b-2 pb-2">
             <button
