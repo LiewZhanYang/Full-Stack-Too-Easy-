@@ -68,10 +68,27 @@ const getAllCustomers = async (req, res) => {
   }
 };
 
+const updateCustomerMembership = async (req, res) => {
+  const id = parseInt(req.params.id); // Customer ID from URL parameters
+  try {
+    const result = await Customer.updateCustomerMembership(id);
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ message: "Customer not found" });
+    }
+
+    res.json({ message: "Customer Membership updated successfully" });
+  } catch (error) {
+    console.error("Error updating customer membership:", error);
+    res.status(500).json({ message: "Error updating customer Membership" });
+  }
+};
+
 module.exports = {
   getCustomerByEmail,
   getCustomerByID,
   postCustomer,
   updateCustomer,
   getAllCustomers,
+  updateCustomerMembership
 };

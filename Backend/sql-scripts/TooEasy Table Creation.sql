@@ -95,9 +95,10 @@ CREATE TABLE SignUp (
 
 CREATE TABLE Booking (
 	BookingID INT PRIMARY KEY AUTO_INCREMENT,
-    Time TIME NOT NULL,
+    StartTime TIME NOT NULL,
+    EndTime TIME NOT NULL,
     Date DATE NOT NULL,
-    URL VARCHAR(100),
+    URL VARCHAR(100) NOT NULL,
     AccountID INT,
     
     FOREIGN KEY (AccountID) REFERENCES Customer (AccountID)
@@ -112,8 +113,8 @@ CREATE TABLE Payment (
     InvoicePath VARCHAR(100) NOT NULL,
     SessionID INT NOT NULL,
     PaidBy INT NOT NULL, 
-Reason VARCHAR(100) NULL DEFAULT NULL,
-ApprovedBy INT NULL DEFAULT NULL,
+    Reason VARCHAR(100) NULL,
+    ApprovedBy INT NULL,
     
     FOREIGN KEY(SessionID) REFERENCES Session(SessionID),
     FOREIGN KEY (PaidBy) REFERENCES Customer (AccountID),
@@ -136,7 +137,8 @@ VALUES
 (2, 'Jane Smith', 'janesmith@example.com', '90123456', FALSE, NULL, NULL, 'password456'),
 (3, 'Bob Johnson', 'bobjohnson@example.com', '78901234', TRUE, '2025-06-30', NULL, 'password789'),
 (4, 'Alice Brown', 'alicebrown@example.com', '56789012', FALSE, NULL, NULL, 'password012'),
-(5, 'Mike Davis', 'ikedavis@example.com', '34567890', TRUE, '2024-03-31', NULL, 'password345');
+(5, 'Mike Davis', 'ikedavis@example.com', '34567890', TRUE, '2024-03-31', NULL, 'password345'),
+(6, 'Caden Toh', 'example@example.com', '10006000', FALSE, NULL, NULL, 'password123');
 
 INSERT INTO Admin (AdminID, Username, Password)
 VALUES
@@ -196,13 +198,13 @@ VALUES
 (3, 3, 3, 3, 4),  -- Bob Johnson, Public Speaking Workshop - Advanced, Fruit Salad
 (4, 4, 4, 4, 2);  -- Alice Brown, PSLE Power Up Camp - PSLE Power Up, Turkey Burger
 
-INSERT INTO Booking (BookingID, Time, Date, URL, AccountID)
+INSERT INTO Booking (BookingID, StartTime, EndTime, Date, URL, AccountID)
 VALUES
-(1, '09:00:00', '2025-01-15', 'https://mindsphere-too-easy.whereby.com/ced5223d-0b18-4cf5-af00-be75fd3c9d94', 1),
-(2, '11:00:00', '2025-01-16', 'https://mindsphere-too-easy.whereby.com/ced5223d-0b18-4cf5-af00-be75fd3c9d94',2),
-(3, '13:00:00', '2025-01-17', 'https://mindsphere-too-easy.whereby.com/ced5223d-0b18-4cf5-af00-be75fd3c9d94',3),
-(4, '15:00:00', '2025-01-18', 'https://mindsphere-too-easy.whereby.com/ced5223d-0b18-4cf5-af00-be75fd3c9d94',4),
-(5, '17:00:00', '2025-01-19', 'https://mindsphere-too-easy.whereby.com/ced5223d-0b18-4cf5-af00-be75fd3c9d94',5);
+(1, '09:00:00', '10:00:00', '2025-01-15', 'https://mindsphere-too-easy.whereby.com/ced5223d-0b18-4cf5-af00-be75fd3c9d94', 1),
+(2, '11:00:00', '12:00:00', '2025-01-16', 'https://mindsphere-too-easy.whereby.com/ced5223d-0b18-4cf5-af00-be75fd3c9d94',2),
+(3, '13:00:00', '14:00:00', '2025-01-17', 'https://mindsphere-too-easy.whereby.com/ced5223d-0b18-4cf5-af00-be75fd3c9d94',3),
+(4, '15:00:00', '16:00:00', '2025-01-18', 'https://mindsphere-too-easy.whereby.com/ced5223d-0b18-4cf5-af00-be75fd3c9d94',4),
+(5, '17:00:00', '18:00:00', '2025-01-19', 'https://mindsphere-too-easy.whereby.com/ced5223d-0b18-4cf5-af00-be75fd3c9d94',5);
 
 INSERT INTO Payment (OrderID, InvoiceID, Amount, CreatedAt, Status, InvoicePath, SessionID, PaidBy, ApprovedBy, Reason)
 VALUES
@@ -214,7 +216,9 @@ VALUES
 INSERT INTO Announcement (AnnouncementID, Title, Body, PostedDate) 
 VALUES 
 (1, 'Release of new programs', 'To all our dear and valued customers, we are excited to announce that with the upcoming holidays, new programs are to be released soon! So Stay tune!', '2024-11-11'),
-(2, 'New promotions', 'In lieu of certain events and happenings, new promotions are to be rolled out! Members can await for the arrival soon!', '2024-11-13');
+(2, 'New promotions', 'In lieu of certain events and happenings, new promotions are to be rolled out! Members can await for the arrival soon!', '2024-11-13'),
+(3, 'Christmas Promotion', 'New year new me! Enjoy upcoming promotions that are being pushed out in light of the New Year! Have a happy holidays!', '2023-11-13'),
+(4, 'Halloween Specials', 'Trick or treat! This year halloween is a very special one, for there are more programs that are to be enrolled on how you can spook your competitors!', '2024-10-13');
 
 Trigger
 
@@ -286,11 +290,3 @@ BEGIN
 END;
 //
 DELIMITER ;
--- Create the user
-CREATE USER 'prototyper'@'localhost' IDENTIFIED BY 'TooEasy';
-
--- Grant privileges on TooEasyDB
-GRANT ALL PRIVILEGES ON TooEasyDB.* TO 'prototyper'@'localhost';
-
--- Apply the changes
-FLUSH PRIVILEGES;
