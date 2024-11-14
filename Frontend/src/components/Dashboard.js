@@ -138,7 +138,7 @@ function Dashboard() {
     
         setPrograms(combinedData);
       } catch (err) {
-        setError("Failed to load programs and sessions.");
+        setError("You have not signed up for any programmes.");
         console.error(err);
       } finally {
         setLoading(false);
