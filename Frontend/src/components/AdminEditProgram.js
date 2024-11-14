@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Container, Row, Col, Button, Form } from "react-bootstrap";
+import { Container, Button, Form, Modal } from "react-bootstrap"; // Added Modal import
 import { useNavigate, useParams } from "react-router-dom";
 
 const AdminEditProgram = () => {
@@ -11,7 +11,9 @@ const AdminEditProgram = () => {
   const [duration, setDuration] = useState("");
   const [lunchProvided, setLunchProvided] = useState(false);
   const [image, setImage] = useState(null);
-  const [imagePreview, setImagePreview] = useState(null); // New state for image preview
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [imagePreview, setImagePreview] = useState(null);
   const navigate = useNavigate();
   const { id } = useParams();
 
@@ -19,7 +21,6 @@ const AdminEditProgram = () => {
   useEffect(() => {
     const fetchProgramDetails = async () => {
       try {
-        console.log(`Fetching details for Program ID: ${id}`);
         const response = await fetch(`http://localhost:8000/program/${id}`);
         if (!response.ok) {
           throw new Error(
@@ -27,9 +28,6 @@ const AdminEditProgram = () => {
           );
         }
         const data = await response.json();
-        console.log("Fetched program details:", data);
-
-        // Populate form fields with fetched data
         setName(data.ProgrameName);
         setType(data.TypeID);
         setDescription(data.ProgramDesc);
@@ -37,34 +35,23 @@ const AdminEditProgram = () => {
         setClassSize(data.ClassSize);
         setDuration(data.Duration);
         setLunchProvided(data.LunchProvided);
-        setImagePreview(data.imageUrl || null); // Load the existing image if available
+        setImagePreview(data.imageUrl || null);
       } catch (error) {
         console.error("Error fetching program details:", error);
       }
     };
-
     fetchProgramDetails();
   }, [id]);
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      setImage(file); // Save the actual file for upload
-      setImagePreview(URL.createObjectURL(file)); // Display the selected file
+      setImage(file);
+      setImagePreview(URL.createObjectURL(file));
     }
   };
 
   const handleSaveProgram = async () => {
-    console.log("Saving program with updated details:", {
-      ProgramName: name,
-      ProgramDesc: description,
-      Cost: cost,
-      ClassSize: classSize,
-      Duration: duration,
-      LunchProvided: lunchProvided,
-      TypeID: type,
-    });
-
     try {
       const formData = new FormData();
       formData.append("ProgramName", name);
@@ -75,7 +62,7 @@ const AdminEditProgram = () => {
       formData.append("LunchProvided", lunchProvided);
       formData.append("TypeID", type);
       if (image) {
-        formData.append("file", image); // Attach the selected image file
+        formData.append("file", image);
       }
 
       const response = await fetch(`http://localhost:8000/program/id/${id}`, {
@@ -86,12 +73,15 @@ const AdminEditProgram = () => {
       if (!response.ok) {
         throw new Error("Failed to save program");
       }
-
-      console.log("Program saved successfully");
-      navigate("/admin-view-program");
+      setShowConfirmModal(false); // Close confirm modal on success
+      setShowSuccessModal(true); // Show success modal
     } catch (error) {
       console.error("Error saving program:", error);
     }
+  };
+
+  const handleConfirmSave = () => {
+    setShowConfirmModal(true); // Open confirmation modal
   };
 
   const handleCancel = () => {
@@ -202,7 +192,7 @@ const AdminEditProgram = () => {
           <Button
             variant="warning"
             className="admin-create-confirm-button me-3"
-            onClick={handleSaveProgram}
+            onClick={handleConfirmSave}
           >
             Save
           </Button>
@@ -215,6 +205,52 @@ const AdminEditProgram = () => {
           </Button>
         </div>
       </Form>
+
+      {/* Confirmation Modal */}
+      <Modal
+        show={showConfirmModal}
+        onHide={() => setShowConfirmModal(false)}
+        centered
+      >
+        <Modal.Header closeButton>
+          <Modal.Title>Confirm Save</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>Are you sure you want to save these changes?</Modal.Body>
+        <Modal.Footer>
+          <Button variant="primary" onClick={handleSaveProgram}>
+            Confirm
+          </Button>
+          <Button
+            variant="secondary"
+            onClick={() => setShowConfirmModal(false)}
+          >
+            Cancel
+          </Button>
+        </Modal.Footer>
+      </Modal>
+
+      {/* Success Modal */}
+      <Modal
+        show={showSuccessModal}
+        onHide={() => setShowSuccessModal(false)}
+        centered
+      >
+        <Modal.Header closeButton>
+          <Modal.Title>Program Saved</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>The program has been saved successfully.</Modal.Body>
+        <Modal.Footer>
+          <Button
+            variant="primary"
+            onClick={() => {
+              setShowSuccessModal(false);
+              navigate("/admin-view-program");
+            }}
+          >
+            Close
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </Container>
   );
 };
