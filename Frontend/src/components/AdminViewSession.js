@@ -1,17 +1,21 @@
 import React, { useState, useEffect } from "react";
-import { Container, Row, Col, Button, Table } from "react-bootstrap";
+import { Container, Row, Col, Button, Table, Modal } from "react-bootstrap";
 import { FaEdit, FaTrash } from "react-icons/fa";
 import { useNavigate, useParams } from "react-router-dom";
 
 const AdminViewSession = () => {
   const [sessions, setSessions] = useState([]);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [sessionToDelete, setSessionToDelete] = useState(null);
   const navigate = useNavigate();
-  const { id: programID } = useParams(); 
+  const { id: programID } = useParams();
 
   useEffect(() => {
     const fetchSessions = async () => {
       try {
-        const response = await fetch(`http://localhost:8000/session/${programID}`);
+        const response = await fetch(
+          `http://localhost:8000/session/${programID}`
+        );
         if (!response.ok) {
           throw new Error("Failed to fetch sessions");
         }
@@ -33,17 +37,33 @@ const AdminViewSession = () => {
     navigate(`/admin-create-session/${programID}`);
   };
 
-  const handleDeleteClick = async (sessionId) => {
+  const handleDeleteClick = (sessionId) => {
+    setSessionToDelete(sessionId);
+    setShowDeleteModal(true);
+  };
+
+  const confirmDeleteSession = async () => {
+    if (!sessionToDelete) return;
     try {
-      const response = await fetch(`http://localhost:8000/session/${sessionId}`, {
-        method: "DELETE",
-      });
+      const response = await fetch(
+        `http://localhost:8000/session/${sessionToDelete}`,
+        {
+          method: "DELETE",
+        }
+      );
       if (!response.ok) {
         throw new Error("Failed to delete session");
       }
-      setSessions((prevSessions) => prevSessions.filter((session) => session.SessionID !== sessionId));
+      setSessions((prevSessions) =>
+        prevSessions.filter((session) => session.SessionID !== sessionToDelete)
+      );
+      setShowDeleteModal(false);
+      setSessionToDelete(null);
     } catch (error) {
       console.error("Error deleting session:", error);
+      alert(
+        "Unable to delete session: there may be associated payments or other dependencies."
+      );
     }
   };
 
@@ -74,7 +94,9 @@ const AdminViewSession = () => {
           <tbody>
             {sessions.map((session) => (
               <tr key={session.SessionID}>
-                <td>{`${formatDate(session.StartDate)} - ${formatDate(session.EndDate)}`}</td>
+                <td>{`${formatDate(session.StartDate)} - ${formatDate(
+                  session.EndDate
+                )}`}</td>
                 <td>{session.Time}</td>
                 <td>{session.Location}</td>
                 <td className="text-end">
@@ -106,6 +128,26 @@ const AdminViewSession = () => {
       >
         Create Session
       </Button>
+
+      {/* Delete Confirmation Modal */}
+      <Modal
+        show={showDeleteModal}
+        onHide={() => setShowDeleteModal(false)}
+        centered
+      >
+        <Modal.Header closeButton>
+          <Modal.Title>Confirm Delete</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>Are you sure you want to delete this session?</Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={() => setShowDeleteModal(false)}>
+            Cancel
+          </Button>
+          <Button variant="danger" onClick={confirmDeleteSession}>
+            Delete
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </Container>
   );
 };
