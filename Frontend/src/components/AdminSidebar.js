@@ -162,10 +162,10 @@ function Sidebar() {
                 {/* Announcement Dropdown */}
                 <div className="mt-3">
                   <button
-                    onClick={() => toggleMenu("announcement")}                
+                    onClick={() => toggleMenu("announcement")}
                     className="btn d-flex align-items-center w-100 text-dark fw-bold px-3 py-2 border-0 bg-transparent"
                   >
-                    <i className="bi bi-camera-video me-2"></i>
+                    <i className="bi bi-bell me-2"></i>
                     Announcement
                     <i
                       className={`bi ${
