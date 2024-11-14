@@ -1,59 +1,61 @@
-import React, { useState } from 'react';
-import { Container, Row, Col, Button, Form, InputGroup } from 'react-bootstrap';
-import { useNavigate } from 'react-router-dom';
-import { FaTrash } from 'react-icons/fa';
+import React, { useState } from "react";
+import { Container, Button, Form } from "react-bootstrap";
+import { useNavigate } from "react-router-dom";
 
 const AdminCreateProgram = () => {
-  const [name, setName] = useState('');
-  const [type, setType] = useState('');
-  const [description, setDescription] = useState('');
-  const [costTiers, setCostTiers] = useState([{ id: 1, cost: '' }]);
-  const [classSize, setClassSize] = useState('');
-  const [duration, setDuration] = useState('');
+  const [name, setName] = useState("");
+  const [type, setType] = useState("");
+  const [description, setDescription] = useState("");
+  const [cost, setCost] = useState("");
+  const [classSize, setClassSize] = useState("");
+  const [duration, setDuration] = useState("");
   const [lunchProvided, setLunchProvided] = useState(false);
-  const [lunchOptions, setLunchOptions] = useState(['']);
-  const [image, setImage] = useState(null);
   const navigate = useNavigate();
 
-  const handleAddTier = () => {
-    setCostTiers([...costTiers, { id: costTiers.length + 1, cost: '' }]);
+  // Mapping of program types to their IDs
+  const programTypeMapping = {
+    Workshop: 1,
+    Camp: 2,
+    Lab: 3,
+    Professional: 4,
   };
 
-  const handleCostChange = (index, value) => {
-    const updatedTiers = costTiers.map((tier, idx) => idx === index ? { ...tier, cost: value } : tier);
-    setCostTiers(updatedTiers);
-  };
+  const handleCreateProgram = async () => {
+    // Convert the selected type to its corresponding ID
+    const typeId = programTypeMapping[type] || null;
 
-  const handleDeleteTier = (index) => {
-    setCostTiers(costTiers.filter((_, idx) => idx !== index));
-  };
+    const programData = {
+      ProgramName: name,
+      ProgramDesc: description,
+      Cost: cost,
+      ClassSize: classSize,
+      Duration: duration,
+      LunchProvided: lunchProvided,
+      TypeID: typeId,
+    };
 
-  const handleLunchOptionChange = (index, value) => {
-    const updatedOptions = lunchOptions.map((option, idx) => idx === index ? value : option);
-    setLunchOptions(updatedOptions);
-  };
+    try {
+      const response = await fetch("http://localhost:8000/program", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(programData),
+      });
 
-  const handleAddLunchOption = () => {
-    setLunchOptions([...lunchOptions, '']);
-  };
+      if (!response.ok) {
+        throw new Error("Failed to create program");
+      }
 
-  const handleDeleteLunchOption = (index) => {
-    setLunchOptions(lunchOptions.filter((_, idx) => idx !== index));
-  };
-
-  const handleImageChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      setImage(URL.createObjectURL(file));
+      console.log("Program created successfully");
+      navigate("/admin-programs");
+    } catch (error) {
+      console.error("Error creating program:", error);
     }
   };
 
-  const handleCreateProgram = () => {
-    console.log('Program Created:', { name, type, description, costTiers, classSize, duration, lunchProvided, lunchOptions, image });
-  };
-
   const handleCancel = () => {
-    navigate('/admin-view-program');
+    navigate("/admin-view-program");
   };
 
   return (
@@ -70,16 +72,6 @@ const AdminCreateProgram = () => {
             value={name}
             onChange={(e) => setName(e.target.value)}
           />
-        </Form.Group>
-        
-        <Form.Group controlId="programImage" className="mb-3">
-          <Form.Label>Upload Image</Form.Label>
-          <Form.Control type="file" accept="image/*" onChange={handleImageChange} />
-          {image && (
-            <div className="image-preview mt-3">
-              <img src={image} alt="Program Preview" className="img-fluid rounded" style={{ maxHeight: '200px' }} />
-            </div>
-          )}
         </Form.Group>
 
         <Form.Group controlId="programType" className="mb-3">
@@ -108,22 +100,15 @@ const AdminCreateProgram = () => {
           />
         </Form.Group>
 
-        <Form.Label>Cost Tiers</Form.Label>
-        {costTiers.map((tier, index) => (
-          <InputGroup className="mb-2" key={tier.id}>
-            <InputGroup.Text>$</InputGroup.Text>
-            <Form.Control
-              type="text"
-              placeholder="Enter cost"
-              value={tier.cost}
-              onChange={(e) => handleCostChange(index, e.target.value)}
-            />
-            <Button variant="outline-danger" onClick={() => handleDeleteTier(index)}>
-              <FaTrash />
-            </Button>
-          </InputGroup>
-        ))}
-        <Button variant="outline-secondary" onClick={handleAddTier}>Add Tier/Type</Button>
+        <Form.Group controlId="programCost" className="mb-3">
+          <Form.Label>Cost</Form.Label>
+          <Form.Control
+            type="text"
+            placeholder="Enter cost"
+            value={cost}
+            onChange={(e) => setCost(e.target.value)}
+          />
+        </Form.Group>
 
         <Form.Group controlId="programClassSize" className="mt-3 mb-3">
           <Form.Label>Class Size</Form.Label>
@@ -154,31 +139,19 @@ const AdminCreateProgram = () => {
           />
         </Form.Group>
 
-        {lunchProvided && (
-          <div className="lunch-options">
-            <Form.Label>Lunch Options</Form.Label>
-            {lunchOptions.map((option, index) => (
-              <InputGroup className="mb-2" key={index}>
-                <Form.Control
-                  type="text"
-                  placeholder="Enter lunch option"
-                  value={option}
-                  onChange={(e) => handleLunchOptionChange(index, e.target.value)}
-                />
-                <Button variant="outline-danger" onClick={() => handleDeleteLunchOption(index)}>
-                  <FaTrash />
-                </Button>
-              </InputGroup>
-            ))}
-            <Button variant="outline-secondary" onClick={handleAddLunchOption}>Add Lunch Option</Button>
-          </div>
-        )}
-
         <div className="admin-create-button-group mt-4">
-          <Button variant="warning" className="admin-create-confirm-button me-3" onClick={handleCreateProgram}>
+          <Button
+            variant="warning"
+            className="admin-create-confirm-button me-3"
+            onClick={handleCreateProgram}
+          >
             Create Program
           </Button>
-          <Button variant="danger" className="admin-create-cancel-button" onClick={handleCancel}>
+          <Button
+            variant="danger"
+            className="admin-create-cancel-button"
+            onClick={handleCancel}
+          >
             Cancel
           </Button>
         </div>
