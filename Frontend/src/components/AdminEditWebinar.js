@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
-import { Container, Form, Button } from "react-bootstrap";
+import { Container, Form, Button, Modal } from "react-bootstrap";
 import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 
 const AdminEditWebinar = () => {
-  const { id } = useParams(); // Get webinar ID if editing an existing webinar
+  const { id } = useParams();
   const navigate = useNavigate();
 
   const [name, setName] = useState("");
@@ -15,10 +15,11 @@ const AdminEditWebinar = () => {
   const [endTime, setEndTime] = useState("");
   const [speaker, setSpeaker] = useState("");
   const [selectedFile, setSelectedFile] = useState(null);
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
 
   useEffect(() => {
     if (id) {
-      // Fetch existing webinar details if ID is present
       const fetchWebinarDetails = async () => {
         try {
           const response = await axios.get(
@@ -28,7 +29,7 @@ const AdminEditWebinar = () => {
           setName(data.WebinarName);
           setDescription(data.WebinarDesc);
           setLink(data.Link);
-          setDate(new Date(data.Date).toISOString().split("T")[0]); // Convert date for input[type="date"]
+          setDate(new Date(data.Date).toISOString().split("T")[0]);
           setStartTime(data.StartTime);
           setEndTime(data.EndTime);
           setSpeaker(data.Speaker);
@@ -44,10 +45,7 @@ const AdminEditWebinar = () => {
     setSelectedFile(e.target.files[0]);
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    // Create FormData object for file upload
+  const handleSubmit = async () => {
     const formData = new FormData();
     formData.append("WebinarName", name);
     formData.append("WebinarDesc", description);
@@ -57,28 +55,24 @@ const AdminEditWebinar = () => {
     formData.append("EndTime", endTime);
     formData.append("Speaker", speaker);
     if (selectedFile) {
-      formData.append("file", selectedFile); // Append file if available
+      formData.append("file", selectedFile);
     }
 
     try {
       if (id) {
-        // Update existing webinar
         await axios.put(`http://localhost:8000/webinar/${id}`, formData, {
           headers: {
             "Content-Type": "multipart/form-data",
           },
         });
-        alert("Webinar updated successfully!");
       } else {
-        // Create new webinar
         await axios.post(`http://localhost:8000/webinar`, formData, {
           headers: {
             "Content-Type": "multipart/form-data",
           },
         });
-        alert("Webinar created successfully!");
       }
-      navigate("/admin-view-webinar"); // Redirect after submission
+      setShowSuccessModal(true); // Show success modal on successful update
     } catch (error) {
       console.error("Error submitting webinar:", error);
       alert("Failed to submit webinar.");
@@ -86,13 +80,18 @@ const AdminEditWebinar = () => {
   };
 
   const handleCancel = () => {
-    navigate("/admin-view-webinar");
+    navigate(-1);
   };
 
   return (
     <Container className="p-4">
-      <h2>{id ? "Edit Webinar" : "Create Webinar"}</h2>
-      <Form onSubmit={handleSubmit}>
+      <h2 className="precoaching-title">Edit Webinar</h2>
+      <Form
+        onSubmit={(e) => {
+          e.preventDefault();
+          setShowConfirmModal(true); // Show confirmation modal
+        }}
+      >
         <Form.Group controlId="webinarName" className="mb-3">
           <Form.Label>Webinar Name</Form.Label>
           <Form.Control
@@ -178,7 +177,23 @@ const AdminEditWebinar = () => {
         </Form.Group>
 
         <div className="mt-4">
-          <Button variant="primary" type="submit" className="me-3">
+          <Button
+            variant="warning"
+            type="submit"
+            className="me-3"
+            style={{
+              backgroundColor: "#fbbf24",
+              color: "black",
+              borderRadius: "8px",
+              padding: "8px 16px",
+              fontSize: "14px",
+              fontWeight: "500",
+              textDecoration: "none",
+              border: "none",
+            }}
+            onMouseOver={(e) => (e.target.style.backgroundColor = "#f59e0b")}
+            onMouseOut={(e) => (e.target.style.backgroundColor = "#fbbf24")}
+          >
             {id ? "Update Webinar" : "Create Webinar"}
           </Button>
           <Button variant="secondary" onClick={handleCancel}>
@@ -186,6 +201,83 @@ const AdminEditWebinar = () => {
           </Button>
         </div>
       </Form>
+
+      {/* Confirmation Modal */}
+      <Modal
+        show={showConfirmModal}
+        onHide={() => setShowConfirmModal(false)}
+        centered
+      >
+        <Modal.Header closeButton>
+          <Modal.Title>Confirm Update</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>Are you sure you want to update this webinar?</Modal.Body>
+        <Modal.Footer>
+          <Button
+            variant="warning"
+            style={{
+              backgroundColor: "#fbbf24",
+              color: "black",
+              borderRadius: "8px",
+              padding: "8px 16px",
+              fontSize: "14px",
+              fontWeight: "500",
+              border: "none",
+            }}
+            onMouseOver={(e) => (e.target.style.backgroundColor = "#f59e0b")}
+            onMouseOut={(e) => (e.target.style.backgroundColor = "#fbbf24")}
+            onClick={() => {
+              setShowConfirmModal(false);
+              handleSubmit();
+            }}
+          >
+            Confirm
+          </Button>
+          <Button
+            variant="secondary"
+            onClick={() => setShowConfirmModal(false)}
+          >
+            Cancel
+          </Button>
+        </Modal.Footer>
+      </Modal>
+
+      {/* Success Modal */}
+      <Modal
+        show={showSuccessModal}
+        onHide={() => {
+          setShowSuccessModal(false);
+          navigate(-1); // Navigate back to previous page after success modal
+        }}
+        centered
+      >
+        <Modal.Header closeButton>
+          <Modal.Title>Webinar Updated</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>The webinar has been updated successfully.</Modal.Body>
+        <Modal.Footer>
+          <Button
+            variant="warning"
+            style={{
+              backgroundColor: "#fbbf24",
+              color: "black",
+              borderRadius: "8px",
+              padding: "8px 16px",
+              fontSize: "14px",
+              fontWeight: "500",
+              border: "none",
+            }}
+            onMouseOver={(e) => (e.target.style.backgroundColor = "#f59e0b")}
+            onMouseOut={(e) => (e.target.style.backgroundColor = "#fbbf24")}
+            onClick={() => {
+              setShowSuccessModal(false);
+              navigate(-1);
+            }}
+          >
+            Close
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </Container>
   );
 };
