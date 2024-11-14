@@ -107,7 +107,7 @@ CREATE TABLE Booking (
 CREATE TABLE Payment (
 	OrderID INT PRIMARY KEY AUTO_INCREMENT,
 	InvoiceID INT NOT NULL,
-    Amount INT NOT NULL,
+    Amount DECIMAL(10,2) NOT NULL,
 	CreatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP, 
     Status ENUM('Pending', 'Approved', 'Rejected') NOT NULL DEFAULT 'Pending',
     InvoicePath VARCHAR(100) NOT NULL,

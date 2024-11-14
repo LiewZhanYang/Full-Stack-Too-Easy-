@@ -109,7 +109,7 @@ const AdminConfirmPayment = () => {
   };
 
   const getStatusClass = (status) => {
-    if (status === "Approved") return "text-success"; 
+    if (status === "Approved") return "text-success";
     if (status === "Rejected") return "text-danger";
     return "";
   };
@@ -117,7 +117,7 @@ const AdminConfirmPayment = () => {
   const getStatusText = (status) => {
     if (status === "Approved") return "Confirmed (Approved)";
     if (status === "Rejected") return "Confirmed (Rejected)";
-    return status; 
+    return status;
   };
 
   return (
@@ -141,6 +141,11 @@ const AdminConfirmPayment = () => {
       <Row>
         <Col md={6}>
           <div className="admin-confirm-details">
+            <p>
+              <strong>Order ID</strong>
+              <br />
+              {paymentDetails.OrderID}
+            </p>
             <p>
               <strong>Invoice ID</strong>
               <br />
@@ -209,7 +214,7 @@ const AdminConfirmPayment = () => {
           <Button
             variant="warning"
             className="admin-confirm-confirm-button me-3"
-            onClick={() => setShowConfirmModal(true)} 
+            onClick={() => setShowConfirmModal(true)}
           >
             Confirm
           </Button>
@@ -261,7 +266,7 @@ const AdminConfirmPayment = () => {
             variant="primary"
             onClick={() => {
               setShowSuccessModal(false);
-              navigate(-1); 
+              navigate(-1);
             }}
           >
             Close
