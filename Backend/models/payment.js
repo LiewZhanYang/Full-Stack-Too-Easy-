@@ -62,7 +62,7 @@ class Payment {
     let connection;
     try {
       connection = await mysql.createConnection(dbConfig);
-  
+
       const sqlQuery = `
         INSERT INTO Payment (InvoiceID, Amount, CreatedAt, Status, InvoicePath, SessionID, PaidBy, ApprovedBy, Reason)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);
@@ -80,30 +80,29 @@ class Payment {
       ];
 
       // For Darling Leong Kai Jie
-      const file = paymentDetails.File
-      console.log(file)
-  
+      //const file = paymentDetails.File;
+      //console.log(file);
+
       // Execute the query and log the result
       const [result] = await connection.execute(sqlQuery, values);
       console.log("Insert result:", result);
-  
+
       // Check if insertId is available
       if (!result.insertId) {
         throw new Error("No order ID generated");
       }
-  
+
       return { OrderID: result.insertId };
     } catch (error) {
-      console.error("Error posting payment to the database:", error.sqlMessage || error.message);
+      console.error(
+        "Error posting payment to the database:",
+        error.sqlMessage || error.message
+      );
       throw error;
     } finally {
       if (connection) connection.end();
     }
-
   }
-  
-
-  
 
   static async approvePayment(OrderID, ApproveDetails) {
     const connection = await mysql.createConnection(dbConfig);
