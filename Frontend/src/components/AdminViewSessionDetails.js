@@ -47,6 +47,24 @@ const AdminViewSessionDetails = () => {
     navigate(-1); // Go back to the previous page
   };
 
+  // Helper function to format dates to DD/MM/YYYY
+  const formatDate = (isoDate) => {
+    const date = new Date(isoDate);
+    return date.toLocaleDateString("en-GB"); // "en-GB" ensures DD/MM/YYYY format
+  };
+
+  // Helper function to format time to HH:MM AM/PM
+  const formatTime = (timeString) => {
+    const [hour, minute] = timeString.split(":");
+    const date = new Date();
+    date.setHours(hour, minute);
+    return date.toLocaleTimeString("en-US", {
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: true,
+    });
+  };
+
   return (
     <Container fluid className="admin-view-session-details-page p-4">
       <Row className="mb-3">
@@ -73,12 +91,13 @@ const AdminViewSessionDetails = () => {
               <p>
                 <strong>Date</strong>
                 <br />
-                {sessionDetails.StartDate} - {sessionDetails.EndDate}
+                {formatDate(sessionDetails.StartDate)} -{" "}
+                {formatDate(sessionDetails.EndDate)}
               </p>
               <p>
                 <strong>Time</strong>
                 <br />
-                {sessionDetails.Time}
+                {formatTime(sessionDetails.Time)}
               </p>
               <p>
                 <strong>Location</strong>
@@ -98,7 +117,7 @@ const AdminViewSessionDetails = () => {
       )}
       <br />
       <Col>
-        <h2 className="page-title">Child Details</h2>
+        <h2 className="page-title">Attendee Details</h2>
       </Col>
       <hr className="divider-line mb-4" />
       {children.length > 0 ? (
@@ -110,7 +129,6 @@ const AdminViewSessionDetails = () => {
               <th>Strength</th>
               <th>Date of Birth</th>
               <th>Age</th>
-              <th>Account ID</th>
             </tr>
           </thead>
           <tbody>
@@ -119,9 +137,8 @@ const AdminViewSessionDetails = () => {
                 <td>{index + 1}</td>
                 <td>{child.Name}</td>
                 <td>{child.Strength}</td>
-                <td>{new Date(child.DOB).toLocaleDateString()}</td>
+                <td>{formatDate(child.DOB)}</td>
                 <td>{child.Age}</td>
-                <td>{child.AccountID}</td>
               </tr>
             ))}
           </tbody>

@@ -26,6 +26,7 @@ class Child {
             row.Name, 
             row.Strength,
             row.DOB,
+            row.Age,
             row.AccountID
         )});
     } 
@@ -117,6 +118,7 @@ class Child {
             row.Name, 
             row.Strength,
             row.DOB,
+            row.Age,
             row.AccountID
         )});
     }
