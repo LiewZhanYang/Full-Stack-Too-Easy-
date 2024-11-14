@@ -7,8 +7,9 @@ const AdminCreateSession = () => {
   const [endDate, setEndDate] = useState("");
   const [time, setTime] = useState("");
   const [location, setLocation] = useState("");
+  const [vacancy, setVacancy] = useState("");
   const navigate = useNavigate();
-  const { id: programID } = useParams(); // Get ProgramID from URL params
+  const { id: programID } = useParams();
 
   const handleCreateSession = async () => {
     const sessionDetails = {
@@ -16,6 +17,7 @@ const AdminCreateSession = () => {
       EndDate: endDate,
       Time: time,
       Location: location,
+      Vacancy: vacancy,
       ProgramID: programID,
     };
 
@@ -33,7 +35,7 @@ const AdminCreateSession = () => {
       }
 
       console.log("Session Created:", sessionDetails);
-      navigate(`/admin-programs/${programID}/sessions`); // Redirect to the sessions list for the program
+      navigate(`/admin-programs/${programID}/sessions`);
     } catch (error) {
       console.error("Error creating session:", error);
     }
@@ -44,7 +46,7 @@ const AdminCreateSession = () => {
   };
 
   return (
-    <Container fluid className="admin-edit-session-page p-4">
+    <Container fluid className="admin-create-session-page p-4">
       <h2 className="page-title">Public Speaking Workshop - Create Session</h2>
       <hr className="divider-line mb-4" />
 
@@ -74,22 +76,32 @@ const AdminCreateSession = () => {
         </Row>
 
         <Form.Group controlId="time" className="mb-3">
-          <Form.Label>Time (24 HRS)</Form.Label>
+          <Form.Label>Time</Form.Label>
           <Form.Control
-            type="text"
-            placeholder="e.g., 10:00-18:00"
+            type="time"
+            placeholder="Enter time"
             value={time}
             onChange={(e) => setTime(e.target.value)}
           />
         </Form.Group>
 
-        <Form.Group controlId="location" className="mb-4">
+        <Form.Group controlId="location" className="mb-3">
           <Form.Label>Location</Form.Label>
           <Form.Control
             type="text"
             placeholder="Enter location"
             value={location}
             onChange={(e) => setLocation(e.target.value)}
+          />
+        </Form.Group>
+
+        <Form.Group controlId="vacancy" className="mb-4">
+          <Form.Label>Vacancy</Form.Label>
+          <Form.Control
+            type="number"
+            placeholder="Enter vacancy"
+            value={vacancy}
+            onChange={(e) => setVacancy(e.target.value)}
           />
         </Form.Group>
 

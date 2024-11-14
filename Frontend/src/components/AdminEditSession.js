@@ -113,7 +113,7 @@ const AdminEditSession = () => {
         </Row>
 
         <Form.Group controlId="time" className="mb-3">
-          <Form.Label>Time (24 HRS)</Form.Label>
+          <Form.Label>Time</Form.Label>
           <Form.Control
             type="text"
             placeholder="e.g., 10:00-18:00"
