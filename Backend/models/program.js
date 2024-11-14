@@ -2,7 +2,17 @@ const dbConfig = require("../dbConfig");
 const mysql = require("mysql2/promise");
 
 class Program {
-  constructor(ProgramID, ProgrameName, ProgramDesc, Cost, DiscountedCost, LunchProvided, Duration, ClassSize, TypeID) {
+  constructor(
+    ProgramID,
+    ProgrameName,
+    ProgramDesc,
+    Cost,
+    DiscountedCost,
+    LunchProvided,
+    Duration,
+    ClassSize,
+    TypeID
+  ) {
     this.ProgramID = ProgramID;
     this.ProgrameName = ProgrameName;
     this.ProgramDesc = ProgramDesc;
@@ -27,7 +37,17 @@ class Program {
     }
 
     const row = rows[0];
-    return new Program(row.ProgramID, row.ProgramName, row.ProgramDesc, row.Cost, row.DiscountedCost, row.LunchProvided, row.Duration, row.ClassSize, row.TypeID);
+    return new Program(
+      row.ProgramID,
+      row.ProgramName,
+      row.ProgramDesc,
+      row.Cost,
+      row.DiscountedCost,
+      row.LunchProvided,
+      row.Duration,
+      row.ClassSize,
+      row.TypeID
+    );
   }
 
   static async getProgramBySignUp(AccountID) {
@@ -45,7 +65,17 @@ class Program {
     }
 
     return rows.map((row) => {
-      return new Program(row.ProgramID, row.ProgramName, row.ProgramDesc, row.Cost, row.DiscountedCost, row.LunchProvided, row.Duration, row.ClassSize, row.TypeID);
+      return new Program(
+        row.ProgramID,
+        row.ProgramName,
+        row.ProgramDesc,
+        row.Cost,
+        row.DiscountedCost,
+        row.LunchProvided,
+        row.Duration,
+        row.ClassSize,
+        row.TypeID
+      );
     });
   }
 
@@ -59,28 +89,48 @@ class Program {
 
     connection.end();
     return result.map((row) => {
-      return new Program(row.ProgramID, row.ProgramName, row.ProgramDesc, row.Cost, row.DiscountedCost, row.LunchProvided, row.Duration, row.ClassSize, row.TypeID);
+      return new Program(
+        row.ProgramID,
+        row.ProgramName,
+        row.ProgramDesc,
+        row.Cost,
+        row.DiscountedCost,
+        row.LunchProvided,
+        row.Duration,
+        row.ClassSize,
+        row.TypeID
+      );
     });
   }
 
   static async postProgram(programDetails) {
-    const connection = await mysql.createConnection(dbConfig);
-    const sqlQuery = `
-            INSERT INTO program (ProgramName, ProgramDesc, Cost, LunchProvided, Duration, ClassSize, TypeID)
-            VALUES (?, ?, ?, ?, ?, ?, ?)`;
+    let connection;
+    try {
+      connection = await mysql.createConnection(dbConfig);
+      const sqlQuery = `
+      INSERT INTO program (ProgramName, ProgramDesc, Cost, LunchProvided, Duration, ClassSize, TypeID)
+      VALUES (?, ?, ?, ?, ?, ?, ?)
+    `;
+      const values = [
+        programDetails.ProgramName,
+        programDetails.ProgramDesc,
+        programDetails.Cost,
+        programDetails.LunchProvided,
+        programDetails.Duration,
+        programDetails.ClassSize,
+        programDetails.TypeID,
+      ];
 
-    const values = [
-      programDetails.ProgramName,
-      programDetails.ProgramDesc,
-      programDetails.Cost,
-      programDetails.LunchProvided,
-      programDetails.Duration,
-      programDetails.ClassSize, 
-      programDetails.TypeID,
-    ];
+      const [result] = await connection.execute(sqlQuery, values);
 
-    const [result] = await connection.execute(sqlQuery, values);
-    connection.end();
+      // Return the generated ProgramID
+      return { ProgramID: result.insertId };
+    } catch (error) {
+      console.error("Error creating new program:", error);
+      throw error;
+    } finally {
+      if (connection) connection.end();
+    }
   }
 
   static async updateProgram(id, updateData) {

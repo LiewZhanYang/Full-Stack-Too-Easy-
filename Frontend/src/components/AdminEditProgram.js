@@ -1,18 +1,18 @@
-import React, { useState, useEffect } from 'react';
-import { Container, Row, Col, Button, Form } from 'react-bootstrap';
-import { useNavigate, useParams } from 'react-router-dom';
+import React, { useState, useEffect } from "react";
+import { Container, Row, Col, Button, Form } from "react-bootstrap";
+import { useNavigate, useParams } from "react-router-dom";
 
 const AdminEditProgram = () => {
-  const [name, setName] = useState('');
-  const [type, setType] = useState('');
-  const [description, setDescription] = useState('');
-  const [cost, setCost] = useState('');
-  const [classSize, setClassSize] = useState('');
-  const [duration, setDuration] = useState('');
+  const [name, setName] = useState("");
+  const [type, setType] = useState("");
+  const [description, setDescription] = useState("");
+  const [cost, setCost] = useState("");
+  const [classSize, setClassSize] = useState("");
+  const [duration, setDuration] = useState("");
   const [lunchProvided, setLunchProvided] = useState(false);
   const [image, setImage] = useState(null);
   const navigate = useNavigate();
-  const { id } = useParams(); 
+  const { id } = useParams();
 
   // Fetch program details from backend on component load
   useEffect(() => {
@@ -21,7 +21,9 @@ const AdminEditProgram = () => {
         console.log(`Fetching details for Program ID: ${id}`);
         const response = await fetch(`http://localhost:8000/program/${id}`);
         if (!response.ok) {
-          throw new Error(`Failed to fetch program details: ${response.statusText}`);
+          throw new Error(
+            `Failed to fetch program details: ${response.statusText}`
+          );
         }
         const data = await response.json();
         console.log("Fetched program details:", data); // Log fetched program data
@@ -59,37 +61,39 @@ const AdminEditProgram = () => {
       LunchProvided: lunchProvided,
       TypeID: type,
     });
-    
+
     try {
+      const formData = new FormData();
+      formData.append("ProgramName", name);
+      formData.append("ProgramDesc", description);
+      formData.append("Cost", cost);
+      formData.append("ClassSize", classSize);
+      formData.append("Duration", duration);
+      formData.append("LunchProvided", lunchProvided);
+      formData.append("TypeID", type);
+      if (image) {
+        formData.append("file", image); // Attach the selected image file
+      }
+      formData.append("ProgramID", id); // Include ProgramID for backend reference
+
       const response = await fetch(`http://localhost:8000/program/id/${id}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          ProgramName: name,
-          ProgramDesc: description,
-          Cost: cost,
-          ClassSize: classSize,
-          Duration: duration,
-          LunchProvided: lunchProvided,
-          TypeID: type,
-        }),
+        method: "PUT",
+        body: formData,
       });
 
       if (!response.ok) {
-        throw new Error('Failed to save program');
+        throw new Error("Failed to save program");
       }
 
-      console.log('Program saved successfully');
-      navigate('/admin-view-program'); // Redirect after saving
+      console.log("Program saved successfully");
+      navigate("/admin-view-program");
     } catch (error) {
-      console.error('Error saving program:', error);
+      console.error("Error saving program:", error);
     }
   };
 
   const handleCancel = () => {
-    navigate('/admin-view-program');
+    navigate("/admin-view-program");
   };
 
   return (
@@ -107,13 +111,22 @@ const AdminEditProgram = () => {
             onChange={(e) => setName(e.target.value)}
           />
         </Form.Group>
-        
+
         <Form.Group controlId="programImage" className="mb-3">
           <Form.Label>Upload Image</Form.Label>
-          <Form.Control type="file" accept="image/*" onChange={handleImageChange} />
+          <Form.Control
+            type="file"
+            accept="image/*"
+            onChange={handleImageChange}
+          />
           {image && (
             <div className="image-preview mt-3">
-              <img src={image} alt="Program Preview" className="img-fluid rounded" style={{ maxHeight: '200px' }} />
+              <img
+                src={image}
+                alt="Program Preview"
+                className="img-fluid rounded"
+                style={{ maxHeight: "200px" }}
+              />
             </div>
           )}
         </Form.Group>
@@ -184,10 +197,18 @@ const AdminEditProgram = () => {
         </Form.Group>
 
         <div className="admin-create-button-group mt-4">
-          <Button variant="warning" className="admin-create-confirm-button me-3" onClick={handleSaveProgram}>
+          <Button
+            variant="warning"
+            className="admin-create-confirm-button me-3"
+            onClick={handleSaveProgram}
+          >
             Save
           </Button>
-          <Button variant="danger" className="admin-create-cancel-button" onClick={handleCancel}>
+          <Button
+            variant="danger"
+            className="admin-create-cancel-button"
+            onClick={handleCancel}
+          >
             Cancel
           </Button>
         </div>
