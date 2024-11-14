@@ -188,7 +188,7 @@ const AdminViewProgram = () => {
       {/* Create Program Button */}
       <Button
         variant="success"
-        className="admin-create-program-button d-flex align-items-center"
+        className="admin-create-webinar-button d-flex align-items-center"
         onClick={handleCreateProgramClick}
       >
         <FaPlus className="me-1" /> <span>Create Programme</span>
