@@ -161,9 +161,12 @@ const AdminViewProgram = () => {
                 </Card.Text>
                 <div className="d-flex gap-2 mt-auto">
                   <Button
+                    onClick={() => handleEditClick(program.ProgramID)}
+                    style={{backgroundColor: "#fbbf24",
+                      color:"black",
+                    }}
                     variant="warning"
                     className="admin-program-edit-button d-flex align-items-center"
-                    onClick={() => handleEditClick(program.ProgramID)}
                   >
                     <FaEdit className="me-1" /> <span>Edit Details</span>
                   </Button>
