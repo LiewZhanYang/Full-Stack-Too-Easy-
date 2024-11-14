@@ -10,16 +10,23 @@ const AdminCreateProgram = () => {
   const [classSize, setClassSize] = useState("");
   const [duration, setDuration] = useState("");
   const [lunchProvided, setLunchProvided] = useState(false);
+  const [image, setImage] = useState(null);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const navigate = useNavigate();
 
-  // Mapping of program types to their IDs
   const programTypeMapping = {
     Workshop: 1,
     Camp: 2,
     Lab: 3,
     Professional: 4,
+  };
+
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setImage(URL.createObjectURL(file));
+    }
   };
 
   const handleCreateProgram = async () => {
@@ -73,6 +80,25 @@ const AdminCreateProgram = () => {
             value={name}
             onChange={(e) => setName(e.target.value)}
           />
+        </Form.Group>
+
+        <Form.Group controlId="programImage" className="mb-3">
+          <Form.Label>Upload Image</Form.Label>
+          <Form.Control
+            type="file"
+            accept="image/*"
+            onChange={handleImageChange}
+          />
+          {image && (
+            <div className="image-preview mt-3">
+              <img
+                src={image}
+                alt="Program Preview"
+                className="img-fluid rounded"
+                style={{ maxHeight: "200px" }}
+              />
+            </div>
+          )}
         </Form.Group>
 
         <Form.Group controlId="programType" className="mb-3">
@@ -144,7 +170,7 @@ const AdminCreateProgram = () => {
           <Button
             variant="warning"
             className="admin-create-confirm-button me-3"
-            onClick={handleCreateProgram}
+            onClick={() => setShowConfirmModal(true)} // Show confirmation modal
           >
             Create
           </Button>
