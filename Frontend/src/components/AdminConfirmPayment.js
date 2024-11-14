@@ -36,6 +36,9 @@ const AdminConfirmPayment = () => {
 
   const handleConfirmClick = async () => {
     try {
+      console.log("Starting payment confirmation process...");
+
+      // Step 1: Approve the payment
       const response = await fetch(
         `http://localhost:8000/payment/approvepayment/${id}`,
         {
@@ -43,16 +46,47 @@ const AdminConfirmPayment = () => {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ AdminID: 1 }), // Example AdminID, replace as necessary
+          body: JSON.stringify({ AdminID: 1 }), // Example AdminID, replace as needed
         }
       );
+
       if (!response.ok) {
         throw new Error("Failed to approve payment");
       }
-      console.log("Payment Confirmed");
+      console.log("Payment approved successfully");
+
+      // Step 2: Use PaidBy as AccountID for updating customer's membership status
+      const accountId = paymentDetails.PaidBy; // Use PaidBy instead of AccountID
+      console.log("AccountID for membership update (from PaidBy):", accountId);
+
+      if (accountId) {
+        const membershipResponse = await fetch(
+          `http://localhost:8000/customer/member/${accountId}`,
+          {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+
+        if (!membershipResponse.ok) {
+          throw new Error("Failed to update customer membership status");
+        }
+
+        console.log("Customer membership status updated successfully");
+      } else {
+        console.error("AccountID (PaidBy) not found in payment details");
+      }
+
+      // Step 3: Navigate back if all steps succeed
+      console.log("Navigating back to previous page...");
       navigate(-1); // Navigate back after confirming
     } catch (error) {
-      console.error("Error confirming payment:", error);
+      console.error(
+        "Error during payment confirmation or membership update:",
+        error
+      );
     }
   };
 
