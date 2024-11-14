@@ -34,7 +34,7 @@ class Booking {
     const connection = await mysql.createConnection(dbConfig);
 
     const sqlQuery = `
-        SELECT * FROM Booking WHERE AccountID = ?
+        SELECT * FROM Booking WHERE AccountID = ? AND Date > CURDATE()
         `;
     const [result] = await connection.execute(sqlQuery, [id]);
 
