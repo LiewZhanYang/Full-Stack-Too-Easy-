@@ -58,4 +58,18 @@ const updateChild = async (req, res) => {
   }
 };
 
-module.exports = { getChildByAccountID, postChild, deleteChild, updateChild };
+const getChildBySessionID = async (req, res) => {
+  const SessionID = req.params.id;
+  try {
+    const children = await Child.getChildBySessionID(SessionID);
+    if (children.length === 0) {
+      return res.status(404).send("Children not found");
+    }
+    res.json(children);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Error retrieving children");
+  }
+};
+
+module.exports = { getChildByAccountID, postChild, deleteChild, updateChild, getChildBySessionID };

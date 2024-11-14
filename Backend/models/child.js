@@ -71,8 +71,6 @@ class Child {
         }
     }
     
-   
-  
 
     static async deleteChild(id) {
         const connection = await mysql.createConnection(dbConfig);
@@ -101,6 +99,26 @@ class Child {
 
         const [result] = await connection.execute(sqlQuery, values);
         connection.end();
+    }
+
+    static async getChildBySessionID(id) {
+        const connection = await mysql.createConnection(dbConfig);
+
+        const sqlQuery = `
+        SELECT * FROM Child WHERE ChildID IN (
+        SELECT ChildID FROM SignUp WHERE SessionID = ?)
+        `;
+        const [result] = await connection.execute(sqlQuery, [id]);
+
+        connection.end();
+        return result.map(row => {
+            return new Child(
+            row.ChildID,
+            row.Name, 
+            row.Strength,
+            row.DOB,
+            row.AccountID
+        )});
     }
 }
 
