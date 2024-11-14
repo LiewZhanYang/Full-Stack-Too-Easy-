@@ -54,13 +54,26 @@ const AdminCoaching = () => {
 
       {!roomUrl ? (
         <div className="mt-4">
-          <button
-            className="btn btn-primary mb-4"
-            onClick={createMeeting}
-            style={{ fontSize: "1.2rem", padding: "0.6rem 1.5rem" }}
-          >
-            Start Meeting
-          </button>
+        <button
+          onClick={createMeeting}
+          style={{
+            backgroundColor: "#fbbf24",
+            color: "black",
+            borderRadius: "8px",
+            padding: "0.6rem 1.5rem",
+            fontSize: "1.2rem",
+            fontWeight: "500",
+            textDecoration: "none",
+            transition: "background-color 0.2s ease-in-out",
+            cursor: "pointer",
+            border: "none",
+            marginTop: "20px", // Adds space above the button to move it down if needed
+          }}
+          onMouseOver={(e) => (e.target.style.backgroundColor = "#f59e0b")}
+          onMouseOut={(e) => (e.target.style.backgroundColor = "#fbbf24")}
+        >
+          Start Meeting
+        </button>
         </div>
       ) : (
         <div className="mt-4">
