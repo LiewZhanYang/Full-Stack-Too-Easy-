@@ -1006,3 +1006,27 @@ code {
 .admin-create-button-group button {
   width: 120px;
 }
+
+/* AdminViewAnnouncement.css */
+
+.admin-view-announcement {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.admin-view-announcement h2 {
+  font-weight: bold;
+  font-size: 1.5em;
+}
+
+.admin-view-announcement .card {
+  border-radius: 8px;
+}
+
+.admin-view-announcement .card .card-title {
+  font-weight: bold;
+}
+
+.admin-view-announcement .sort-select {
+  width: 200px;
+}
