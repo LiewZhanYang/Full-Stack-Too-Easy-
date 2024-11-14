@@ -124,7 +124,7 @@ const AdminConfirmPayment = () => {
     <Container fluid className="admin-confirm-payment-page p-4">
       <Row className="mb-3">
         <Col>
-          <h2 className="admin-confirm-title">Admin Console</h2>
+          <h2 className="admin-confirm-title">Confirm Payment</h2>
         </Col>
         <Col className="text-end">
           <Button
