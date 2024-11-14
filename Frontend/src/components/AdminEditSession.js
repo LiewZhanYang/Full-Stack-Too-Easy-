@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Container, Row, Col, Button, Form } from "react-bootstrap";
+import { Container, Row, Col, Button, Form, Modal } from "react-bootstrap";
 import { useNavigate, useParams } from "react-router-dom";
 
 const formatDate = (dateString) => {
@@ -16,8 +16,10 @@ const AdminEditSession = () => {
   const [time, setTime] = useState("");
   const [location, setLocation] = useState("");
   const [vacancy, setVacancy] = useState("");
+  const [showSaveModal, setShowSaveModal] = useState(false); // State for save confirmation modal
+  const [showSuccessModal, setShowSuccessModal] = useState(false); // State for success confirmation modal
   const navigate = useNavigate();
-  const { id: sessionID } = useParams(); 
+  const { id: sessionID } = useParams();
 
   useEffect(() => {
     const fetchSessionDetails = async () => {
@@ -31,12 +33,11 @@ const AdminEditSession = () => {
         const session = await response.json();
 
         if (session) {
-          console.log("Fetched session details:", session);
           setStartDate(formatDate(session.StartDate));
           setEndDate(formatDate(session.EndDate));
           setTime(session.Time);
           setLocation(session.Location);
-          setVacancy(session.Vacancy); 
+          setVacancy(session.Vacancy);
         } else {
           console.error("Session not found");
         }
@@ -72,7 +73,8 @@ const AdminEditSession = () => {
       }
 
       console.log("Session saved successfully");
-      navigate("/admin-view-program");
+      setShowSaveModal(false); // Close the save confirmation modal
+      setShowSuccessModal(true); // Open the success confirmation modal
     } catch (error) {
       console.error("Error saving session:", error);
     }
@@ -146,7 +148,7 @@ const AdminEditSession = () => {
           <Button
             variant="warning"
             className="save-button"
-            onClick={handleSaveSession}
+            onClick={() => setShowSaveModal(true)} // Open modal on Save click
           >
             Save
           </Button>
@@ -159,6 +161,51 @@ const AdminEditSession = () => {
           </Button>
         </div>
       </Form>
+
+      {/* Save Confirmation Modal */}
+      <Modal
+        show={showSaveModal}
+        onHide={() => setShowSaveModal(false)}
+        centered
+      >
+        <Modal.Header closeButton>
+          <Modal.Title>Save Confirmation</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          Are you sure you want to save the changes to this session?
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="primary" onClick={handleSaveSession}>
+            Confirm Save
+          </Button>
+          <Button variant="secondary" onClick={() => setShowSaveModal(false)}>
+            Cancel
+          </Button>
+        </Modal.Footer>
+      </Modal>
+
+      {/* Success Confirmation Modal */}
+      <Modal
+        show={showSuccessModal}
+        onHide={() => setShowSuccessModal(false)}
+        centered
+      >
+        <Modal.Header closeButton>
+          <Modal.Title>Session Saved</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>The session has been successfully saved.</Modal.Body>
+        <Modal.Footer>
+          <Button
+            variant="primary"
+            onClick={() => {
+              setShowSuccessModal(false);
+              navigate("/admin-view-program");
+            }}
+          >
+            Close
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </Container>
   );
 };
