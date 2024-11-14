@@ -1,11 +1,12 @@
 import React, { useState } from "react";
-import { Container, Button, Form } from "react-bootstrap";
+import { Container, Button, Form, Modal } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
 const AdminCreateAnnouncement = () => {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
   const navigate = useNavigate();
 
   const handleCreateAnnouncement = async () => {
@@ -61,7 +62,7 @@ const AdminCreateAnnouncement = () => {
           <Button
             variant="warning"
             className="me-3"
-            onClick={handleCreateAnnouncement}
+            onClick={() => setShowConfirmModal(true)} // Show confirmation modal on Create click
           >
             Create
           </Button>
@@ -70,6 +71,37 @@ const AdminCreateAnnouncement = () => {
           </Button>
         </div>
       </Form>
+
+      {/* Confirmation Modal */}
+      <Modal
+        show={showConfirmModal}
+        onHide={() => setShowConfirmModal(false)}
+        centered
+      >
+        <Modal.Header closeButton>
+          <Modal.Title>Confirm Announcement Creation</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          Are you sure you want to create this announcement?
+        </Modal.Body>
+        <Modal.Footer>
+          <Button
+            variant="primary"
+            onClick={() => {
+              setShowConfirmModal(false); // Close modal
+              handleCreateAnnouncement(); // Proceed with creation
+            }}
+          >
+            Confirm
+          </Button>
+          <Button
+            variant="secondary"
+            onClick={() => setShowConfirmModal(false)}
+          >
+            Cancel
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </Container>
   );
 };

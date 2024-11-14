@@ -82,7 +82,7 @@ const AdminViewProgram = () => {
 
   return (
     <Container fluid className="admin-program-page p-4">
-      <h1 className="admin-program-title fw-bold">Programs</h1>
+      <h2 className="precoaching-title">Programmes</h2>
 
       {/* Search and Filter Section */}
       <div className="admin-program-controls d-flex align-items-center my-3">
