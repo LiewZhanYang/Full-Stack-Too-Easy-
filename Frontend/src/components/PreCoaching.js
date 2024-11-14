@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
-import { Button } from "react-bootstrap";
+import { Button, Modal } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 
 function Precoaching() {
   const [hasBooking, setHasBooking] = useState(false);
   const [bookingData, setBookingData] = useState(null);
+  const [showCancelModal, setShowCancelModal] = useState(false); // State for cancel confirmation modal
   const navigate = useNavigate();
 
   const handleNavigateToBooking = () => {
@@ -49,6 +50,30 @@ function Precoaching() {
       minute: "2-digit",
       hour12: true,
     });
+  };
+
+  const handleCancelBooking = async () => {
+    if (bookingData && bookingData.BookingID) {
+      try {
+        const response = await fetch(
+          `http://localhost:8000/booking/${bookingData.BookingID}`,
+          {
+            method: "DELETE",
+          }
+        );
+        if (response.ok) {
+          console.log("Booking canceled successfully.");
+          setHasBooking(false);
+          setBookingData(null);
+        } else {
+          console.error("Failed to cancel booking.");
+        }
+      } catch (error) {
+        console.error("Error canceling booking:", error);
+      } finally {
+        setShowCancelModal(false); // Close the confirmation modal
+      }
+    }
   };
 
   return (
@@ -107,6 +132,7 @@ function Precoaching() {
                   variant="outline-secondary"
                   className="px-4 cancel-button"
                   style={{ fontWeight: 500 }}
+                  onClick={() => setShowCancelModal(true)} // Show the confirmation modal
                 >
                   Cancel
                 </Button>
@@ -134,6 +160,26 @@ function Precoaching() {
           </Button>
         </div>
       )}
+
+      {/* Cancellation Confirmation Modal */}
+      <Modal
+        show={showCancelModal}
+        onHide={() => setShowCancelModal(false)}
+        centered
+      >
+        <Modal.Header closeButton>
+          <Modal.Title>Confirm Cancellation</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>Are you sure you want to cancel this booking?</Modal.Body>
+        <Modal.Footer>
+          <Button variant="danger" onClick={handleCancelBooking}>
+            Yes, Cancel Booking
+          </Button>
+          <Button variant="secondary" onClick={() => setShowCancelModal(false)}>
+            No, Keep Booking
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </div>
   );
 }
