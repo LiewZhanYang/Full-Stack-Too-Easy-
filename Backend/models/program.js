@@ -134,29 +134,43 @@ class Program {
   }
 
   static async updateProgram(id, updateData) {
-    const connection = await mysql.createConnection(dbConfig);
-
-    // Construct the SQL query dynamically based on updateData keys
-    const fields = Object.keys(updateData)
-      .map((field) => `${field} = ?`)
-      .join(", ");
-    const values = Object.values(updateData);
-    values.push(id); // Add the ID at the end for the WHERE clause
-
-    const sqlQuery = `
-            UPDATE program
-            SET ${fields}
-            WHERE ProgramID = ?
-        `;
-
+    let connection;
     try {
+      connection = await mysql.createConnection(dbConfig);
+
+      // Remove any keys that should not be part of the database update
+      const filteredUpdateData = { ...updateData };
+      delete filteredUpdateData.file; // Remove 'file' key if it exists
+
+      // Check if there are any fields to update
+      if (!filteredUpdateData || Object.keys(filteredUpdateData).length === 0) {
+        throw new Error("No data provided to update.");
+      }
+
+      // Construct the SQL query dynamically based on filteredUpdateData keys
+      const fields = Object.keys(filteredUpdateData)
+        .map((field) => `${field} = ?`)
+        .join(", ");
+      const values = Object.values(filteredUpdateData);
+      values.push(id); // Add the ID at the end for the WHERE clause
+
+      const sqlQuery = `
+      UPDATE program
+      SET ${fields}
+      WHERE ProgramID = ?
+    `;
+
+      // Execute the query
       const [result] = await connection.execute(sqlQuery, values);
-      connection.end();
       return result;
     } catch (error) {
       console.error("Error updating program:", error);
-      connection.end();
       throw error;
+    } finally {
+      // Ensure the connection is closed even in case of an error
+      if (connection) {
+        await connection.end();
+      }
     }
   }
 }

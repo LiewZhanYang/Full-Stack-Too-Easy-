@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Container, Button, Form, Modal } from "react-bootstrap";
+import { Container, Button, Form, Modal } from "react-bootstrap"; // Added Modal import
 import { useNavigate, useParams } from "react-router-dom";
 
 const AdminEditProgram = () => {
@@ -13,9 +13,11 @@ const AdminEditProgram = () => {
   const [image, setImage] = useState(null);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [imagePreview, setImagePreview] = useState(null);
   const navigate = useNavigate();
   const { id } = useParams();
 
+  // Fetch program details from backend on component load
   useEffect(() => {
     const fetchProgramDetails = async () => {
       try {
@@ -33,36 +35,36 @@ const AdminEditProgram = () => {
         setClassSize(data.ClassSize);
         setDuration(data.Duration);
         setLunchProvided(data.LunchProvided);
+        setImagePreview(data.imageUrl || null);
       } catch (error) {
         console.error("Error fetching program details:", error);
       }
     };
-
     fetchProgramDetails();
   }, [id]);
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      setImage(URL.createObjectURL(file));
+      setImage(file);
+      setImagePreview(URL.createObjectURL(file));
     }
   };
 
   const handleSaveProgram = async () => {
-    const formData = new FormData();
-    formData.append("ProgramName", name);
-    formData.append("ProgramDesc", description);
-    formData.append("Cost", cost);
-    formData.append("ClassSize", classSize);
-    formData.append("Duration", duration);
-    formData.append("LunchProvided", lunchProvided);
-    formData.append("TypeID", type);
-    if (image) {
-      formData.append("file", image); // Attach the selected image file
-    }
-    formData.append("ProgramID", id); // Include ProgramID for backend reference
-
     try {
+      const formData = new FormData();
+      formData.append("ProgramName", name);
+      formData.append("ProgramDesc", description);
+      formData.append("Cost", cost);
+      formData.append("ClassSize", classSize);
+      formData.append("Duration", duration);
+      formData.append("LunchProvided", lunchProvided);
+      formData.append("TypeID", type);
+      if (image) {
+        formData.append("file", image);
+      }
+
       const response = await fetch(`http://localhost:8000/program/id/${id}`, {
         method: "PUT",
         body: formData,
@@ -71,13 +73,15 @@ const AdminEditProgram = () => {
       if (!response.ok) {
         throw new Error("Failed to save program");
       }
-
-      console.log("Program saved successfully");
-      setShowConfirmModal(false); // Close the confirmation modal
-      setShowSuccessModal(true); // Open the success modal
+      setShowConfirmModal(false); // Close confirm modal on success
+      setShowSuccessModal(true); // Show success modal
     } catch (error) {
       console.error("Error saving program:", error);
     }
+  };
+
+  const handleConfirmSave = () => {
+    setShowConfirmModal(true); // Open confirmation modal
   };
 
   const handleCancel = () => {
@@ -107,10 +111,10 @@ const AdminEditProgram = () => {
             accept="image/*"
             onChange={handleImageChange}
           />
-          {image && (
+          {imagePreview && (
             <div className="image-preview mt-3">
               <img
-                src={image}
+                src={imagePreview}
                 alt="Program Preview"
                 className="img-fluid rounded"
                 style={{ maxHeight: "200px" }}
@@ -188,7 +192,7 @@ const AdminEditProgram = () => {
           <Button
             variant="warning"
             className="admin-create-confirm-button me-3"
-            onClick={() => setShowConfirmModal(true)} // Show confirmation modal on click
+            onClick={handleConfirmSave}
           >
             Save
           </Button>

@@ -1,16 +1,33 @@
 const Program = require("../models/program");
-const uploadController = require("../controllers/uploadController"); // Import the uploadController
+const uploadController = require("../controllers/uploadController");
+const { getProgramPicByProgramID } = require("../controllers/uploadController"); // Adjust path if necessary
 
-// Retrieve all programs
+// Retrieve all programs and attach image URLs
 const getAllPrograms = async (req, res) => {
   try {
     const programs = await Program.getAllPrograms();
     if (programs.length === 0) {
       return res.status(404).send("Programs not found");
     }
-    res.json(programs);
+
+    const programsWithImages = await Promise.all(
+      programs.map(async (program) => {
+        try {
+          const { url } = await getProgramPicByProgramID(program.ProgramID);
+          return { ...program, image: url };
+        } catch (error) {
+          console.error(
+            `Error fetching image for ProgramID ${program.ProgramID}:`,
+            error
+          );
+          return { ...program, image: "/img/default.jpg" }; // Fallback image
+        }
+      })
+    );
+
+    res.status(200).json(programsWithImages);
   } catch (error) {
-    console.error(error);
+    console.error("Error retrieving programs:", error);
     res.status(500).send("Error retrieving programs");
   }
 };
@@ -33,9 +50,13 @@ const getProgramById = async (req, res) => {
 // Post a new program
 const postProgram = async (req, res) => {
   const programDetails = req.body;
+  console.log("Received program details:", programDetails);
+
   try {
     // Create the new program in the database
     const newProgram = await Program.postProgram(programDetails);
+    console.log("New program created:", newProgram);
+
     if (!newProgram.ProgramID) {
       return res.status(500).json({ error: "Failed to create new program" });
     }
@@ -43,9 +64,7 @@ const postProgram = async (req, res) => {
     // Optional: Upload a program picture if a file is provided
     if (req.file) {
       try {
-        await uploadController.uploadProgramPic(req, res, {
-          ProgramID: newProgram.ProgramID, // Use the generated ProgramID for folder structure
-        });
+        await uploadController.uploadProgramPic(req.file, newProgram.ProgramID); // Corrected parameter handling
       } catch (uploadError) {
         console.error("Error uploading program picture:", uploadError);
         return res
@@ -63,24 +82,27 @@ const postProgram = async (req, res) => {
 
 // Update an existing program
 const updateProgram = async (req, res) => {
-  const id = parseInt(req.params.id); // Program ID from URL parameters
-  const updateData = req.body; // Program data to be updated
+  const id = parseInt(req.params.id, 10);
+  const updateData = req.body;
 
   try {
-    // Update the program in the database
+    // Update program data in the database
     const result = await Program.updateProgram(id, updateData);
     if (result.affectedRows === 0) {
       return res.status(404).json({ message: "Program not found" });
     }
 
-    // Optional: Handle file upload if a file is provided
+    // Handle file upload if present
     if (req.file) {
+      console.log("File received for upload during update:", req.file);
+
       try {
-        await uploadController.uploadProgramPic(req, res, {
-          ProgramID: id, // Use the existing ProgramID for folder structure
-        });
+        await uploadController.uploadProgramPic(req.file, id);
       } catch (uploadError) {
-        console.error("Error uploading program picture:", uploadError);
+        console.error(
+          "Error uploading program picture during update:",
+          uploadError
+        );
         return res
           .status(500)
           .json({ error: "Program updated, but error uploading picture." });
@@ -93,8 +115,10 @@ const updateProgram = async (req, res) => {
     res.status(500).json({ message: "Error updating program" });
   }
 };
+
+// Retrieve programs by sign-up
 const getProgramBySignUp = async (req, res) => {
-  const AccountID = req.params.id;
+  const { id: AccountID } = req.params;
   try {
     const programs = await Program.getProgramBySignUp(AccountID);
     if (!programs || programs.length === 0) {
@@ -102,7 +126,7 @@ const getProgramBySignUp = async (req, res) => {
     }
     res.json(programs);
   } catch (error) {
-    console.error(error);
+    console.error("Error retrieving programs by sign-up:", error);
     res.status(500).send("Error retrieving programs");
   }
 };

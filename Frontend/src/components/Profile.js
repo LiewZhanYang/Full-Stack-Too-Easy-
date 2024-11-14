@@ -203,13 +203,29 @@ function Profile() {
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Profile Picture:
             </label>
-            <input
-              type="file"
-              onChange={handleProfilePictureChange}
-              disabled={!isEditing}
-              accept="image/*"
-              className="w-full px-3 py-2 border border-gray-300 rounded-md"
-            />
+            <div className="relative w-full">
+              <button
+                type="button"
+                className={`bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition-colors ${
+                  isEditing ? "" : "opacity-50 cursor-not-allowed"
+                }`}
+                onClick={() => document.getElementById("profilePictureInput").click()}
+                disabled={!isEditing}
+              >
+                Choose File
+              </button>
+              <span className="ml-4 text-gray-600">
+                {profilePicture ? profilePicture.name : "No file selected"}
+              </span>
+              <input
+                id="profilePictureInput"
+                type="file"
+                onChange={handleProfilePictureChange}
+                disabled={!isEditing}
+                accept="image/*"
+                className="hidden"
+              />
+            </div>
           </div>
 
           <div className="grid grid-cols-2 gap-6">
