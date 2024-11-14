@@ -3,6 +3,7 @@ import { FaChevronDown, FaChevronUp } from "react-icons/fa";
 
 const AnnouncementBoard = () => {
   const [announcements, setAnnouncements] = useState([]);
+  const [currentAnnouncementIndex, setCurrentAnnouncementIndex] = useState(0);
   const [expanded, setExpanded] = useState(false); // Track if the announcement is expanded
 
   // Fetch announcements from your backend
@@ -13,14 +14,30 @@ const AnnouncementBoard = () => {
       .catch((error) => console.error("Error fetching announcements:", error));
   }, []);
 
+  // Update current announcement index every 5 seconds
+  useEffect(() => {
+    if (expanded && announcements.length > 1) {
+      const interval = setInterval(() => {
+        setCurrentAnnouncementIndex((prevIndex) =>
+          prevIndex === announcements.length - 1 ? 0 : prevIndex + 1
+        );
+      }, 5000);
+
+      return () => clearInterval(interval);
+    }
+  }, [expanded, announcements.length]);
+
   const toggleExpand = () => {
     setExpanded(!expanded);
+    if (!expanded) {
+      setCurrentAnnouncementIndex(0); // Reset to the first announcement when expanded
+    }
   };
 
   return (
     <div
       style={{
-        backgroundColor: "#f9fafb", // Soft background for the announcement board
+        backgroundColor: "#f9fafb",
         borderRadius: "12px",
         padding: "16px",
         boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
@@ -39,7 +56,7 @@ const AnnouncementBoard = () => {
           style={{
             fontSize: "18px",
             fontWeight: "bold",
-            color: "#374151", // Dark gray for the title
+            color: "#374151",
           }}
         >
           Latest Announcement
@@ -61,21 +78,23 @@ const AnnouncementBoard = () => {
             style={{
               fontSize: "16px",
               fontWeight: "600",
-              color: "#111827", // Strong text color for the announcement title
+              color: "#111827",
               marginBottom: "8px",
             }}
           >
-            {announcements[0].Title}
+            {announcements[currentAnnouncementIndex].Title}
           </h4>
           <p
             style={{
               fontSize: "12px",
-              color: "#9ca3af", // Muted text color for the date
+              color: "#9ca3af",
               marginBottom: "8px",
             }}
           >
             Published on:{" "}
-            {new Date(announcements[0].PostedDate).toLocaleDateString("en-US", {
+            {new Date(
+              announcements[currentAnnouncementIndex].PostedDate
+            ).toLocaleDateString("en-US", {
               weekday: "short",
               month: "long",
               day: "numeric",
@@ -85,17 +104,17 @@ const AnnouncementBoard = () => {
           <p
             style={{
               fontSize: "14px",
-              color: "#4b5563", // Standard text color for the body
+              color: "#4b5563",
             }}
           >
-            {announcements[0].Body}
+            {announcements[currentAnnouncementIndex].Body}
           </p>
         </div>
       ) : expanded ? (
         <p
           style={{
             fontSize: "14px",
-            color: "#9ca3af", // Muted color for empty state
+            color: "#9ca3af",
             marginTop: "12px",
           }}
         >
