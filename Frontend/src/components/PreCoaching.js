@@ -18,15 +18,15 @@ function Precoaching() {
 
   useEffect(() => {
     const fetchBookingByAccountID = async () => {
-      const id = localStorage.getItem("userId"); // Retrieve AccountID from localStorage
-      console.log("Account ID:", id); // Log Account ID for debugging
+      const id = localStorage.getItem("userId");
+      console.log("Account ID:", id);
       if (id) {
         try {
           const response = await fetch(`http://localhost:8000/booking/${id}`);
           const data = await response.json();
-          console.log("User Booking Data:", data); // Log booking data for debugging
+          console.log("User Booking Data:", data);
           if (data && data.length > 0) {
-            setBookingData(data[0]); // Assuming only one booking is allowed at a time
+            setBookingData(data[0]);
             setHasBooking(true);
           } else {
             setHasBooking(false);
@@ -45,18 +45,6 @@ function Precoaching() {
     const date = new Date();
     date.setHours(hours, minutes, seconds || 0);
     return date.toLocaleTimeString([], {
-      hour: "2-digit",
-      minute: "2-digit",
-      hour12: true,
-    });
-  };
-
-  const getEndTime = (startTime) => {
-    const [hours, minutes, seconds] = startTime.split(":").map(Number);
-    const startDate = new Date();
-    startDate.setHours(hours, minutes, seconds || 0);
-    startDate.setHours(startDate.getHours() + 1); // Add one hour to start time
-    return startDate.toLocaleTimeString([], {
       hour: "2-digit",
       minute: "2-digit",
       hour12: true,
@@ -86,13 +74,13 @@ function Precoaching() {
                   <p className="mb-1" style={{ fontWeight: 500 }}>
                     Starts
                   </p>
-                  <p>{formatTime(bookingData.Time)}</p>
+                  <p>{formatTime(bookingData.StartTime)}</p>
                 </div>
                 <div className="col-4 text-start">
                   <p className="mb-1" style={{ fontWeight: 500 }}>
-                    End
+                    Ends
                   </p>
-                  <p>{getEndTime(bookingData.Time)}</p>
+                  <p>{formatTime(bookingData.EndTime)}</p>
                 </div>
                 <div className="col-4 text-start">
                   <p className="mb-1" style={{ fontWeight: 500 }}>
@@ -106,21 +94,22 @@ function Precoaching() {
               </p>
 
               <div className="d-flex justify-content-start mt-3">
-                <button
+                <Button
                   className="btn btn-warning me-3 px-4 join-button"
                   style={{ fontWeight: 500 }}
                   onClick={() =>
-                    handleNavigateToCoaching(bookingData.AccountID)
-                  } 
+                    handleNavigateToCoaching(bookingData.BookingID)
+                  }
                 >
                   Let's go!
-                </button>
-                <button
-                  className="btn btn-outline-secondary px-4 cancel-button"
+                </Button>
+                <Button
+                  variant="outline-secondary"
+                  className="px-4 cancel-button"
                   style={{ fontWeight: 500 }}
                 >
                   Cancel
-                </button>
+                </Button>
               </div>
             </div>
             <p
@@ -133,7 +122,6 @@ function Precoaching() {
           </div>
         </>
       ) : (
-        // No Bookings Message
         <div className="no-bookings text-start">
           <p style={{ fontSize: "1rem", color: "#555", marginBottom: "1rem" }}>
             No bookings have been made for 1 to 1 coaching.
