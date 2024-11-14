@@ -128,9 +128,10 @@ function Workshopvm() {
   );
 }
 
+
 const styles = {
   container: {
-    fontFamily: "Arial, sans-serif",
+    fontFamily: "League Spartan, sans-serif",
     maxWidth: "700px",
     margin: "40px auto",
     padding: "20px",
