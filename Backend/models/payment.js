@@ -80,8 +80,8 @@ class Payment {
       ];
 
       // For Darling Leong Kai Jie
-      const file = paymentDetails.File;
-      console.log(file);
+      //const file = paymentDetails.File;
+      //console.log(file);
 
       // Execute the query and log the result
       const [result] = await connection.execute(sqlQuery, values);

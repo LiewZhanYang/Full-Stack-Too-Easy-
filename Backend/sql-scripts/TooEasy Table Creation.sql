@@ -112,8 +112,8 @@ CREATE TABLE Payment (
     InvoicePath VARCHAR(100) NOT NULL,
     SessionID INT NOT NULL,
     PaidBy INT NOT NULL, 
-    Reason VARCHAR(100) NULL,
-    ApprovedBy INT NULL,
+Reason VARCHAR(100) NULL DEFAULT NULL,
+ApprovedBy INT NULL DEFAULT NULL,
     
     FOREIGN KEY(SessionID) REFERENCES Session(SessionID),
     FOREIGN KEY (PaidBy) REFERENCES Customer (AccountID),
@@ -286,3 +286,11 @@ BEGIN
 END;
 //
 DELIMITER ;
+-- Create the user
+CREATE USER 'prototyper'@'localhost' IDENTIFIED BY 'TooEasy';
+
+-- Grant privileges on TooEasyDB
+GRANT ALL PRIVILEGES ON TooEasyDB.* TO 'prototyper'@'localhost';
+
+-- Apply the changes
+FLUSH PRIVILEGES;

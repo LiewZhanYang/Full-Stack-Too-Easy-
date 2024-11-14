@@ -1,77 +1,39 @@
-const { S3Client, PutObjectCommand } = require("@aws-sdk/client-s3");
 const { sendEmailNotification } = require("../controllers/emailController");
-const multer = require("multer");
+const {
+  uploadFileToS3,
+  getSignedUrlFromS3,
+  listObjectsByPrefix,
+} = require("../models/upload");
 
-// Initialize S3 Client
-const s3 = new S3Client({
-  region: process.env.AWS_REGION,
-  credentials: {
-    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
-  },
-});
+// Handle general file upload to S3 (e.g., payment invoice)
+exports.uploadFile = async (file, OrderID) => {
+  if (!file) {
+    throw new Error("No file provided for upload.");
+  }
 
-// Set up multer storage (store file in memory)
-const storage = multer.memoryStorage();
-const upload = multer({ storage });
+  if (!OrderID) {
+    throw new Error("OrderID is required for file upload.");
+  }
 
-// Middleware for file upload
-exports.uploadSingleFile = upload.single("file");
-
-// Utility function to upload files to S3
-const uploadToS3 = async (file, keyPrefix) => {
-  const params = {
-    Bucket: process.env.AWS_BUCKET_NAME,
-    Key: `${keyPrefix}/${file.originalname}`, // Construct the S3 key
-    Body: file.buffer,
-    ContentType: file.mimetype,
-  };
-
-  console.log("Uploading file to S3 with params:", params);
-  const command = new PutObjectCommand(params);
-  return await s3.send(command);
-};
-
-// Handle file upload to S3 and trigger email
-exports.uploadFile = async (req, res) => {
   try {
-    const file = req.file;
-    const OrderID = req.body.OrderID;
+    const data = await uploadFileToS3(file, `PaymentInvoice/${OrderID}`);
+    console.log("File uploaded successfully:", data);
 
-    if (!file) {
-      return res
-        .status(400)
-        .json({ error: "No file uploaded. Please provide a file." });
-    }
-
-    try {
-      // Upload file to S3
-      const data = await uploadToS3(
-        file,
-        `PaymentInvoice/${OrderID}/${file.originalname}`
-      );
-      console.log("File uploaded successfully:", data);
-
-      // Trigger email after successful upload
-      const emailResponse = await sendEmailNotification(
-        process.env.ADMIN_EMAIL,
-        file.originalname
-      );
-
-      res.status(200).json({
-        message: "File uploaded to S3 and email notification sent!",
-        data,
-        emailResponse,
-      });
-    } catch (error) {
-      console.error("Error during file upload or email notification:", error);
-      res.status(500).json({ error: "Error processing file upload." });
-    }
+    // Optional: Notify via email if needed (ensure this is intended)
+    /*
+    const emailResponse = await sendEmailNotification(
+      process.env.ADMIN_EMAIL,
+      file.originalname
+    );
+    return {
+      message: "File uploaded to S3 and email notification sent!",
+      data,
+      emailResponse,
+    };
+*/
   } catch (error) {
-    console.error("Unexpected error:", error);
-    res
-      .status(500)
-      .json({ error: "Unexpected error occurred during file upload." });
+    console.error("Error during file upload or email notification:", error);
+    throw new Error("Error processing file upload.");
   }
 };
 
@@ -79,7 +41,7 @@ exports.uploadFile = async (req, res) => {
 exports.uploadProfilePic = async (req, res) => {
   try {
     const file = req.file;
-    const userID = req.body.AccountID;
+    const AccountID = req.body.AccountID;
 
     if (!file) {
       return res
@@ -87,12 +49,14 @@ exports.uploadProfilePic = async (req, res) => {
         .json({ error: "No profile picture uploaded. Please provide a file." });
     }
 
+    if (!AccountID) {
+      return res
+        .status(400)
+        .json({ error: "AccountID is required for profile picture upload." });
+    }
+
     try {
-      // Upload profile picture to S3
-      const data = await uploadToS3(
-        file,
-        `profile-pictures/${AccountID}/${file.originalname}`
-      );
+      const data = await uploadFileToS3(file, `profile-pictures/${AccountID}`);
       console.log("Profile picture uploaded successfully:", data);
 
       res.status(200).json({
@@ -110,10 +74,12 @@ exports.uploadProfilePic = async (req, res) => {
     });
   }
 };
+
+// Handle program picture upload to S3
 exports.uploadProgramPic = async (req, res) => {
   try {
     const file = req.file;
-    const ProgramID = req.body.ProgramID; // Assuming ProgramID is passed in the request body
+    const ProgramID = req.body.ProgramID;
 
     if (!file) {
       return res
@@ -121,12 +87,14 @@ exports.uploadProgramPic = async (req, res) => {
         .json({ error: "No program picture uploaded. Please provide a file." });
     }
 
+    if (!ProgramID) {
+      return res
+        .status(400)
+        .json({ error: "ProgramID is required for program picture upload." });
+    }
+
     try {
-      // Upload program picture to S3
-      const data = await uploadToS3(
-        file,
-        `program-pics/${ProgramID}/${file.originalname}`
-      );
+      const data = await uploadFileToS3(file, `program-pics/${ProgramID}`);
       console.log("Program picture uploaded successfully:", data);
 
       res.status(200).json({
@@ -142,5 +110,102 @@ exports.uploadProgramPic = async (req, res) => {
     res.status(500).json({
       error: "Unexpected error occurred during program picture upload.",
     });
+  }
+};
+
+// Retrieve a file by OrderID
+exports.getFileByOrderID = async (req, res) => {
+  try {
+    const { orderID } = req.params;
+    if (!orderID) {
+      return res.status(400).json({ error: "OrderID is required." });
+    }
+
+    const foldername = `PaymentInvoice/${orderID}`;
+    try {
+      const files = await listObjectsByPrefix(foldername);
+      if (files.length === 0) {
+        return res
+          .status(404)
+          .json({ error: "No files found for this OrderID." });
+      }
+      const url = await getSignedUrlFromS3(
+        foldername,
+        files[0].split("/").pop()
+      );
+      res.status(200).json({ url });
+    } catch (error) {
+      console.error("Error retrieving file:", error);
+      res.status(500).json({ error: "Error retrieving file from S3." });
+    }
+  } catch (error) {
+    console.error("Unexpected error:", error);
+    res.status(500).json({ error: "Unexpected error occurred." });
+  }
+};
+
+// Retrieve a profile picture by AccountID
+exports.getProfilePicByAccountID = async (req, res) => {
+  try {
+    const { accountID } = req.params;
+    if (!accountID) {
+      return res.status(400).json({ error: "AccountID is required." });
+    }
+
+    const foldername = `profile-pictures/${accountID}`;
+    try {
+      const files = await listObjectsByPrefix(foldername);
+      if (files.length === 0) {
+        return res
+          .status(404)
+          .json({ error: "No profile picture found for this AccountID." });
+      }
+      const url = await getSignedUrlFromS3(
+        foldername,
+        files[0].split("/").pop()
+      );
+      res.status(200).json({ url });
+    } catch (error) {
+      console.error("Error retrieving profile picture:", error);
+      res
+        .status(500)
+        .json({ error: "Error retrieving profile picture from S3." });
+    }
+  } catch (error) {
+    console.error("Unexpected error:", error);
+    res.status(500).json({ error: "Unexpected error occurred." });
+  }
+};
+
+// Retrieve a program picture by ProgramID
+exports.getProgramPicByProgramID = async (req, res) => {
+  try {
+    const { programID } = req.params;
+    if (!programID) {
+      return res.status(400).json({ error: "ProgramID is required." });
+    }
+
+    const foldername = `program-pics/${programID}`;
+    try {
+      const files = await listObjectsByPrefix(foldername);
+      if (files.length === 0) {
+        return res
+          .status(404)
+          .json({ error: "No program picture found for this ProgramID." });
+      }
+      const url = await getSignedUrlFromS3(
+        foldername,
+        files[0].split("/").pop()
+      );
+      res.status(200).json({ url });
+    } catch (error) {
+      console.error("Error retrieving program picture:", error);
+      res
+        .status(500)
+        .json({ error: "Error retrieving program picture from S3." });
+    }
+  } catch (error) {
+    console.error("Unexpected error:", error);
+    res.status(500).json({ error: "Unexpected error occurred." });
   }
 };

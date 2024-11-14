@@ -24,4 +24,18 @@ router.post(
   upload.single("file"), // Middleware for handling single file upload (field name: 'file')
   uploadController.uploadProgramPic
 );
+router.get("/file/:orderID", uploadController.getFileByOrderID);
+
+// Route to get a profile picture by AccountID
+router.get(
+  "/profile-pic/:accountID",
+  uploadController.getProfilePicByAccountID
+);
+
+// Route to get a program picture by ProgramID
+router.get(
+  "/program-pic/:programID",
+  uploadController.getProgramPicByProgramID
+);
+
 module.exports = router;
