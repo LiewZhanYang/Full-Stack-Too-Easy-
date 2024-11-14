@@ -39,7 +39,8 @@ import AdminViewWebinars from "./components/AdminViewWebinars.js";
 import AdminViewBooking from "./components/AdminViewBooking.js";
 import Chatbot from "./components/Chatbot.js";
 import AdminSideBar from "./components/AdminSidebar.js";
-import Workshopvm from "./components/Workshopvm.js"
+import Workshopvm from "./components/Workshopvm.js";
+import AdminCreateAnnouncement from "./components/AdminCreateAnnouncement.js";
 import "./App.css";
 
 // Layout component to handle conditional rendering
@@ -93,7 +94,7 @@ function App() {
                   <Route path="/labs" element={<Labs />} />
                   <Route path="/professionals" element={<Professionals />} />
                   <Route path="/webinars" element={<Webinars />} />
-                  <Route path="/workshopvm" element={<Workshopvm/>} />
+                  <Route path="/workshopvm" element={<Workshopvm />} />
                   <Route
                     path="/webinar-details/:id"
                     element={<WebinarDetails />}
@@ -145,6 +146,10 @@ function App() {
                   <Route
                     path="/admin-edit-timing"
                     element={<AdminEditTiming />}
+                  />
+                  <Route
+                    path="/admin-create-announcement"
+                    element={<AdminCreateAnnouncement />}
                   />
                   <Route
                     path="/admin-create-webinar"
