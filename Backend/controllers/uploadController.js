@@ -20,7 +20,7 @@ exports.uploadFile = async (file, OrderID) => {
     console.log("File uploaded successfully:", data);
 
     // Optional: Notify via email if needed (ensure this is intended)
-    /*
+
     const emailResponse = await sendEmailNotification(
       process.env.ADMIN_EMAIL,
       file.originalname
@@ -30,7 +30,6 @@ exports.uploadFile = async (file, OrderID) => {
       data,
       emailResponse,
     };
-*/
   } catch (error) {
     console.error("Error during file upload or email notification:", error);
     throw new Error("Error processing file upload.");
@@ -80,6 +79,28 @@ exports.uploadProgramPic = async (file, ProgramID) => {
   } catch (error) {
     console.error("Error during program picture upload:", error);
     throw new Error("Error uploading program picture to S3.");
+  }
+};
+exports.uploadWebinar = async (file, WebinarID) => {
+  if (!file) {
+    throw new Error("No file provided for upload.");
+  }
+
+  if (!WebinarID) {
+    throw new Error("WebinarID is required for file upload.");
+  }
+
+  try {
+    const data = await uploadFileToS3(file, `webinar-pics/${WebinarID}`);
+    console.log("Webinar picture uploaded successfully:", data);
+
+    return {
+      message: "File uploaded to S3 successfully!",
+      data,
+    };
+  } catch (error) {
+    console.error("Error during webinar picture upload:", error);
+    throw new Error("Error processing file upload.");
   }
 };
 

@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from "react";
-import { Container, Row, Col, Button, Form } from "react-bootstrap";
+import { Container, Form, Button } from "react-bootstrap";
 import { useNavigate, useParams } from "react-router-dom";
+import axios from "axios";
 
 const AdminEditWebinar = () => {
-  const { id } = useParams();
+  const { id } = useParams(); // Get webinar ID if editing an existing webinar
   const navigate = useNavigate();
 
   const [name, setName] = useState("");
@@ -13,74 +14,74 @@ const AdminEditWebinar = () => {
   const [startTime, setStartTime] = useState("");
   const [endTime, setEndTime] = useState("");
   const [speaker, setSpeaker] = useState("");
-  const [image, setImage] = useState(null);
+  const [selectedFile, setSelectedFile] = useState(null);
 
   useEffect(() => {
-    const fetchWebinarDetails = async () => {
-      try {
-        const response = await fetch(`http://localhost:8000/webinar/${id}`);
-        if (!response.ok) {
-          throw new Error(`Error: ${response.statusText}`);
+    if (id) {
+      // Fetch existing webinar details if ID is present
+      const fetchWebinarDetails = async () => {
+        try {
+          const response = await axios.get(
+            `http://localhost:8000/webinar/${id}`
+          );
+          const data = response.data[0];
+          setName(data.WebinarName);
+          setDescription(data.WebinarDesc);
+          setLink(data.Link);
+          setDate(new Date(data.Date).toISOString().split("T")[0]); // Convert date for input[type="date"]
+          setStartTime(data.StartTime);
+          setEndTime(data.EndTime);
+          setSpeaker(data.Speaker);
+        } catch (error) {
+          console.error("Error fetching webinar details:", error);
         }
-        const data = await response.json();
-        const webinar = data[0];
-        console.log("Fetched webinar data:", webinar);
-
-        let formattedDate = webinar.Date.split("T")[0];
-        let date = new Date(formattedDate);
-        date.setDate(date.getDate() + 1);
-        formattedDate = date.toISOString().split("T")[0];
-
-        console.log("Adjusted date:", formattedDate);
-
-        setName(webinar.WebinarName);
-        setDescription(webinar.WebinarDesc);
-        setLink(webinar.Link);
-        setDate(formattedDate);
-        setStartTime(webinar.StartTime);
-        setEndTime(webinar.EndTime);
-        setSpeaker(webinar.Speaker);
-        setImage(webinar.Image);
-      } catch (error) {
-        console.error("Error fetching webinar details:", error);
-      }
-    };
-
-    fetchWebinarDetails();
+      };
+      fetchWebinarDetails();
+    }
   }, [id]);
 
-  const handleUpdateWebinar = async () => {
-    const updatedWebinarDetails = {
-      WebinarName: name,
-      WebinarDesc: description,
-      Link: link,
-      Date: date,
-      StartTime: startTime,
-      EndTime: endTime,
-      Speaker: speaker,
-      Image: image,
-    };
+  const handleFileChange = (e) => {
+    setSelectedFile(e.target.files[0]);
+  };
 
-    console.log("Updating webinar with data:", updatedWebinarDetails);
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    // Create FormData object for file upload
+    const formData = new FormData();
+    formData.append("WebinarName", name);
+    formData.append("WebinarDesc", description);
+    formData.append("Link", link);
+    formData.append("Date", date);
+    formData.append("StartTime", startTime);
+    formData.append("EndTime", endTime);
+    formData.append("Speaker", speaker);
+    if (selectedFile) {
+      formData.append("file", selectedFile); // Append file if available
+    }
 
     try {
-      const response = await fetch(`http://localhost:8000/webinar/${id}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(updatedWebinarDetails),
-      });
-
-      if (response.ok) {
-        const result = await response.json();
-        console.log("Webinar updated successfully:", result);
-        navigate("/admin-view-webinar");
+      if (id) {
+        // Update existing webinar
+        await axios.put(`http://localhost:8000/webinar/${id}`, formData, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        });
+        alert("Webinar updated successfully!");
       } else {
-        console.error("Failed to update webinar");
+        // Create new webinar
+        await axios.post(`http://localhost:8000/webinar`, formData, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        });
+        alert("Webinar created successfully!");
       }
+      navigate("/admin-view-webinar"); // Redirect after submission
     } catch (error) {
-      console.error("Error updating webinar:", error);
+      console.error("Error submitting webinar:", error);
+      alert("Failed to submit webinar.");
     }
   };
 
@@ -89,11 +90,9 @@ const AdminEditWebinar = () => {
   };
 
   return (
-    <Container fluid className="admin-edit-webinar-page p-4">
-      <h2 className="admin-create-title">Edit Webinar</h2>
-      <hr className="admin-create-divider mb-4" />
-
-      <Form>
+    <Container className="p-4">
+      <h2>{id ? "Edit Webinar" : "Create Webinar"}</h2>
+      <Form onSubmit={handleSubmit}>
         <Form.Group controlId="webinarName" className="mb-3">
           <Form.Label>Webinar Name</Form.Label>
           <Form.Control
@@ -101,22 +100,17 @@ const AdminEditWebinar = () => {
             placeholder="Enter webinar name"
             value={name}
             onChange={(e) => setName(e.target.value)}
+            required
           />
         </Form.Group>
 
         <Form.Group controlId="webinarImage" className="mb-3">
           <Form.Label>Upload Image</Form.Label>
-          <Form.Control type="file" accept="image/*" />
-          {image && (
-            <div className="image-preview mt-3">
-              <img
-                src={image}
-                alt="Webinar Preview"
-                className="img-fluid rounded"
-                style={{ maxHeight: "200px" }}
-              />
-            </div>
-          )}
+          <Form.Control
+            type="file"
+            accept="image/*"
+            onChange={handleFileChange}
+          />
         </Form.Group>
 
         <Form.Group controlId="webinarDescription" className="mb-3">
@@ -127,6 +121,7 @@ const AdminEditWebinar = () => {
             placeholder="Enter webinar description"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
+            required
           />
         </Form.Group>
 
@@ -137,41 +132,39 @@ const AdminEditWebinar = () => {
             placeholder="Enter webinar link"
             value={link}
             onChange={(e) => setLink(e.target.value)}
+            required
           />
         </Form.Group>
 
-        <Row>
-          <Col md={6}>
-            <Form.Group controlId="webinarDate" className="mb-3">
-              <Form.Label>Date</Form.Label>
-              <Form.Control
-                type="date"
-                value={date}
-                onChange={(e) => setDate(e.target.value)}
-              />
-            </Form.Group>
-          </Col>
-          <Col md={3}>
-            <Form.Group controlId="webinarStartTime" className="mb-3">
-              <Form.Label>Start Time</Form.Label>
-              <Form.Control
-                type="time"
-                value={startTime}
-                onChange={(e) => setStartTime(e.target.value)}
-              />
-            </Form.Group>
-          </Col>
-          <Col md={3}>
-            <Form.Group controlId="webinarEndTime" className="mb-3">
-              <Form.Label>End Time</Form.Label>
-              <Form.Control
-                type="time"
-                value={endTime}
-                onChange={(e) => setEndTime(e.target.value)}
-              />
-            </Form.Group>
-          </Col>
-        </Row>
+        <Form.Group controlId="webinarDate" className="mb-3">
+          <Form.Label>Date</Form.Label>
+          <Form.Control
+            type="date"
+            value={date}
+            onChange={(e) => setDate(e.target.value)}
+            required
+          />
+        </Form.Group>
+
+        <Form.Group controlId="webinarStartTime" className="mb-3">
+          <Form.Label>Start Time</Form.Label>
+          <Form.Control
+            type="time"
+            value={startTime}
+            onChange={(e) => setStartTime(e.target.value)}
+            required
+          />
+        </Form.Group>
+
+        <Form.Group controlId="webinarEndTime" className="mb-3">
+          <Form.Label>End Time</Form.Label>
+          <Form.Control
+            type="time"
+            value={endTime}
+            onChange={(e) => setEndTime(e.target.value)}
+            required
+          />
+        </Form.Group>
 
         <Form.Group controlId="webinarSpeaker" className="mb-3">
           <Form.Label>Speaker</Form.Label>
@@ -180,18 +173,15 @@ const AdminEditWebinar = () => {
             placeholder="Enter speaker's name"
             value={speaker}
             onChange={(e) => setSpeaker(e.target.value)}
+            required
           />
         </Form.Group>
 
-        <div className="admin-create-button-group mt-4">
-          <Button
-            variant="warning"
-            className="me-3 px-4"
-            onClick={handleUpdateWebinar}
-          >
-            Update Webinar
+        <div className="mt-4">
+          <Button variant="primary" type="submit" className="me-3">
+            {id ? "Update Webinar" : "Create Webinar"}
           </Button>
-          <Button variant="danger" className="px-4" onClick={handleCancel}>
+          <Button variant="secondary" onClick={handleCancel}>
             Cancel
           </Button>
         </div>
