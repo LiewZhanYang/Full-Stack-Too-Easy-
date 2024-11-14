@@ -98,7 +98,7 @@ CREATE TABLE Booking (
     StartTime TIME NOT NULL,
     EndTime TIME NOT NULL,
     Date DATE NOT NULL,
-    URL VARCHAR(100) NOT NULL,
+    URL VARCHAR(100),
     AccountID INT,
     
     FOREIGN KEY (AccountID) REFERENCES Customer (AccountID)
@@ -200,11 +200,11 @@ VALUES
 
 INSERT INTO Booking (BookingID, StartTime, EndTime, Date, URL, AccountID)
 VALUES
-(1, '09:00:00', '10:00:00', '2025-01-15', 'https://mindsphere-too-easy.whereby.com/ced5223d-0b18-4cf5-af00-be75fd3c9d94', 1),
-(2, '11:00:00', '12:00:00', '2025-01-16', 'https://mindsphere-too-easy.whereby.com/ced5223d-0b18-4cf5-af00-be75fd3c9d94',2),
-(3, '13:00:00', '14:00:00', '2025-01-17', 'https://mindsphere-too-easy.whereby.com/ced5223d-0b18-4cf5-af00-be75fd3c9d94',3),
-(4, '15:00:00', '16:00:00', '2025-01-18', 'https://mindsphere-too-easy.whereby.com/ced5223d-0b18-4cf5-af00-be75fd3c9d94',4),
-(5, '17:00:00', '18:00:00', '2025-01-19', 'https://mindsphere-too-easy.whereby.com/ced5223d-0b18-4cf5-af00-be75fd3c9d94',5);
+(1, '09:00:00', '10:00:00', '2025-01-15', NULL, 1),
+(2, '11:00:00', '12:00:00', '2025-01-16', NULL,2),
+(3, '13:00:00', '14:00:00', '2025-01-17', NULL,3),
+(4, '15:00:00', '16:00:00', '2025-01-18', NULL,4),
+(5, '17:00:00', '18:00:00', '2025-01-19', NULL,5);
 
 INSERT INTO Payment (OrderID, InvoiceID, Amount, CreatedAt, Status, InvoicePath, SessionID, PaidBy, ApprovedBy, Reason)
 VALUES
