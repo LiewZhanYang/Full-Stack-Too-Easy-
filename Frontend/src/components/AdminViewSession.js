@@ -6,6 +6,7 @@ import { useNavigate, useParams } from "react-router-dom";
 const AdminViewSession = () => {
   const [sessions, setSessions] = useState([]);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [showErrorModal, setShowErrorModal] = useState(false);
   const [sessionToDelete, setSessionToDelete] = useState(null);
   const navigate = useNavigate();
   const { id: programID } = useParams();
@@ -52,7 +53,9 @@ const AdminViewSession = () => {
         }
       );
       if (!response.ok) {
-        throw new Error("Failed to delete session");
+        throw new Error(
+          "Unable to delete session: there may be associated payments or other dependencies."
+        );
       }
       setSessions((prevSessions) =>
         prevSessions.filter((session) => session.SessionID !== sessionToDelete)
@@ -61,9 +64,8 @@ const AdminViewSession = () => {
       setSessionToDelete(null);
     } catch (error) {
       console.error("Error deleting session:", error);
-      alert(
-        "Unable to delete session: there may be associated payments or other dependencies."
-      );
+      setShowDeleteModal(false);
+      setShowErrorModal(true);
     }
   };
 
@@ -136,15 +138,37 @@ const AdminViewSession = () => {
         centered
       >
         <Modal.Header closeButton>
-          <Modal.Title>Confirm Delete</Modal.Title>
+          <Modal.Title>Delete Confirmation</Modal.Title>
         </Modal.Header>
-        <Modal.Body>Are you sure you want to delete this session?</Modal.Body>
+        <Modal.Body>
+          Are you sure you want to delete this session? This action cannot be
+          undone.
+        </Modal.Body>
         <Modal.Footer>
+        <Button variant="danger" onClick={confirmDeleteSession}>
+            Delete
+          </Button>
           <Button variant="secondary" onClick={() => setShowDeleteModal(false)}>
             Cancel
           </Button>
-          <Button variant="danger" onClick={confirmDeleteSession}>
-            Delete
+        </Modal.Footer>
+      </Modal>
+
+      {/* Error Modal */}
+      <Modal
+        show={showErrorModal}
+        onHide={() => setShowErrorModal(false)}
+        centered
+      >
+        <Modal.Header closeButton>
+          <Modal.Title>Error Deleting Session</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          Unable to delete session. Session already has confirmed payments. 
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="primary" onClick={() => setShowErrorModal(false)}>
+            Close
           </Button>
         </Modal.Footer>
       </Modal>
