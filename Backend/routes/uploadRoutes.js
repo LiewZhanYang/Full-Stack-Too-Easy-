@@ -25,7 +25,11 @@ router.post(
   uploadController.uploadProgramPic
 );
 router.get("/file/:orderID", uploadController.getFileByOrderID);
-
+router.post(
+  "/webinar-pic",
+  upload.single("file"), // Middleware for handling single file upload (field name: 'file')
+  uploadController.uploadWebinar
+);
 // Route to get a profile picture by AccountID
 router.get(
   "/profile-pic/:accountID",
