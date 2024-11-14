@@ -2,37 +2,41 @@ import React, { useState, useEffect } from "react";
 import { Container, Row, Col, Button, Form } from "react-bootstrap";
 import { useNavigate, useParams } from "react-router-dom";
 
+const formatDate = (dateString) => {
+  const date = new Date(dateString);
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+};
+
 const AdminEditSession = () => {
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [time, setTime] = useState("");
   const [location, setLocation] = useState("");
+  const [vacancy, setVacancy] = useState("");
   const navigate = useNavigate();
-  const { id } = useParams(); // Session ID from the route params
+  const { id: sessionID } = useParams(); 
 
   useEffect(() => {
     const fetchSessionDetails = async () => {
       try {
-        const response = await fetch(`http://localhost:8000/session/${id}`);
+        const response = await fetch(
+          `http://localhost:8000/session/sessionID/${sessionID}`
+        );
         if (!response.ok) {
           throw new Error("Failed to fetch session details");
         }
-        const data = await response.json();
-
-        // If data is an array, find the session with the matching ID
-        const session = Array.isArray(data)
-          ? data.find((item) => item.SessionID === parseInt(id))
-          : data;
+        const session = await response.json();
 
         if (session) {
-          // Log the specific session object
           console.log("Fetched session details:", session);
-
-          // Populate form fields with fetched data
-          setStartDate(session.StartDate);
-          setEndDate(session.EndDate);
+          setStartDate(formatDate(session.StartDate));
+          setEndDate(formatDate(session.EndDate));
           setTime(session.Time);
           setLocation(session.Location);
+          setVacancy(session.Vacancy); 
         } else {
           console.error("Session not found");
         }
@@ -42,22 +46,26 @@ const AdminEditSession = () => {
     };
 
     fetchSessionDetails();
-  }, [id]);
+  }, [sessionID]);
 
   const handleSaveSession = async () => {
     try {
-      const response = await fetch(`http://localhost:8000/session/${id}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          StartDate: startDate,
-          EndDate: endDate,
-          Time: time,
-          Location: location,
-        }),
-      });
+      const response = await fetch(
+        `http://localhost:8000/session/${sessionID}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            StartDate: startDate,
+            EndDate: endDate,
+            Time: time,
+            Location: location,
+            Vacancy: vacancy,
+          }),
+        }
+      );
 
       if (!response.ok) {
         throw new Error("Failed to save session");
@@ -86,7 +94,7 @@ const AdminEditSession = () => {
               <Form.Label>Start Date</Form.Label>
               <Form.Control
                 type="date"
-                value={startDate}
+                value={startDate || ""}
                 onChange={(e) => setStartDate(e.target.value)}
               />
             </Form.Group>
@@ -97,7 +105,7 @@ const AdminEditSession = () => {
               <Form.Label>End Date</Form.Label>
               <Form.Control
                 type="date"
-                value={endDate}
+                value={endDate || ""}
                 onChange={(e) => setEndDate(e.target.value)}
               />
             </Form.Group>
@@ -114,13 +122,23 @@ const AdminEditSession = () => {
           />
         </Form.Group>
 
-        <Form.Group controlId="location" className="mb-4">
+        <Form.Group controlId="location" className="mb-3">
           <Form.Label>Location</Form.Label>
           <Form.Control
             type="text"
             placeholder="Enter location"
             value={location}
             onChange={(e) => setLocation(e.target.value)}
+          />
+        </Form.Group>
+
+        <Form.Group controlId="vacancy" className="mb-4">
+          <Form.Label>Vacancy</Form.Label>
+          <Form.Control
+            type="number"
+            placeholder="Enter vacancy"
+            value={vacancy}
+            onChange={(e) => setVacancy(e.target.value)}
           />
         </Form.Group>
 
