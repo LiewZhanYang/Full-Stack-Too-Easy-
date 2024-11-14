@@ -48,12 +48,14 @@ const AdminHome = () => {
             </Link>
           </Col>
           <Col md={4} className="d-flex justify-content-center">
+          <Link to="/admin-view-announcement" className="w-100">
             <Card className="shortcut-card text-center shadow-sm h-100">
               <Card.Body className="d-flex flex-column align-items-center justify-content-center">
                 <FaDollarSign size={40} className="shortcut-icon mb-3" />
-                <Card.Title className="shortcut-title">.</Card.Title>
+                <Card.Title className="shortcut-title">Announcement</Card.Title>
               </Card.Body>
             </Card>
+            </Link>
           </Col>
         </Row>
       </Container>

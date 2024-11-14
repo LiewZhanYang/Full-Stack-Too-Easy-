@@ -1,6 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
+const lunchOptionMapping = {
+  chicken: 1,
+  fish: 2,
+  veggie: 3,
+};
 
 function Payment() {
   const location = useLocation();
@@ -25,6 +30,7 @@ function Payment() {
   const [orderId, setOrderId] = useState(null);
   const [activeTab, setActiveTab] = useState("Overview");
   const [isMemberActive, setIsMemberActive] = useState(false);
+
 
   useEffect(() => {
     const fetchMembershipStatus = async () => {
@@ -111,16 +117,12 @@ function Payment() {
     });
   };
 
-  const lunchOptionMapping = {
-    chicken: 1,
-    fish: 2,
-    veggie: 3,
-  };
+
   const handleLunchOptionChange = (childId, lunchOption) => {
     setSelectedChildren((prevSelected) =>
       prevSelected.map((child) =>
         child.ChildID === childId
-          ? { ...child, lunchOption: lunchOptionMapping[lunchOption] }
+          ? { ...child, lunchOption } // Update the `lunchOption` directly
           : child
       )
     );
@@ -170,17 +172,17 @@ function Payment() {
       formData.append("InvoicePath", "default.png"); // You can change this if necessary
       formData.append("SessionID", selectedSession?.SessionID);
       formData.append("PaidBy", userId);
-
-      // Add selected children data as a stringified JSON object
+      // Convert lunch options to numeric IDs before submitting
       formData.append(
         "SelectedChildren",
         JSON.stringify(
           selectedChildren.map((child) => ({
             ChildID: child.ChildID,
-            lunchOption: child.lunchOption || "No lunch selected",
+            lunchOption: lunchOptionMapping[child.lunchOption] || null, // Convert to numeric ID
           }))
         )
       );
+
 
       // Send the FormData using axios
       const response = await axios.post(
@@ -205,9 +207,9 @@ function Payment() {
         // Create signups for selected children
         for (const child of selectedChildren) {
           const signUpDetails = {
-            AccountID: parseInt(userId), // Ensure AccountID is an integer
+            AccountID: parseInt(userId, 10),
             SessionID: selectedSession.SessionID,
-            LunchOptionID: child.lunchOption,
+            LunchOptionID: lunchOptionMapping[child.lunchOption] || null, // Use numeric ID
             ChildID: child.ChildID,
           };
 
@@ -370,25 +372,23 @@ function Payment() {
                   )
                 </label>
 
+                  
                 {selectedChildren.some((c) => c.ChildID === child.ChildID) && (
                   <div className="mt-2">
                     <label className="form-label">Lunch Option:</label>
                     <select
-                      className="form-select"
-                      value={
-                        selectedChildren.find(
-                          (c) => c.ChildID === child.ChildID
-                        )?.lunchOption || ""
-                      }
-                      onChange={(e) =>
-                        handleLunchOptionChange(child.ChildID, e.target.value)
-                      }
-                    >
-                      <option value="">Select lunch option</option>
-                      <option value="chicken">Chicken Rice</option>
-                      <option value="fish">Fish & Chips</option>
-                      <option value="veggie">Vegetarian</option>
-                    </select>
+                    className="form-select"
+                    value={
+                      selectedChildren.find((c) => c.ChildID === child.ChildID)?.lunchOption || ""
+                    }
+                    onChange={(e) => handleLunchOptionChange(child.ChildID, e.target.value)}
+                  >
+                    <option value="">Select lunch option</option>
+                    <option value="chicken">Chicken Rice</option>
+                    <option value="fish">Fish & Chips</option>
+                    <option value="veggie">Vegetarian</option>
+                  </select>
+
                   </div>
                 )}
               </div>

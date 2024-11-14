@@ -37,10 +37,14 @@ import AdminCreateWebinar from "./components/AdminCreateWebinar.js";
 import AdminEditWebinar from "./components/AdminEditWebinar.js";
 import AdminViewWebinars from "./components/AdminViewWebinars.js";
 import AdminViewBooking from "./components/AdminViewBooking.js";
+import AdminViewSessionDetails from "./components/AdminViewSessionDetails.js";
 import Chatbot from "./components/Chatbot.js";
 import AdminSideBar from "./components/AdminSidebar.js";
 import Workshopvm from "./components/Workshopvm.js";
 import AdminCreateAnnouncement from "./components/AdminCreateAnnouncement.js";
+import AdminViewAnnouncement from "./components/AdminViewAnnouncement.js";
+import AdminEditAnnouncement from "./components/AdminEditAnnouncement.js"; // Import the componen
+import AdminViewSingleAnnouncement from "./components/AdminViewSingleAnnouncement";
 import "./App.css";
 
 // Layout component to handle conditional rendering
@@ -152,6 +156,18 @@ function App() {
                     element={<AdminCreateAnnouncement />}
                   />
                   <Route
+                    path="/admin-view-announcement"
+                    element={<AdminViewAnnouncement />}
+                  />
+                  <Route
+                    path="/admin-edit-announcement/:id"
+                    element={<AdminEditAnnouncement />}
+                  />
+                  <Route
+                    path="/admin-view-single-announcement/:id"
+                    element={<AdminViewSingleAnnouncement />}
+                  />
+                  <Route
                     path="/admin-create-webinar"
                     element={<AdminCreateWebinar />}
                   />
@@ -166,6 +182,10 @@ function App() {
                   <Route
                     path="/admin-view-booking"
                     element={<AdminViewBooking />}
+                  />
+                  <Route
+                    path="/admin-view-session-details/:id"
+                    element={<AdminViewSessionDetails/>}
                   />
                   {/* Logout route redirects to login */}
                   <Route

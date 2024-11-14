@@ -184,6 +184,26 @@ class Customer {
       throw error;
     }
   }
+
+  static async updateCustomerMembership(id) {
+    const connection = await mysql.createConnection(dbConfig);
+
+    const sqlQuery = `
+      UPDATE Customer
+      SET MembershipExpiry = DATE_ADD(CURDATE(), INTERVAL 1 YEAR), MemberStatus = TRUE
+      WHERE AccountID = ?
+    `;
+
+    try {
+      const [result] = await connection.execute(sqlQuery, [id]);
+      connection.end();
+      return result;
+    } catch (error) {
+      console.error("Error updating customer:", error);
+      connection.end();
+      throw error;
+    }
+  }
 }
 
 module.exports = Customer;

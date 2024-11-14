@@ -10,6 +10,7 @@ const AdminCreateProgram = () => {
   const [classSize, setClassSize] = useState("");
   const [duration, setDuration] = useState("");
   const [lunchProvided, setLunchProvided] = useState(false);
+
   const [image, setImage] = useState(null); // Store image file
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
@@ -32,6 +33,7 @@ const AdminCreateProgram = () => {
   const handleCreateProgram = async () => {
     const typeId = programTypeMapping[type] || null;
 
+
     // Create FormData object
     const formData = new FormData();
     formData.append("ProgramName", name);
@@ -50,6 +52,7 @@ const AdminCreateProgram = () => {
     try {
       const response = await fetch("http://localhost:8000/program", {
         method: "POST",
+
         body: formData, // Use FormData as the request body
       });
 
@@ -95,6 +98,7 @@ const AdminCreateProgram = () => {
           {image && (
             <div className="image-preview mt-3">
               <img
+
                 src={URL.createObjectURL(image)}
                 alt="Program Preview"
                 className="img-fluid rounded"
