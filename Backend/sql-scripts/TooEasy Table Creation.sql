@@ -137,7 +137,8 @@ VALUES
 (2, 'Jane Smith', 'janesmith@example.com', '90123456', FALSE, NULL, NULL, 'password456'),
 (3, 'Bob Johnson', 'bobjohnson@example.com', '78901234', TRUE, '2025-06-30', NULL, 'password789'),
 (4, 'Alice Brown', 'alicebrown@example.com', '56789012', FALSE, NULL, NULL, 'password012'),
-(5, 'Mike Davis', 'ikedavis@example.com', '34567890', TRUE, '2024-03-31', NULL, 'password345');
+(5, 'Mike Davis', 'ikedavis@example.com', '34567890', TRUE, '2024-03-31', NULL, 'password345'),
+(6, 'Caden Toh', 'example@example.com', '10006000', FALSE, NULL, NULL, 'password123');
 
 INSERT INTO Admin (AdminID, Username, Password)
 VALUES
