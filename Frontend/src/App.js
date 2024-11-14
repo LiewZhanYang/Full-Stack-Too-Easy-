@@ -88,7 +88,7 @@ function App() {
                   {/* Redirect root to dashboard */}
                   <Route
                     path="/"
-                    element={<Navigate to="/dashboard" replace />}
+                    element={<Navigate to="/login" replace />}
                   />
                   {/* Main routes */}
                   <Route path="/dashboard" element={<Dashboard />} />
