@@ -88,7 +88,7 @@ const AdminViewProgram = () => {
       <div className="admin-program-controls d-flex align-items-center my-3">
         <Form.Control
           type="text"
-          placeholder="Search for programmes"
+          placeholder="Search for programs"
           className="admin-program-search me-2"
           style={{ maxWidth: "700px" }}
           value={searchTerm}
@@ -144,7 +144,7 @@ const AdminViewProgram = () => {
               <div className="admin-program-card-image-container">
                 <Card.Img
                   variant="top"
-                  src={program.image || "/img/default.jpg"}
+                  src={program.image || "/img/default.jpg"} // Use the image URL or fallback to default
                   alt={program.ProgrameName}
                   className="admin-program-card-image"
                 />
@@ -191,7 +191,7 @@ const AdminViewProgram = () => {
         className="admin-create-webinar-button d-flex align-items-center"
         onClick={handleCreateProgramClick}
       >
-        <FaPlus className="me-1" /> <span>Create Programme</span>
+        <FaPlus className="me-1" /> <span>Create Program</span>
       </Button>
     </Container>
   );

@@ -109,7 +109,7 @@ const AdminViewWebinars = () => {
               <div className="admin-webinar-card-image-container">
                 <Card.Img
                   variant="top"
-                  src={webinar.image || "/img/default.jpg"}
+                  src={webinar.imageUrl || "/img/default.jpg"} // Use 'imageUrl' from backend
                   alt={webinar.WebinarName}
                   className="admin-webinar-card-image"
                 />

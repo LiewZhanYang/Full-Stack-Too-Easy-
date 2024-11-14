@@ -3,6 +3,7 @@ const uploadController = require("../controllers/uploadController");
 
 const postWebinar = async (req, res) => {
   const webinarDetails = req.body;
+  console.log(webinarDetails);
   try {
     // Insert webinar data into the database
     const newWebinar = await Webinar.postWebinar(webinarDetails);
@@ -47,9 +48,32 @@ const updateWebinar = async (req, res) => {
 
 const getAllWebinar = async (req, res) => {
   try {
+    // Fetch all webinars from the database
     const webinars = await Webinar.getAllWebinar();
-    res.status(200).json(webinars);
-    console.log("Successfully retrieved all webinars");
+
+    // Loop through webinars to fetch image URLs
+    const webinarsWithImages = await Promise.all(
+      webinars.map(async (webinar) => {
+        try {
+          // Fetch the image URL using the uploadController function
+          const { url } = await uploadController.getFileByWebinarID(
+            webinar.WebinarID
+          );
+          return { ...webinar, imageUrl: url };
+        } catch (error) {
+          // If there's an error fetching the image, log it and return the webinar without imageUrl
+          console.error(
+            `Error fetching image for WebinarID ${webinar.WebinarID}:`,
+            error
+          );
+          return { ...webinar, imageUrl: null };
+        }
+      })
+    );
+
+    // Return webinars with their image URLs
+    res.status(200).json(webinarsWithImages);
+    console.log("Successfully retrieved all webinars with images");
   } catch (error) {
     console.error("Error getting Webinar:", error);
     res.status(500).send("Error getting Webinar");

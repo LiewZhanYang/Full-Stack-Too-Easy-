@@ -65,8 +65,10 @@ exports.listObjectsByPrefix = async (prefix) => {
     });
     const data = await s3.send(command);
 
+    // Return empty array if no files are found
     if (!data.Contents || data.Contents.length === 0) {
-      throw new Error("No files found for the specified prefix.");
+      console.warn(`No files found for the specified prefix: ${prefix}`);
+      return [];
     }
 
     return data.Contents.map((content) => content.Key);

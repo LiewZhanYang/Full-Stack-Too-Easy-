@@ -16,7 +16,7 @@ const Webinars = () => {
         }
         const data = await response.json();
         console.log("Fetched webinars:", data);
-        setWebinars(data); 
+        setWebinars(data);
       } catch (error) {
         console.error("Error fetching webinars:", error);
       }
@@ -45,7 +45,7 @@ const Webinars = () => {
               <div className="admin-program-card-image-container">
                 <Card.Img
                   variant="top"
-                  src={webinar.image || "/img/default.jpg"}
+                  src={webinar.imageUrl || "/img/default.jpg"} // Using `webinar.imageUrl` or fallback to a default image
                   alt={webinar.WebinarName}
                   className="admin-program-card-image"
                 />

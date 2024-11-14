@@ -11,8 +11,8 @@ const AdminEditProgram = () => {
   const [duration, setDuration] = useState("");
   const [lunchProvided, setLunchProvided] = useState(false);
   const [image, setImage] = useState(null);
-  const [showConfirmModal, setShowConfirmModal] = useState(false);
-  const [showSuccessModal, setShowSuccessModal] = useState(false);
+
+  const [imagePreview, setImagePreview] = useState(null); // New state for image preview
   const navigate = useNavigate();
   const { id } = useParams();
 
@@ -26,6 +26,10 @@ const AdminEditProgram = () => {
           );
         }
         const data = await response.json();
+
+        console.log("Fetched program details:", data);
+
+        // Populate form fields with fetched data
         setName(data.ProgrameName);
         setType(data.TypeID);
         setDescription(data.ProgramDesc);
@@ -33,6 +37,7 @@ const AdminEditProgram = () => {
         setClassSize(data.ClassSize);
         setDuration(data.Duration);
         setLunchProvided(data.LunchProvided);
+        setImagePreview(data.imageUrl || null); // Load the existing image if available
       } catch (error) {
         console.error("Error fetching program details:", error);
       }
@@ -44,7 +49,8 @@ const AdminEditProgram = () => {
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      setImage(URL.createObjectURL(file));
+      setImage(file); // Save the actual file for upload
+      setImagePreview(URL.createObjectURL(file)); // Display the selected file
     }
   };
 
@@ -63,6 +69,19 @@ const AdminEditProgram = () => {
     formData.append("ProgramID", id); // Include ProgramID for backend reference
 
     try {
+
+      const formData = new FormData();
+      formData.append("ProgramName", name);
+      formData.append("ProgramDesc", description);
+      formData.append("Cost", cost);
+      formData.append("ClassSize", classSize);
+      formData.append("Duration", duration);
+      formData.append("LunchProvided", lunchProvided);
+      formData.append("TypeID", type);
+      if (image) {
+        formData.append("file", image); // Attach the selected image file
+      }
+
       const response = await fetch(`http://localhost:8000/program/id/${id}`, {
         method: "PUT",
         body: formData,
@@ -107,10 +126,10 @@ const AdminEditProgram = () => {
             accept="image/*"
             onChange={handleImageChange}
           />
-          {image && (
+          {imagePreview && (
             <div className="image-preview mt-3">
               <img
-                src={image}
+                src={imagePreview}
                 alt="Program Preview"
                 className="img-fluid rounded"
                 style={{ maxHeight: "200px" }}

@@ -1,5 +1,6 @@
 const Payment = require("../models/payment");
 const uploadController = require("../controllers/uploadController");
+const { getFileByOrderID } = require("../controllers/uploadController");
 const getAllPayment = async (req, res) => {
   try {
     const payments = await Payment.getAllPayment();
@@ -117,19 +118,32 @@ const getPaymentById = async (req, res) => {
   const orderID = req.params.orderID;
 
   try {
+    // Fetch payment details from the database
     const payment = await Payment.getPaymentById(orderID);
 
     if (!payment) {
       return res.status(404).json({ message: "Payment not found" });
     }
 
-    res.json(payment);
+    // Fetch the screenshot URL using the `getFileByOrderID` function
+    try {
+      const { url } = await getFileByOrderID(orderID);
+      console.log("Generated screenshot URL:", url); // Logging the URL for debugging
+      res.json({ ...payment, screenshotUrl: url });
+    } catch (fileError) {
+      console.error("Error retrieving file URL:", fileError);
+      // Return payment details but indicate file retrieval error
+      res.status(200).json({
+        ...payment,
+        screenshotUrl: null,
+        fileError: "Error retrieving file from S3.",
+      });
+    }
   } catch (error) {
     console.error("Error retrieving payment by ID:", error);
     res.status(500).json({ message: "Error retrieving payment" });
   }
 };
-
 module.exports = {
   getAllPayment,
   postPayment,

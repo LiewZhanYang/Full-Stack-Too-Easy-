@@ -10,7 +10,8 @@ const AdminCreateProgram = () => {
   const [classSize, setClassSize] = useState("");
   const [duration, setDuration] = useState("");
   const [lunchProvided, setLunchProvided] = useState(false);
-  const [image, setImage] = useState(null);
+
+  const [image, setImage] = useState(null); // Store image file
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const navigate = useNavigate();
@@ -25,29 +26,34 @@ const AdminCreateProgram = () => {
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      setImage(URL.createObjectURL(file));
+      setImage(file); // Store the file object instead of a URL
     }
   };
 
   const handleCreateProgram = async () => {
     const typeId = programTypeMapping[type] || null;
-    const programData = {
-      ProgramName: name,
-      ProgramDesc: description,
-      Cost: cost,
-      ClassSize: classSize,
-      Duration: duration,
-      LunchProvided: lunchProvided,
-      TypeID: typeId,
-    };
+
+
+    // Create FormData object
+    const formData = new FormData();
+    formData.append("ProgramName", name);
+    formData.append("ProgramDesc", description);
+    formData.append("Cost", cost);
+    formData.append("ClassSize", classSize);
+    formData.append("Duration", duration);
+    formData.append("LunchProvided", lunchProvided ? 1 : 0); // Convert boolean to integer
+    formData.append("TypeID", typeId);
+
+    // Append the image file if available
+    if (image) {
+      formData.append("file", image); // Ensure field name matches backend expectation
+    }
 
     try {
       const response = await fetch("http://localhost:8000/program", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(programData),
+
+        body: formData, // Use FormData as the request body
       });
 
       if (!response.ok) {
@@ -92,7 +98,8 @@ const AdminCreateProgram = () => {
           {image && (
             <div className="image-preview mt-3">
               <img
-                src={image}
+
+                src={URL.createObjectURL(image)}
                 alt="Program Preview"
                 className="img-fluid rounded"
                 style={{ maxHeight: "200px" }}
