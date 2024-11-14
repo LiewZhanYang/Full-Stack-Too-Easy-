@@ -90,6 +90,11 @@ const AdminViewSessionDetails = () => {
     });
   };
 
+  // Calculate remaining vacancies
+  const remainingVacancy = sessionDetails
+    ? sessionDetails.Vacancy - children.length
+    : 0;
+
   return (
     <Container fluid className="admin-view-session-details-page p-4">
       <Row className="mb-3">
@@ -148,9 +153,14 @@ const AdminViewSessionDetails = () => {
                 {sessionDetails.Location}
               </p>
               <p>
-                <strong>Vacancy</strong>
+                <strong>Total Vacancy</strong>
                 <br />
                 {sessionDetails.Vacancy}
+              </p>
+              <p>
+                <strong>Remaining Vacancy</strong>
+                <br />
+                {remainingVacancy}
               </p>
             </div>
           </Col>
