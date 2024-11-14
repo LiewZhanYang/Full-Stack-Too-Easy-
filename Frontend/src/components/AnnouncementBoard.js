@@ -4,13 +4,22 @@ import { FaChevronDown, FaChevronUp } from "react-icons/fa";
 const AnnouncementBoard = () => {
   const [announcements, setAnnouncements] = useState([]);
   const [currentAnnouncementIndex, setCurrentAnnouncementIndex] = useState(0);
-  const [expanded, setExpanded] = useState(false); // Track if the announcement is expanded
+  const [expanded, setExpanded] = useState(false);
 
   // Fetch announcements from your backend
   useEffect(() => {
     fetch("http://localhost:8000/announcement/") // Adjust the endpoint as per your backend setup
       .then((response) => response.json())
-      .then((data) => setAnnouncements(data))
+      .then((data) => {
+        const filteredAnnouncements = data.filter((announcement) => {
+          const publishedDate = new Date(announcement.PostedDate);
+          const currentDate = new Date();
+          const timeDifference = currentDate - publishedDate;
+          const daysDifference = timeDifference / (1000 * 60 * 60 * 24); // Convert ms to days
+          return daysDifference <= 20;
+        });
+        setAnnouncements(filteredAnnouncements);
+      })
       .catch((error) => console.error("Error fetching announcements:", error));
   }, []);
 
@@ -118,7 +127,7 @@ const AnnouncementBoard = () => {
             marginTop: "12px",
           }}
         >
-          No announcements available.
+          No recent announcements available.
         </p>
       ) : null}
     </div>
