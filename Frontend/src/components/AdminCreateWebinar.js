@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Container, Row, Col, Button, Form } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 const AdminCreateWebinar = () => {
   const [name, setName] = useState("");
@@ -10,30 +11,43 @@ const AdminCreateWebinar = () => {
   const [startTime, setStartTime] = useState("");
   const [endTime, setEndTime] = useState("");
   const [speaker, setSpeaker] = useState("");
+  const [image, setImage] = useState(null);
   const navigate = useNavigate();
 
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setImage(file); // Store the file directly
+    }
+  };
+
   const handleCreateWebinar = async () => {
-    const webinarDetails = {
-      WebinarName: name,
-      WebinarDesc: description,
-      Link: link,
-      Date: date,
-      StartTime: startTime,
-      EndTime: endTime,
-      Speaker: speaker,
-    };
+    const formData = new FormData();
+    formData.append("WebinarName", name);
+    formData.append("WebinarDesc", description);
+    formData.append("Link", link);
+    formData.append("Date", date);
+    formData.append("StartTime", startTime);
+    formData.append("EndTime", endTime);
+    formData.append("Speaker", speaker);
+
+    if (image) {
+      formData.append("file", image); // Add the file to FormData
+    }
 
     try {
-      const response = await fetch("http://localhost:8000/webinar", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(webinarDetails),
-      });
+      const response = await axios.post(
+        "http://localhost:8000/webinar",
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data", // Important for file uploads
+          },
+        }
+      );
 
-      if (response.ok) {
-        const result = await response.json();
+      if (response.status === 201) {
+        const result = response.data;
         console.log("Webinar created:", result);
         navigate("/admin-view-webinar"); // Redirect after successful creation
       } else {
@@ -64,6 +78,24 @@ const AdminCreateWebinar = () => {
           />
         </Form.Group>
 
+        <Form.Group controlId="webinarImage" className="mb-3">
+          <Form.Label>Upload Image</Form.Label>
+          <Form.Control
+            type="file"
+            accept="image/*"
+            onChange={handleImageChange}
+          />
+          {image && (
+            <div className="image-preview mt-3">
+              <img
+                src={URL.createObjectURL(image)}
+                alt="Webinar Preview"
+                className="img-fluid rounded"
+                style={{ maxHeight: "200px" }}
+              />
+            </div>
+          )}
+        </Form.Group>
         <Form.Group controlId="webinarDescription" className="mb-3">
           <Form.Label>Description</Form.Label>
           <Form.Control

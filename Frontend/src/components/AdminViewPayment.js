@@ -61,8 +61,8 @@ const AdminViewPayment = () => {
       <Card
         key={payment.OrderID}
         className="admin-payment-card mb-3 p-3"
-        onClick={() => handleCardClick(payment.OrderID)} 
-        style={{ cursor: "pointer" }} 
+        onClick={() => handleCardClick(payment.OrderID)}
+        style={{ cursor: "pointer" }}
       >
         <Card.Body>
           <Card.Title className="admin-payment-order-id">
@@ -91,7 +91,6 @@ const AdminViewPayment = () => {
           display: "flex",
           justifyContent: "flex-start", // Align tabs to the left
           borderBottom: "2px solid #e5e7eb", // Light gray bottom border
-          
         }}
       >
         <Nav.Item>
@@ -102,7 +101,10 @@ const AdminViewPayment = () => {
               fontWeight: activeTab === "pending" ? "bold" : "normal", // Bold text for active
               padding: "10px 20px",
               textAlign: "center",
-              borderBottom: activeTab === "pending" ? "2px solid #f59e0b" : "2px solid transparent", // Underline for active tab
+              borderBottom:
+                activeTab === "pending"
+                  ? "2px solid #f59e0b"
+                  : "2px solid transparent", // Underline for active tab
               cursor: "pointer",
               transition: "color 0.3s ease, border-bottom-color 0.3s ease", // Smooth transitions
               marginLeft: "10px",
@@ -119,7 +121,10 @@ const AdminViewPayment = () => {
               fontWeight: activeTab === "confirmed" ? "bold" : "normal",
               padding: "10px 20px",
               textAlign: "center",
-              borderBottom: activeTab === "confirmed" ? "2px solid #f59e0b" : "2px solid transparent",
+              borderBottom:
+                activeTab === "confirmed"
+                  ? "2px solid #f59e0b"
+                  : "2px solid transparent",
               cursor: "pointer",
               transition: "color 0.3s ease, border-bottom-color 0.3s ease",
             }}

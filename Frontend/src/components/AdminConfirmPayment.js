@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { Container, Row, Col, Button, Form } from "react-bootstrap";
 import { useNavigate, useParams } from "react-router-dom";
-import { FaArrowLeft, FaImage } from "react-icons/fa";
+import { FaArrowLeft } from "react-icons/fa";
 
 const AdminConfirmPayment = () => {
   const [paymentDetails, setPaymentDetails] = useState({});
   const [rejectionReason, setRejectionReason] = useState("");
+  const [screenshotUrl, setScreenshotUrl] = useState(null); // State to store screenshot URL
   const navigate = useNavigate();
   const { id } = useParams(); // Get the payment ID from the URL
 
@@ -20,8 +21,12 @@ const AdminConfirmPayment = () => {
           );
         }
         const data = await response.json();
-        console.log("Fetched payment details:", data); // Log the entire data object
         setPaymentDetails(data);
+
+        // Fetch screenshot URL if available
+        if (data.screenshotUrl) {
+          setScreenshotUrl(data.screenshotUrl);
+        }
       } catch (error) {
         console.error("Error fetching payment details:", error);
       }
@@ -162,9 +167,18 @@ const AdminConfirmPayment = () => {
             <p>
               <strong>Screenshot Preview:</strong>
             </p>
-            <div className="admin-confirm-screenshot-placeholder">
-              <FaImage className="admin-confirm-screenshot-icon" />
-            </div>
+            {screenshotUrl ? (
+              <img
+                src={screenshotUrl}
+                alt="Payment Screenshot"
+                className="img-fluid rounded"
+                style={{ maxHeight: "300px" }}
+              />
+            ) : (
+              <div className="admin-confirm-screenshot-placeholder">
+                <p>No screenshot available</p>
+              </div>
+            )}
           </div>
         </Col>
       </Row>

@@ -103,35 +103,46 @@ exports.uploadWebinar = async (file, WebinarID) => {
     throw new Error("Error processing file upload.");
   }
 };
+exports.getFileByWebinarID = async (WebinarID) => {
+  if (!WebinarID) {
+    throw new Error("WebinarID is required.");
+  }
 
-// Retrieve a file by OrderID
-exports.getFileByOrderID = async (req, res) => {
+  const foldername = `webinar-pics/${WebinarID}`;
   try {
-    const { orderID } = req.params;
-    if (!orderID) {
-      return res.status(400).json({ error: "OrderID is required." });
+    // List objects in the specified folder in S3
+    const files = await listObjectsByPrefix(foldername);
+    if (files.length === 0) {
+      throw new Error("No files found for this WebinarID.");
     }
 
-    const foldername = `PaymentInvoice/${orderID}`;
-    try {
-      const files = await listObjectsByPrefix(foldername);
-      if (files.length === 0) {
-        return res
-          .status(404)
-          .json({ error: "No files found for this OrderID." });
-      }
-      const url = await getSignedUrlFromS3(
-        foldername,
-        files[0].split("/").pop()
-      );
-      res.status(200).json({ url });
-    } catch (error) {
-      console.error("Error retrieving file:", error);
-      res.status(500).json({ error: "Error retrieving file from S3." });
-    }
+    // Generate a signed URL for the first file
+    const url = await getSignedUrlFromS3(foldername, files[0].split("/").pop());
+    return { url };
   } catch (error) {
-    console.error("Unexpected error:", error);
-    res.status(500).json({ error: "Unexpected error occurred." });
+    console.error("Error retrieving file:", error);
+    throw new Error("Error retrieving file from S3.");
+  }
+};
+// Retrieve a file by OrderID
+exports.getFileByOrderID = async (orderID) => {
+  if (!orderID) {
+    throw new Error("OrderID is required.");
+  }
+
+  const foldername = `PaymentInvoice/${orderID}`;
+  try {
+    const files = await listObjectsByPrefix(foldername);
+    if (files.length === 0) {
+      throw new Error("No files found for this OrderID.");
+    }
+
+    // Generate the signed URL for the first file
+    const url = await getSignedUrlFromS3(foldername, files[0].split("/").pop());
+    return { url };
+  } catch (error) {
+    console.error("Error retrieving file:", error);
+    throw new Error("Error retrieving file from S3.");
   }
 };
 

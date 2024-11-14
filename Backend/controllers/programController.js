@@ -33,6 +33,7 @@ const getProgramById = async (req, res) => {
 // Post a new program
 const postProgram = async (req, res) => {
   const programDetails = req.body;
+  console.log(programDetails);
   try {
     // Create the new program in the database
     const newProgram = await Program.postProgram(programDetails);
