@@ -10,14 +10,15 @@ const AdminViewSingleAnnouncement = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Fetch the announcement details
     const fetchAnnouncement = async () => {
       try {
         const response = await axios.get(
           `http://localhost:8000/announcement/${id}`
         );
         const announcement = response.data;
+        console.log("Fetched announcement in frontend:", announcement); // Log fetched data
 
+        // Set title and description if announcement is valid
         if (announcement) {
           setTitle(announcement.Title);
           setDescription(announcement.Body);
