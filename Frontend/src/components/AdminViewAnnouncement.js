@@ -2,11 +2,29 @@ import React, { useState, useEffect } from "react";
 import { Container, Form, Card, Button } from "react-bootstrap";
 import axios from "axios";
 import { FaEye, FaEdit, FaTrash } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
 
 const AdminViewAnnouncement = () => {
+  const navigate = useNavigate();
   const [announcements, setAnnouncements] = useState([]);
   const [sortedAnnouncements, setSortedAnnouncements] = useState([]);
   const [sortOption, setSortOption] = useState("Latest");
+
+  const handleViewClick = (id) => {
+    navigate(`/announcement/view/${id}`);
+  };
+
+  const handleEditClick = (id) => {
+    navigate(`/admin-edit-announcement/${id}`);
+  };
+
+  const handleDeleteClick = (id) => {
+    // Optional: Implement a confirmation dialog
+    if (window.confirm("Are you sure you want to delete this announcement?")) {
+      // Implement delete functionality here
+      console.log("Deleting announcement with ID:", id);
+    }
+  };
 
   useEffect(() => {
     // Fetch all announcements from the API
@@ -74,13 +92,24 @@ const AdminViewAnnouncement = () => {
             </Card.Text>
             <Card.Text>id : {announcement.AnnouncementID}</Card.Text>
             <div className="d-flex justify-content-end">
-              <Button variant="light" className="me-2">
+              <Button
+                variant="light"
+                className="me-2"
+                onClick={() => handleViewClick(announcement.AnnouncementID)}
+              >
                 <FaEye />
               </Button>
-              <Button variant="light" className="me-2">
+              <Button
+                variant="light"
+                className="me-2"
+                onClick={() => handleEditClick(announcement.AnnouncementID)}
+              >
                 <FaEdit />
               </Button>
-              <Button variant="danger">
+              <Button
+                variant="danger"
+                onClick={() => handleDeleteClick(announcement.AnnouncementID)}
+              >
                 <FaTrash />
               </Button>
             </div>

@@ -42,6 +42,7 @@ import AdminSideBar from "./components/AdminSidebar.js";
 import Workshopvm from "./components/Workshopvm.js";
 import AdminCreateAnnouncement from "./components/AdminCreateAnnouncement.js";
 import AdminViewAnnouncement from "./components/AdminViewAnnouncement.js";
+import AdminEditAnnouncement from "./components/AdminEditAnnouncement.js"; // Import the componen
 import "./App.css";
 
 // Layout component to handle conditional rendering
@@ -155,6 +156,10 @@ function App() {
                   <Route
                     path="/admin-view-announcement"
                     element={<AdminViewAnnouncement />}
+                  />
+                  <Route
+                    path="/admin-edit-announcement/:id"
+                    element={<AdminEditAnnouncement />}
                   />
                   <Route
                     path="/admin-create-webinar"
