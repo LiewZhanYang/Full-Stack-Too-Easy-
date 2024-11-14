@@ -1,4 +1,8 @@
 const Customer = require("../models/customer");
+const {
+  uploadProfilePic,
+  getProfilePicByAccountID,
+} = require("../controllers/uploadController");
 
 const getCustomerByEmail = async (req, res) => {
   const email = req.params.email;
@@ -21,9 +25,15 @@ const getCustomerByID = async (req, res) => {
     if (customer.length === 0) {
       return res.status(404).send("Customer not found");
     }
+
+    // Fetch the profile picture URL using uploadController
+    const profilePic = await getProfilePicByAccountID(id);
+    customer[0].ProfilePictureURL =
+      profilePic?.url || "/img/default-profile.jpg";
+
     res.json(customer);
   } catch (error) {
-    console.error(error);
+    console.error("Error retrieving customer:", error);
     res.status(500).send("Error retrieving Customer");
   }
 };
@@ -45,6 +55,27 @@ const updateCustomer = async (req, res) => {
   const updateData = req.body; // Customer data to be updated
 
   try {
+    // Handle profile picture upload if a file is provided
+    if (req.file) {
+      try {
+        const uploadResult = await uploadProfilePic(req.file, id); // Use uploadController for file upload
+        updateData.PfpPath = uploadResult.data.Location || null; // Ensure PfpPath is set to null if no URL is returned
+      } catch (uploadError) {
+        console.error("Error uploading profile picture:", uploadError);
+        return res
+          .status(500)
+          .json({ message: "Error uploading profile picture" });
+      }
+    }
+
+    // Convert undefined values to null in updateData
+    for (const key in updateData) {
+      if (updateData[key] === undefined) {
+        updateData[key] = null;
+      }
+    }
+
+    // Update customer details in the database
     const result = await Customer.updateCustomer(id, updateData);
 
     if (result.affectedRows === 0) {
@@ -69,7 +100,7 @@ const getAllCustomers = async (req, res) => {
 };
 
 const updateCustomerMembership = async (req, res) => {
-  const id = parseInt(req.params.id); // Customer ID from URL parameters
+  const id = parseInt(req.params.id);
   try {
     const result = await Customer.updateCustomerMembership(id);
 
@@ -90,5 +121,5 @@ module.exports = {
   postCustomer,
   updateCustomer,
   getAllCustomers,
-  updateCustomerMembership
+  updateCustomerMembership,
 };
