@@ -17,11 +17,13 @@ const AdminCreateWebinar = () => {
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
+
       setImage(file); // Store the file directly
     }
   };
 
   const handleCreateWebinar = async () => {
+
     const formData = new FormData();
     formData.append("WebinarName", name);
     formData.append("WebinarDesc", description);
@@ -80,6 +82,7 @@ const AdminCreateWebinar = () => {
 
         <Form.Group controlId="webinarImage" className="mb-3">
           <Form.Label>Upload Image</Form.Label>
+
           <Form.Control
             type="file"
             accept="image/*"
@@ -96,6 +99,7 @@ const AdminCreateWebinar = () => {
             </div>
           )}
         </Form.Group>
+
         <Form.Group controlId="webinarDescription" className="mb-3">
           <Form.Label>Description</Form.Label>
           <Form.Control

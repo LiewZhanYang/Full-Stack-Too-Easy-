@@ -16,7 +16,7 @@ class Session {
     const connection = await mysql.createConnection(dbConfig);
 
     const sqlQuery = `
-        SELECT * FROM session WHERE ProgramID = ?
+        SELECT * FROM session WHERE ProgramID = ? AND StartDate > CURDATE()
         `;
     const [result] = await connection.execute(sqlQuery, [ProgramID]);
 

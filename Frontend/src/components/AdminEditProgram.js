@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Container, Row, Col, Button, Form } from "react-bootstrap";
+import { Container, Button, Form, Modal } from "react-bootstrap";
 import { useNavigate, useParams } from "react-router-dom";
 
 const AdminEditProgram = () => {
@@ -11,15 +11,14 @@ const AdminEditProgram = () => {
   const [duration, setDuration] = useState("");
   const [lunchProvided, setLunchProvided] = useState(false);
   const [image, setImage] = useState(null);
+
   const [imagePreview, setImagePreview] = useState(null); // New state for image preview
   const navigate = useNavigate();
   const { id } = useParams();
 
-  // Fetch program details from backend on component load
   useEffect(() => {
     const fetchProgramDetails = async () => {
       try {
-        console.log(`Fetching details for Program ID: ${id}`);
         const response = await fetch(`http://localhost:8000/program/${id}`);
         if (!response.ok) {
           throw new Error(
@@ -27,6 +26,7 @@ const AdminEditProgram = () => {
           );
         }
         const data = await response.json();
+
         console.log("Fetched program details:", data);
 
         // Populate form fields with fetched data
@@ -55,17 +55,21 @@ const AdminEditProgram = () => {
   };
 
   const handleSaveProgram = async () => {
-    console.log("Saving program with updated details:", {
-      ProgramName: name,
-      ProgramDesc: description,
-      Cost: cost,
-      ClassSize: classSize,
-      Duration: duration,
-      LunchProvided: lunchProvided,
-      TypeID: type,
-    });
+    const formData = new FormData();
+    formData.append("ProgramName", name);
+    formData.append("ProgramDesc", description);
+    formData.append("Cost", cost);
+    formData.append("ClassSize", classSize);
+    formData.append("Duration", duration);
+    formData.append("LunchProvided", lunchProvided);
+    formData.append("TypeID", type);
+    if (image) {
+      formData.append("file", image); // Attach the selected image file
+    }
+    formData.append("ProgramID", id); // Include ProgramID for backend reference
 
     try {
+
       const formData = new FormData();
       formData.append("ProgramName", name);
       formData.append("ProgramDesc", description);
@@ -88,7 +92,8 @@ const AdminEditProgram = () => {
       }
 
       console.log("Program saved successfully");
-      navigate("/admin-view-program");
+      setShowConfirmModal(false); // Close the confirmation modal
+      setShowSuccessModal(true); // Open the success modal
     } catch (error) {
       console.error("Error saving program:", error);
     }
@@ -202,7 +207,7 @@ const AdminEditProgram = () => {
           <Button
             variant="warning"
             className="admin-create-confirm-button me-3"
-            onClick={handleSaveProgram}
+            onClick={() => setShowConfirmModal(true)} // Show confirmation modal on click
           >
             Save
           </Button>
@@ -215,6 +220,52 @@ const AdminEditProgram = () => {
           </Button>
         </div>
       </Form>
+
+      {/* Confirmation Modal */}
+      <Modal
+        show={showConfirmModal}
+        onHide={() => setShowConfirmModal(false)}
+        centered
+      >
+        <Modal.Header closeButton>
+          <Modal.Title>Confirm Save</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>Are you sure you want to save these changes?</Modal.Body>
+        <Modal.Footer>
+          <Button variant="primary" onClick={handleSaveProgram}>
+            Confirm
+          </Button>
+          <Button
+            variant="secondary"
+            onClick={() => setShowConfirmModal(false)}
+          >
+            Cancel
+          </Button>
+        </Modal.Footer>
+      </Modal>
+
+      {/* Success Modal */}
+      <Modal
+        show={showSuccessModal}
+        onHide={() => setShowSuccessModal(false)}
+        centered
+      >
+        <Modal.Header closeButton>
+          <Modal.Title>Program Saved</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>The program has been saved successfully.</Modal.Body>
+        <Modal.Footer>
+          <Button
+            variant="primary"
+            onClick={() => {
+              setShowSuccessModal(false);
+              navigate("/admin-view-program");
+            }}
+          >
+            Close
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </Container>
   );
 };

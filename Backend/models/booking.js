@@ -2,9 +2,10 @@ const dbConfig = require("../dbConfig");
 const mysql = require("mysql2/promise");
 
 class Booking {
-  constructor(BookingID, Time, Date, URL, AccountID) {
+  constructor(BookingID, StartTime, EndTime, Date, URL, AccountID) {
     this.BookingID = BookingID;
-    this.Time = Time;
+    this.StartTime = StartTime;
+    this.EndTime = EndTime;
     this.Date = Date;
     this.URL = URL;
     this.AccountID = AccountID;
@@ -22,7 +23,8 @@ class Booking {
     return result.map((row) => {
       return new Booking(
         row.BookingID,
-        row.Time,
+        row.StartTime,
+        row.EndTime,
         row.Date,
         row.URL,
         row.AccountID
@@ -34,7 +36,7 @@ class Booking {
     const connection = await mysql.createConnection(dbConfig);
 
     const sqlQuery = `
-        SELECT * FROM Booking WHERE AccountID = ?
+        SELECT * FROM Booking WHERE AccountID = ? AND Date > CURDATE()
         `;
     const [result] = await connection.execute(sqlQuery, [id]);
 
@@ -42,7 +44,8 @@ class Booking {
     return result.map((row) => {
       return new Booking(
         row.BookingID,
-        row.Time,
+        row.StartTime,
+        row.EndTime,
         row.Date,
         row.URL,
         row.AccountID
@@ -53,11 +56,12 @@ class Booking {
   static async postBooking(bookingDetails) {
     const connection = await mysql.createConnection(dbConfig);
     const sqlQuery = `
-            INSERT INTO Booking (Time, Date, URL, AccountID)
-            VALUES (?, ?, ?, ?)`;
+            INSERT INTO Booking (StartTime, EndTime, Date, URL, AccountID)
+            VALUES (?, ?, ?, ?, ?)`;
 
     const values = [
-      bookingDetails.Time,
+      bookingDetails.StartTime,
+      bookingDetails.EndTime,
       bookingDetails.Date,
       bookingDetails.URL || null,
       bookingDetails.AccountID,

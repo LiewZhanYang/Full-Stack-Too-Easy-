@@ -70,7 +70,7 @@ function Camps() {
     },
     {
       level: "Elite",
-      programId: 3,
+      programId: 6,
       programName: "PSLE Power Camp - Elite",
       price: "$400",
       classSize: "5-10",
@@ -139,18 +139,6 @@ function Camps() {
           </h1>
         </div>
 
-        <div className="course-details-box position-absolute bg-white rounded-3 shadow-lg p-4">
-          <ul className="list-unstyled mb-3">
-            <h2 className="text-center fw-bold mb-3">Excel in PSLE with Us!</h2>
-            <li className="mb-2">• Master exam techniques.</li>
-            <li className="mb-2">• Improve problem-solving skills.</li>
-            <li className="mb-2">• Build your confidence.</li>
-            <li className="mb-2">• Get personalized guidance.</li>
-            <li className="mb-2">• Learn from experienced tutors.</li>
-          </ul>
-          <button className="btn btn-primary w-100 rounded-pill">Learn More</button>
-        </div>
-
         <div className="skibidi-section position-absolute w-100">
           <div className="d-flex justify-content-center">
             {skillDevelopmentData.map((skill, index) => (
@@ -200,15 +188,7 @@ function Camps() {
 
       {activeTab === "About"}
 
-      {activeTab === "Details" && (
-        <div className="details-section mt-4">
-          <h3>Camp Details</h3>
-          <p>
-            The camp spans 4-5 days and is available in Foundation, Core, and Elite levels.
-            Class sizes are kept small to ensure individualized attention.
-          </p>
-        </div>
-      )}
+      {activeTab === "Details"  }
 
       <div className="price-tiers-section mt-4">
         <div className="row g-4">

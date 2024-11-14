@@ -8,5 +8,6 @@ router.get("/id/:id", customerController.getCustomerByID);
 router.post("/", customerController.postCustomer);
 router.put("/id/:id", customerController.updateCustomer);
 router.get("/", customerController.getAllCustomers);
+router.put("/member/:id", customerController.updateCustomerMembership)
 
 module.exports = router;
