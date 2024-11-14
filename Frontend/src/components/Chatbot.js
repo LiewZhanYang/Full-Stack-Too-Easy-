@@ -1,71 +1,46 @@
 import React, { useState } from 'react';
-import { MessageCircle, X, Mail } from 'lucide-react';
+import { MessageCircle, X } from 'lucide-react';
 
 const ExpandableChatbot = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState([]);
   const [isTyping, setIsTyping] = useState(false);
-  const [customQuestion, setCustomQuestion] = useState('');
-  const [showCustomQuestionInput, setShowCustomQuestionInput] = useState(false);
 
   const toggleChatbot = () => {
     setIsOpen(!isOpen);
     setMessages([]);
-    setCustomQuestion('');
-    setShowCustomQuestionInput(false);
-
-    
   };
 
   const handleQuestionClick = (question) => {
-    if (question === 'I have a different question') {
-      setShowCustomQuestionInput(true);
-    } else {
-      setMessages([{ type: 'user', text: question }]);
-      setIsTyping(true);
+    setMessages([{ type: 'user', text: question }]);
+    setIsTyping(true);
 
-      setTimeout(() => {
-        setMessages([
-          { type: 'user', text: question },
-          { type: 'bot', text: getAnswer(question) },
-        ]);
-        setIsTyping(false);
-      }, 500);
-    }
-  };
-
-  const handleCustomQuestionSubmit = (e) => {
-    e.preventDefault();
-    if (customQuestion.trim() !== '') {
+    setTimeout(() => {
       setMessages([
-        { type: 'user', text: customQuestion },
-        { type: 'bot', text: 'Thank you for your inquiry. We will get back to you soon.' },
+        { type: 'user', text: question },
+        { type: 'bot', text: getAnswer(question) },
       ]);
-      setCustomQuestion('');
-      setShowCustomQuestionInput(false);
-      // Here, you can add logic to send the custom inquiry to the admin
-      console.log('Sending custom inquiry to admin:', customQuestion);
-    }
+      setIsTyping(false);
+    }, 500);
   };
 
   const getAnswer = (question) => {
     switch (question) {
-      case 'What is the maximum number of children that can be registered for each program?':
-        return 'The maximum number of children that can be registered per program is two.';
+      case 'How long will it take for my payment to be approved?':
+        return 'Payments are usually approved within a few hours, but it can take up to one business day';
       case 'What are the benefits of being a member?':
         return 'Membership benefits include access to resources like virtual one-on-one coaching, webinars, and discounts on other programs.';
       case 'How do I view which programmes I have signed up for?':
         return 'You can view the programs you have enrolled in on your dashboard.';
       default:
-        return 'I do not have an answer for that question. Please submit your inquiry and we will get back to you.';
+        return 'I do not have an answer for that question. Please contact support for more details.';
     }
   };
 
   const inquiryOptions = [
-    'What is the maximum number of children that can be registered for each program?',
+    'How long will it take for my payment to be approved?',
     'What are the benefits of being a member?',
     'How do I view which programmes I have signed up for?',
-    'I have a different question',
   ];
 
   return (
@@ -118,48 +93,22 @@ const ExpandableChatbot = () => {
             </div>
           )}
         </div>
-        {showCustomQuestionInput ? (
-          <form onSubmit={handleCustomQuestionSubmit} className="px-4 py-2 bg-gray-100 rounded-b-lg flex items-center">
-            <input
-              type="text"
-              placeholder="Ask your question"
-              value={customQuestion}
-              onChange={(e) => setCustomQuestion(e.target.value)}
-              className="flex-1 bg-gray-200 px-3 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-            <button
-              type="submit"
-              className="ml-2 bg-blue-500 hover:bg-blue-600 text-white px-3 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              Submit
-            </button>
-          </form>
-        ) : (
-          <div className="px-4 py-2 bg-gray-100 rounded-b-lg">
-            <ul className="space-y-1">
-              {inquiryOptions.map((option, index) => (
-                <li
-                  key={index}
-                  className="bg-gray-200 p-2 rounded hover:bg-gray-300 cursor-pointer"
-                  onClick={() => handleQuestionClick(option)}
-                >
-                  {option}
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
-        <div className="px-4 py-2 bg-gray-100 rounded-b-lg flex justify-end">
-          <a href="mailto:support@example.com" className="flex items-center text-blue-500 hover:text-blue-600">
-            <Mail size={16} className="mr-2" />
-            Email
-          </a>
+        <div className="px-4 py-2 bg-gray-100 rounded-b-lg">
+          <ul className="space-y-1">
+            {inquiryOptions.map((option, index) => (
+              <li
+                key={index}
+                className="bg-gray-200 p-2 rounded hover:bg-gray-300 cursor-pointer"
+                onClick={() => handleQuestionClick(option)}
+              >
+                {option}
+              </li>
+            ))}
+          </ul>
         </div>
       </div>
     </div>
   );
-
-  
 };
 
 export default ExpandableChatbot;
