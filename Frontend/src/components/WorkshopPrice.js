@@ -104,7 +104,7 @@ function WorkshopPrice() {
       <div className="hero-section position-relative">
         {/* Hero Section */}
         <img
-          src={"/publickid.png"}
+          src={"img/workshops.jpg"}
           alt="Public Speaking"
           className="w-100"
           style={{ minHeight: "600px", objectFit: "cover" }}
@@ -139,17 +139,6 @@ function WorkshopPrice() {
           </h1>
         </div>
 
-        <div className="course-details-box position-absolute bg-white rounded-3 shadow-lg p-4">
-          <ul className="list-unstyled mb-3">
-            <h2 className="text-center fw-bold mb-3">Join this Course Today!</h2>
-            <li className="mb-2">• Join this course now!</li>
-            <li className="mb-2">• Save LAST WARNING!</li>
-            <li className="mb-2">• Enjoy my full education!</li>
-            <li className="mb-2">• Improve your art skills!</li>
-            <li className="mb-2">• Having change public broadcast!</li>
-          </ul>
-          <button className="btn btn-primary w-100 rounded-pill">Learn More</button>
-        </div>
 
         <div className="skibidi-section position-absolute w-100">
           <div className="d-flex justify-content-center">
