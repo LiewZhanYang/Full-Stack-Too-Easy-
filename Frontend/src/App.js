@@ -41,6 +41,7 @@ import Chatbot from "./components/Chatbot.js";
 import AdminSideBar from "./components/AdminSidebar.js";
 import Workshopvm from "./components/Workshopvm.js";
 import AdminCreateAnnouncement from "./components/AdminCreateAnnouncement.js";
+import AdminViewAnnouncement from "./components/AdminViewAnnouncement.js";
 import "./App.css";
 
 // Layout component to handle conditional rendering
@@ -150,6 +151,10 @@ function App() {
                   <Route
                     path="/admin-create-announcement"
                     element={<AdminCreateAnnouncement />}
+                  />
+                  <Route
+                    path="/admin-view-announcement"
+                    element={<AdminViewAnnouncement />}
                   />
                   <Route
                     path="/admin-create-webinar"
