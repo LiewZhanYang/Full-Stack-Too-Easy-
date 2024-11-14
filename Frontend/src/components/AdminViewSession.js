@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Container, Row, Col, Button, Table, Modal } from "react-bootstrap";
+import { Container, Button, Table, Modal } from "react-bootstrap";
 import { FaEdit, FaTrash } from "react-icons/fa";
 import { useNavigate, useParams } from "react-router-dom";
 
@@ -83,45 +83,51 @@ const AdminViewSession = () => {
       <h2 className="page-title">Public Speaking Workshop - Sessions</h2>
       <hr className="divider-line mb-4" />
 
-      <div className="session-container p-3">
-        <Table borderless className="session-table mb-0">
-          <thead>
-            <tr>
-              <th>Date</th>
-              <th>Time</th>
-              <th>Location</th>
-              <th className="text-end">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {sessions.map((session) => (
-              <tr key={session.SessionID}>
-                <td>{`${formatDate(session.StartDate)} - ${formatDate(
-                  session.EndDate
-                )}`}</td>
-                <td>{session.Time}</td>
-                <td>{session.Location}</td>
-                <td className="text-end">
-                  <Button
-                    variant="link"
-                    className="action-icon"
-                    onClick={() => handleEditClick(session.SessionID)}
-                  >
-                    <FaEdit />
-                  </Button>
-                  <Button
-                    variant="link"
-                    className="action-icon"
-                    onClick={() => handleDeleteClick(session.SessionID)}
-                  >
-                    <FaTrash />
-                  </Button>
-                </td>
+      {sessions.length > 0 ? (
+        <div className="session-container p-3">
+          <Table borderless className="session-table mb-0">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Time</th>
+                <th>Location</th>
+                <th className="text-end">Actions</th>
               </tr>
-            ))}
-          </tbody>
-        </Table>
-      </div>
+            </thead>
+            <tbody>
+              {sessions.map((session) => (
+                <tr key={session.SessionID}>
+                  <td>{`${formatDate(session.StartDate)} - ${formatDate(
+                    session.EndDate
+                  )}`}</td>
+                  <td>{session.Time}</td>
+                  <td>{session.Location}</td>
+                  <td className="text-end">
+                    <Button
+                      variant="link"
+                      className="action-icon"
+                      onClick={() => handleEditClick(session.SessionID)}
+                    >
+                      <FaEdit />
+                    </Button>
+                    <Button
+                      variant="link"
+                      className="action-icon"
+                      onClick={() => handleDeleteClick(session.SessionID)}
+                    >
+                      <FaTrash />
+                    </Button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </Table>
+        </div>
+      ) : (
+        <p className="text-align-left mt-4">
+          No sessions available for this program.
+        </p>
+      )}
 
       <Button
         variant="warning"
@@ -145,7 +151,7 @@ const AdminViewSession = () => {
           undone.
         </Modal.Body>
         <Modal.Footer>
-        <Button variant="danger" onClick={confirmDeleteSession}>
+          <Button variant="danger" onClick={confirmDeleteSession}>
             Delete
           </Button>
           <Button variant="secondary" onClick={() => setShowDeleteModal(false)}>
@@ -164,7 +170,7 @@ const AdminViewSession = () => {
           <Modal.Title>Error Deleting Session</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          Unable to delete session. Session already has confirmed payments. 
+          Unable to delete session. Session already has confirmed payments.
         </Modal.Body>
         <Modal.Footer>
           <Button variant="primary" onClick={() => setShowErrorModal(false)}>
