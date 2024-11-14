@@ -64,28 +64,29 @@ const AdminViewBooking = () => {
             Date: {new Date(booking.Date).toLocaleDateString()}
           </Card.Text>
           <Card.Text className="admin-booking-text">
-            Time: {formatTime(booking.Time)}
+            Time: {formatTime(booking.StartTime)} -{" "}
+            {formatTime(booking.EndTime)}
           </Card.Text>
           <Button
-          onClick={() => handleStartCoaching(booking.BookingID)}
-          style={{
-            backgroundColor: "#fbbf24",
-            color: "black",
-            borderRadius: "8px", // Matches your desired radius
-            padding: "8px 16px", // Keeps the size consistent
-            fontSize: "14px", // Ensures text size remains the same
-            fontWeight: "500", // Use medium weight
-            textDecoration: "none",
-            transition: "background-color 0.2s ease-in-out",
-            cursor: "pointer",
-            border: "none", // Removes border styling
-            marginTop: "20px", 
-          }}
-          onMouseOver={(e) => (e.target.style.backgroundColor = "#f59e0b")}
-          onMouseOut={(e) => (e.target.style.backgroundColor = "#fbbf24")}
-        >
-          Start Coaching
-        </Button>
+            onClick={() => handleStartCoaching(booking.BookingID)}
+            style={{
+              backgroundColor: "#fbbf24",
+              color: "black",
+              borderRadius: "8px",
+              padding: "8px 16px",
+              fontSize: "14px",
+              fontWeight: "500",
+              textDecoration: "none",
+              transition: "background-color 0.2s ease-in-out",
+              cursor: "pointer",
+              border: "none",
+              marginTop: "20px",
+            }}
+            onMouseOver={(e) => (e.target.style.backgroundColor = "#f59e0b")}
+            onMouseOut={(e) => (e.target.style.backgroundColor = "#fbbf24")}
+          >
+            Start Coaching
+          </Button>
         </Card.Body>
       </Card>
     ));

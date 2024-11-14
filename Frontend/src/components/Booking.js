@@ -67,16 +67,20 @@ function Booking() {
   };
 
   const handleConfirmBooking = async () => {
-    const accountId = localStorage.getItem("userId"); // Assuming AccountID is saved in localStorage
+    const accountId = localStorage.getItem("userId");
     if (accountId && selectedSlot && selectedTimeSlot) {
-      // Format the date as YYYY-MM-DD without any timezone adjustments
       const formattedDate = `${selectedSlot.getFullYear()}-${String(
         selectedSlot.getMonth() + 1
       ).padStart(2, "0")}-${String(selectedSlot.getDate()).padStart(2, "0")}`;
 
+      const timeSlotData = timeSlots.find(
+        (slot) => slot.label === selectedTimeSlot
+      );
+
       const bookingDetails = {
         Date: formattedDate,
-        Time: timeSlots.find((slot) => slot.label === selectedTimeSlot).start,
+        StartTime: timeSlotData.start,
+        EndTime: timeSlotData.end,
         AccountID: accountId,
       };
 
@@ -89,11 +93,7 @@ function Booking() {
           body: JSON.stringify(bookingDetails),
         });
 
-        console.log("Booking response status:", response.status); // Debugging log
-
-        // Skip response handling and directly set the modal to show
         setShowModal(true);
-        console.log("Modal should show up now"); // Debugging log
       } catch (error) {
         console.error("Error creating booking:", error);
       }
@@ -121,7 +121,7 @@ function Booking() {
     return bookings.some(
       (booking) =>
         new Date(booking.Date).toDateString() === selectedSlot.toDateString() &&
-        booking.Time === timeSlot.start
+        booking.StartTime === timeSlot.start
     );
   };
 
@@ -231,7 +231,6 @@ function Booking() {
           </Button>
         </Col>
       </Row>
-      {console.log("showModal value: ", showModal)}
       <Modal show={showModal} onHide={handleCloseModal} centered>
         <Modal.Header closeButton>
           <Modal.Title>Booking Confirmed</Modal.Title>
