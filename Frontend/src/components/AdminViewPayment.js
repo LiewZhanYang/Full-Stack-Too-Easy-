@@ -87,14 +87,43 @@ const AdminViewPayment = () => {
         activeKey={activeTab}
         onSelect={handleSelect}
         className="mb-3"
+        style={{
+          display: "flex",
+          justifyContent: "flex-start", // Align tabs to the left
+          borderBottom: "2px solid #e5e7eb", // Light gray bottom border
+          
+        }}
       >
         <Nav.Item>
-          <Nav.Link eventKey="pending" className="admin-payments-tab">
+          <Nav.Link
+            eventKey="pending"
+            style={{
+              color: activeTab === "pending" ? "#f59e0b" : "#6b7280", // Highlight current tab
+              fontWeight: activeTab === "pending" ? "bold" : "normal", // Bold text for active
+              padding: "10px 20px",
+              textAlign: "center",
+              borderBottom: activeTab === "pending" ? "2px solid #f59e0b" : "2px solid transparent", // Underline for active tab
+              cursor: "pointer",
+              transition: "color 0.3s ease, border-bottom-color 0.3s ease", // Smooth transitions
+              marginLeft: "10px",
+            }}
+          >
             Pending
           </Nav.Link>
         </Nav.Item>
         <Nav.Item>
-          <Nav.Link eventKey="confirmed" className="admin-payments-tab">
+          <Nav.Link
+            eventKey="confirmed"
+            style={{
+              color: activeTab === "confirmed" ? "#f59e0b" : "#6b7280",
+              fontWeight: activeTab === "confirmed" ? "bold" : "normal",
+              padding: "10px 20px",
+              textAlign: "center",
+              borderBottom: activeTab === "confirmed" ? "2px solid #f59e0b" : "2px solid transparent",
+              cursor: "pointer",
+              transition: "color 0.3s ease, border-bottom-color 0.3s ease",
+            }}
+          >
             Confirmed
           </Nav.Link>
         </Nav.Item>

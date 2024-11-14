@@ -67,12 +67,25 @@ const AdminViewBooking = () => {
             Time: {formatTime(booking.Time)}
           </Card.Text>
           <Button
-            variant="primary"
-            onClick={() => handleStartCoaching(booking.BookingID)}
-            className="mt-3"
-          >
-            Start Coaching
-          </Button>
+          onClick={() => handleStartCoaching(booking.BookingID)}
+          style={{
+            backgroundColor: "#fbbf24",
+            color: "black",
+            borderRadius: "8px", // Matches your desired radius
+            padding: "8px 16px", // Keeps the size consistent
+            fontSize: "14px", // Ensures text size remains the same
+            fontWeight: "500", // Use medium weight
+            textDecoration: "none",
+            transition: "background-color 0.2s ease-in-out",
+            cursor: "pointer",
+            border: "none", // Removes border styling
+            marginTop: "20px", 
+          }}
+          onMouseOver={(e) => (e.target.style.backgroundColor = "#f59e0b")}
+          onMouseOut={(e) => (e.target.style.backgroundColor = "#fbbf24")}
+        >
+          Start Coaching
+        </Button>
         </Card.Body>
       </Card>
     ));

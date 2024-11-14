@@ -8,6 +8,9 @@ function Payment() {
   const { programId, price } = location.state || {};  
   console.log('Program ID:', programId);  
 
+
+  const [children, setChildren] = useState([]);
+  const [selectedChildren, setSelectedChildren] = useState([]);
   const [programName, setProgramName] = useState('');  
   const [sessions, setSessions] = useState([]);  
   const [selectedSession, setSelectedSession] = useState(null);  
@@ -22,8 +25,26 @@ function Payment() {
   const [isConfirmed, setIsConfirmed] = useState(false);  
   const [orderId, setOrderId] = useState(null);  
   const [activeTab, setActiveTab] = useState('Overview');  
+  const [isMemberActive, setIsMemberActive] = useState(false);
 
   useEffect(() => {  
+
+    const fetchMembershipStatus = async () => {
+      const userId = localStorage.getItem("userId");
+      if (!userId) return;
+
+      try {
+        const response = await axios.get(
+          `http://localhost:8000/customer/id/${userId}`
+        );
+        if (response.data && response.data.length > 0) {
+          setIsMemberActive(response.data[0].MemberStatus === 1);
+        }
+      } catch (error) {
+        console.error("Error fetching membership status:", error);
+      }
+    };
+
     const fetchSessions = async () => {  
       try {  
         const response = await axios.get(`http://localhost:8000/session/${programId}`);  
@@ -44,15 +65,64 @@ function Payment() {
       }  
     };  
 
+    const fetchChildren = async () => {
+      const userId = localStorage.getItem('userId');
+      if (!userId) return;
+    
+      try {
+        const response = await axios.get(`http://localhost:8000/children/${userId}`);
+        setChildren(
+          response.data.map((child) => ({
+            ...child,
+            DOB: child.DOB || '', // Ensure DOB is at least an empty string
+          }))
+        );
+      } catch (error) {
+        console.error('Error fetching children:', error);
+      }
+    };
+
     fetchSessions();  
+    fetchChildren();
     fetchProgramName();  
   }, [programId]);  
 
-  useEffect(() => {  
-    const numChildren = childrenCount === '1 Child' ? 1 : 2;  
-    const pricePerChild = parseFloat(price?.replace('$', '') || 0);  
-    setTotalPrice(pricePerChild * numChildren);  
-  }, [childrenCount, price]);  
+  useEffect(() => {
+    const pricePerChild = parseFloat(price?.replace('$', '') || 0);
+    setTotalPrice(pricePerChild * selectedChildren.length);
+  }, [selectedChildren, price]);
+  
+
+  const handleChildSelection = (childId) => {
+    setSelectedChildren((prevSelected) => {
+      if (prevSelected.some((child) => child.ChildID === childId)) {
+        // Remove child if already selected
+        return prevSelected.filter((child) => child.ChildID !== childId);
+      }
+      if (prevSelected.length >= 2) {
+        alert('You can only select a maximum of 2 children.');
+        return prevSelected;
+      }
+      // Add new child with default lunch option
+      return [...prevSelected, { ChildID: childId, lunchOption: '' }];
+    });
+  };
+  
+  const lunchOptionMapping = {
+    chicken: 1,
+    fish: 2,
+    veggie: 3,
+  };
+  const handleLunchOptionChange = (childId, lunchOption) => {
+    setSelectedChildren((prevSelected) =>
+      prevSelected.map((child) =>
+        child.ChildID === childId
+          ? { ...child, lunchOption: lunchOptionMapping[lunchOption] }
+          : child
+      )
+    );
+  };
+
 
   const handleBack = () => {  
     navigate(-1);  
@@ -79,29 +149,30 @@ function Payment() {
       return;
     }
   
+    if (selectedChildren.length === 0) {
+      alert('Please select at least one child.');
+      return;
+    }
+  
     setShowProcessing(true);
     setIsProcessing(true);
   
     try {
-      // Convert the file to base64 format, with error handling
+      // Convert the file to base64 format
       console.log("Starting file upload...");
       const fileBase64 = await new Promise((resolve, reject) => {
         const reader = new FileReader();
         reader.readAsDataURL(selectedFile);
         reader.onloadend = () => {
-          console.log("File converted to base64");
           resolve(reader.result.split(',')[1]);
         };
         reader.onerror = (error) => {
-          console.error("File conversion error:", error);
           reject(error);
         };
       });
   
       const generateNumericInvoiceId = () => {
-        const invoiceId = Math.floor(100000 + Math.random() * 900000);
-        console.log("Generated Invoice ID:", invoiceId);
-        return invoiceId;
+        return Math.floor(100000 + Math.random() * 900000);
       };
   
       const defaultInvoicePath = "default.png";
@@ -115,45 +186,71 @@ function Payment() {
         PaidBy: userId,
         ApprovedBy: null,
         Reason: null,
+        SelectedChildren: selectedChildren.map((child) => ({
+          ChildID: child.ChildID,
+          lunchOption: child.lunchOption || 'No lunch selected',
+        })),
       };
   
       console.log("Sending payment data:", paymentData);
   
-      // Send the request
-      const response = await axios.post(`http://localhost:8000/payment`, paymentData);
+      // Send payment request
+      const paymentResponse = await axios.post(`http://localhost:8000/payment`, paymentData);
   
-      // Verify response data structure
-      console.log("Server response:", response);
-  
-      if (response.data && response.data.OrderID) {
-        setOrderId(response.data.OrderID);
-        setIsConfirmed(true);
-        console.log("Payment submitted successfully. Order ID:", response.data.OrderID);
-      } else {
+      if (!paymentResponse.data || !paymentResponse.data.OrderID) {
         throw new Error("Order ID was not returned in the response data.");
       }
+  
+      console.log("Payment submitted successfully. Order ID:", paymentResponse.data.OrderID);
+  
+      // Create signups for selected children
+      for (const child of selectedChildren) {
+        const signUpDetails = {
+          AccountID: parseInt(userId), // Ensure AccountID is an integer
+          SessionID: selectedSession.SessionID,
+          LunchOptionID: child.lunchOption,
+          ChildID: child.ChildID,
+        };
+      
+        console.log("Creating signup for child:", signUpDetails);
+      
+        try {
+          const response = await axios.post(`http://localhost:8000/signup/`, signUpDetails);
+      
+          if (response.data && response.data.success) {
+            console.log("Signup created successfully:", response.data.signUpId);
+          } else {
+            throw new Error("Signup creation failed");
+          }
+        } catch (error) {
+          console.error("Error creating signup for child:", child.ChildID, error);
+          alert(`Failed to create signup for child: ${child.ChildID}.`);
+        }
+      }
+      
+  
+      alert("Payment submitted and signups created successfully!");
+      setOrderId(paymentResponse.data.OrderID);
+      setIsConfirmed(true);
     } catch (error) {
       if (error.response) {
         console.error("Error response from server:", error.response.data);
-        alert(`Failed to submit payment. Server responded with: ${error.response.data.message}`);
-      } else if (error.request) {
-        console.error("No response from server. Request was:", error.request);
-        alert("Failed to submit payment. No response from server.");
+        alert(`Failed to submit payment or create signup. Server responded with: ${error.response.data.message}`);
       } else {
         console.error("Unexpected error:", error.message);
-        alert(`Failed to submit payment. Error: ${error.message}`);
+        alert(`Failed to submit payment or create signup. Error: ${error.message}`);
       }
     } finally {
       setTimeout(() => {
         setIsProcessing(false);
-        setIsConfirmed(true);
-      }, 2000); // Increase this time (e.g., 5000 for 5 seconds) to make the spinner last longer
+      }, 2000);
     }
-
-
   };
   
   
+  const discountedPrice = isMemberActive
+    ? `$${(parseFloat(price.replace("$", "")) * 0.9).toFixed(2)}`
+    : price;
 
   
 
@@ -188,90 +285,78 @@ function Payment() {
       </div>
 
       {activeTab === 'Overview' && (
-        <div className="mb-5">
-          <h3 className="fs-5 mb-3">Sessions</h3>
-          <div className="dropdown">
+        <div>
+          <h3 className="fs-5 mb-3">Select a Session</h3>
+          <div className="dropdown mb-4">
             <button
               className="btn btn-outline-secondary w-100 text-start"
               type="button"
               id="sessionDropdown"
               data-bs-toggle="dropdown"
               aria-expanded="false"
-              style={{
-                maxWidth: '300px',
-                textOverflow: 'ellipsis',
-                whiteSpace: 'nowrap',
-                overflow: 'hidden',
-                backgroundColor: '#f8f9fa',
-              }}
             >
-              <div className="fw-bold">
-                {selectedSession
-                  ? `${new Date(selectedSession.StartDate).toLocaleDateString()} - ${new Date(selectedSession.EndDate).toLocaleDateString()} - ${selectedSession.Time}`
-                  : 'Select a Session'}
-              </div>
+              {selectedSession
+                ? `${new Date(selectedSession.StartDate).toLocaleDateString()} - ${new Date(selectedSession.EndDate).toLocaleDateString()} - ${selectedSession.Time}`
+                : 'Select a Session'}
             </button>
-            <ul className="dropdown-menu w-100" aria-labelledby="sessionDropdown" style={{ maxHeight: '300px', overflowY: 'auto' }}>
+            <ul className="dropdown-menu">
               {sessions.map((session) => (
                 <li key={session.SessionID}>
-                  <a
+                  <button
                     className="dropdown-item"
-                    href="#"
-                    onClick={(e) => { e.preventDefault(); setSelectedSession(session); }}
+                    onClick={() => setSelectedSession(session)}
                   >
-                    {new Date(session.StartDate).toLocaleDateString()} - {new Date(session.EndDate).toLocaleDateString()} - {session.Time} ({session.Location})
-                  </a>
+                    {new Date(session.StartDate).toLocaleDateString()} - {new Date(session.EndDate).toLocaleDateString()} ({session.Location})
+                  </button>
                 </li>
               ))}
             </ul>
           </div>
 
+          <h3 className="fs-5 mb-3">Select Children Attending</h3>
           <div className="mb-4">
-            <div className="mb-2">Select child attending:</div>
-            <select
-              value={childrenCount}
-              onChange={(e) => setChildrenCount(e.target.value)}
-              className="form-select"
-              style={{ maxWidth: '300px' }}
-            >
-              <option value="1 Child">1 Child</option>
-              <option value="2 Children">2 Children</option>
-            </select>
-          </div>
+          {children.map((child) => (
+          <div key={child.ChildID} className="form-check mb-3">
+            <input
+              type="checkbox"
+              className="form-check-input"
+              id={`child-${child.ChildID}`}
+              checked={selectedChildren.some((c) => c.ChildID === child.ChildID)}
+              onChange={() => handleChildSelection(child.ChildID)}
+              disabled={
+                !selectedChildren.some((c) => c.ChildID === child.ChildID) &&
+                selectedChildren.length >= 2
+              }
+            />
+            <label className="form-check-label" htmlFor={`child-${child.ChildID}`}>
+              {child.Name} ({child.DOB ? child.DOB.split('T')[0] : 'Date of Birth not provided'})
+            </label>
 
-          <div className="mb-3">
-            <div className="mb-2">Lunch option (1st Child):</div>
-            <select
-              value={firstChildLunch}
-              onChange={(e) => setFirstChildLunch(e.target.value)}
-              className="form-select"
-              style={{ maxWidth: '300px' }}
-            >
-              <option value="">Select lunch option</option>
-              <option value="chicken">Chicken Rice</option>
-              <option value="fish">Fish & Chips</option>
-              <option value="veggie">Vegetarian</option>
-            </select>
-          </div>
-
-          {childrenCount === '2 Children' && (
-            <div className="mb-3">
-              <div className="mb-2">Lunch option (2nd Child):</div>
-              <select
-                value={secondChildLunch}
-                onChange={(e) => setSecondChildLunch(e.target.value)}
+            {selectedChildren.some((c) => c.ChildID === child.ChildID) && (
+              <div className="mt-2">
+                <label className="form-label">Lunch Option:</label>
+                <select
                 className="form-select"
-                style={{ maxWidth: '300px' }}
+                value={
+                  selectedChildren.find((c) => c.ChildID === child.ChildID)?.lunchOption || ''
+                }
+                onChange={(e) =>
+                  handleLunchOptionChange(child.ChildID, e.target.value)
+                }
               >
                 <option value="">Select lunch option</option>
                 <option value="chicken">Chicken Rice</option>
                 <option value="fish">Fish & Chips</option>
                 <option value="veggie">Vegetarian</option>
               </select>
-            </div>
-          )}
+              </div>
+            )}
+              </div>
+            ))}
+          </div>
         </div>
       )}
+
 
 {activeTab === 'Payment' && (
   <div className="row">
@@ -307,7 +392,7 @@ function Payment() {
 
         <div className="mb-3">
           <small className="text-muted">Programme</small>
-          <p className="mb-0">{programName} x {childrenCount === '1 Child' ? '1' : '2'}</p>
+          <p className="mb-0">{programName} x {selectedChildren.length}</p>
         </div>
 
         <div className="mb-3">
@@ -315,27 +400,72 @@ function Payment() {
           <div className="p-3 bg-light rounded">
             <div className="d-flex justify-content-between mb-2">
               <span>Price per child:</span>
-              <span>{price}</span>
+              <span>
+                {isMemberActive && (
+                  <span
+                    style={{
+                      textDecoration: "line-through",
+                      color: "red",
+                      marginRight: "10px",
+                    }}
+                  >
+                    {price}
+                  </span>
+                )}
+                {isMemberActive
+                  ? `$${(parseFloat(price.replace("$", "")) * 0.9).toFixed(2)}`
+                  : price}
+              </span>
             </div>
             <div className="d-flex justify-content-between mb-2">
               <span>Number of children:</span>
-              <span>{childrenCount === '1 Child' ? '1' : '2'}</span>
+              <span>{selectedChildren.length}</span> 
             </div>
+            {isMemberActive && (
+              <div className="d-flex justify-content-between mb-2">
+                <span>Membership Discount:</span>
+                <span>-10%</span>
+              </div>
+            )}
             <div className="d-flex justify-content-between fw-bold pt-2 border-top">
               <span>Total Amount:</span>
               <span>${totalPrice.toFixed(2)}</span>
             </div>
+            <button onClick={() => setShowPaynow(true)} className="btn btn-outline-secondary w-100 mt-3">Show PayNow QR</button>
+            
           </div>
+          
         </div>
-
-        <button
-          onClick={() => setShowPaynow(true)}
-          className="btn btn-outline-secondary w-100 mt-3"
-        >
-          Show PayNow QR
-        </button>
       </div>
     </div>
+      {/* QR Code Modal */}  
+      {showPaynow && (  
+        <>  
+          <div className="modal-backdrop fade show" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}></div>  
+          <div className="modal fade show d-block" style={{ zIndex: 1056 }}>  
+            <div className="modal-dialog modal-dialog-centered" style={{ maxWidth: '400px' }}>  
+              <div className="modal-content">  
+                <div className="modal-body p-4">  
+                  <h5 className="text-center mb-3">Pay via PayNow</h5>  
+                  <p className="text-center small text-muted mb-4">  
+                    Please include the order ID in the payment reference or it may be rejected.  
+                  </p>  
+                  <div className="text-center mb-4">  
+                    <div className="mx-auto" style={{ width: '200px', height: '200px', border: '1px solid #dee2e6', borderRadius: '8px' }}>  
+                      <img src="/qrcode.png" alt="PayNow QR Code" style={{ width: '100%', height: '100%' }} />  
+                    </div>  
+                  </div>  
+                  <p className="text-center fw-bold">Total Amount: ${totalPrice.toFixed(2)}</p>  
+                  <button onClick={handleCloseModal} className="btn w-100 mt-3" style={{ backgroundColor: '#FFC107', color: '#000' }}>  
+                    Close Window  
+                  </button>  
+                </div>  
+              </div>  
+            </div>  
+          </div>  
+        </>  
+      )}  
+
 
     <div className="col-md-6">
       <div className="mb-4">

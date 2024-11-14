@@ -30,7 +30,7 @@ const ExpandableChatbot = () => {
           { type: 'bot', text: getAnswer(question) },
         ]);
         setIsTyping(false);
-      }, 2000);
+      }, 500);
     }
   };
 
@@ -50,24 +50,21 @@ const ExpandableChatbot = () => {
 
   const getAnswer = (question) => {
     switch (question) {
-      case 'Do you ship internationally?':
-        return 'Yes, we ship internationally to most countries.';
-      case 'Why are your prices so low?':
-        return 'We are able to offer low prices due to our efficient supply chain and high sales volume.';
-      case 'How do I track my order?':
-        return 'You can track your order by logging into your account and going to the orders section.';
-      case 'How much is shipping?':
-        return 'Shipping costs vary depending on your location and the size/weight of your order. You can check the shipping costs during checkout.';
+      case 'What is the maximum number of children that can be registered for each program?':
+        return 'The maximum number of children that can be registered per program is two.';
+      case 'What are the benefits of being a member?':
+        return 'Membership benefits include access to resources like virtual one-on-one coaching, webinars, and discounts on other programs.';
+      case 'How do I view which programmes I have signed up for?':
+        return 'You can view the programs you have enrolled in on your dashboard.';
       default:
         return 'I do not have an answer for that question. Please submit your inquiry and we will get back to you.';
     }
   };
 
   const inquiryOptions = [
-    'Do you ship internationally?',
-    'Why are your prices so low?',
-    'How do I track my order?',
-    'How much is shipping?',
+    'What is the maximum number of children that can be registered for each program?',
+    'What are the benefits of being a member?',
+    'How do I view which programmes I have signed up for?',
     'I have a different question',
   ];
 
