@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Container, Button, Form } from "react-bootstrap";
+import { Container, Button, Form, Modal } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 
 const AdminCreateProgram = () => {
@@ -10,6 +10,8 @@ const AdminCreateProgram = () => {
   const [classSize, setClassSize] = useState("");
   const [duration, setDuration] = useState("");
   const [lunchProvided, setLunchProvided] = useState(false);
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
   const navigate = useNavigate();
 
   // Mapping of program types to their IDs
@@ -21,9 +23,7 @@ const AdminCreateProgram = () => {
   };
 
   const handleCreateProgram = async () => {
-    // Convert the selected type to its corresponding ID
     const typeId = programTypeMapping[type] || null;
-
     const programData = {
       ProgramName: name,
       ProgramDesc: description,
@@ -48,7 +48,8 @@ const AdminCreateProgram = () => {
       }
 
       console.log("Program created successfully");
-      navigate("/admin-programs");
+      setShowConfirmModal(false); // Close the confirmation modal
+      setShowSuccessModal(true); // Open the success modal
     } catch (error) {
       console.error("Error creating program:", error);
     }
@@ -145,7 +146,7 @@ const AdminCreateProgram = () => {
             className="admin-create-confirm-button me-3"
             onClick={handleCreateProgram}
           >
-            Create Program
+            Create
           </Button>
           <Button
             variant="danger"
@@ -156,6 +157,52 @@ const AdminCreateProgram = () => {
           </Button>
         </div>
       </Form>
+
+      {/* Confirmation Modal */}
+      <Modal
+        show={showConfirmModal}
+        onHide={() => setShowConfirmModal(false)}
+        centered
+      >
+        <Modal.Header closeButton>
+          <Modal.Title>Confirm Program Creation</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>Are you sure you want to create this program?</Modal.Body>
+        <Modal.Footer>
+          <Button variant="primary" onClick={handleCreateProgram}>
+            Confirm
+          </Button>
+          <Button
+            variant="secondary"
+            onClick={() => setShowConfirmModal(false)}
+          >
+            Cancel
+          </Button>
+        </Modal.Footer>
+      </Modal>
+
+      {/* Success Modal */}
+      <Modal
+        show={showSuccessModal}
+        onHide={() => setShowSuccessModal(false)}
+        centered
+      >
+        <Modal.Header closeButton>
+          <Modal.Title>Program Created</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>The program has been created successfully.</Modal.Body>
+        <Modal.Footer>
+          <Button
+            variant="primary"
+            onClick={() => {
+              setShowSuccessModal(false);
+              navigate("/admin-view-program");
+            }}
+          >
+            Close
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </Container>
   );
 };
