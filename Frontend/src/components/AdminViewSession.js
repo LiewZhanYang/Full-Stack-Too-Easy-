@@ -5,12 +5,34 @@ import { useNavigate, useParams } from "react-router-dom";
 
 const AdminViewSession = () => {
   const [sessions, setSessions] = useState([]);
+  const [programName, setProgramName] = useState(""); // State for program name
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showErrorModal, setShowErrorModal] = useState(false);
   const [sessionToDelete, setSessionToDelete] = useState(null);
   const navigate = useNavigate();
   const { id: programID } = useParams();
 
+  // Fetch program details to get the program name
+  useEffect(() => {
+    const fetchProgramDetails = async () => {
+      try {
+        const response = await fetch(
+          `http://localhost:8000/program/${programID}`
+        );
+        if (!response.ok) {
+          throw new Error("Failed to fetch program details");
+        }
+        const programData = await response.json();
+        setProgramName(programData.ProgrameName); // Set the program name
+      } catch (error) {
+        console.error("Error fetching program details:", error);
+      }
+    };
+
+    fetchProgramDetails();
+  }, [programID]);
+
+  // Fetch sessions for the program
   useEffect(() => {
     const fetchSessions = async () => {
       try {
@@ -84,7 +106,7 @@ const AdminViewSession = () => {
 
   return (
     <Container fluid className="admin-edit-program-page p-4">
-      <h2 className="page-title">Public Speaking Workshop - Sessions</h2>
+      <h2 className="page-title">{programName} Sessions</h2>
       <hr className="divider-line mb-4" />
 
       {sessions.length > 0 ? (
