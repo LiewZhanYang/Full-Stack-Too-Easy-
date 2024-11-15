@@ -131,10 +131,23 @@ const getProgramBySignUp = async (req, res) => {
   }
 };
 
+const deleteProgram = async (req, res) => {
+  const id = req.params.id;
+  try {
+    const deletedProgram = await Program.deleteProgram(id);
+    res.status(201).json(deletedProgram);
+    console.log("Successfully deleted Program");
+  } catch (error) {
+    console.error(error);
+    res.status(403).send("Cannot delete Programs, there are sessions");
+  }
+}
+
 module.exports = {
   getAllPrograms,
   postProgram,
   updateProgram,
   getProgramById,
   getProgramBySignUp,
+  deleteProgram
 };

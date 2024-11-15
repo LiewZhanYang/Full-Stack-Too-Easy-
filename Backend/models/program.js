@@ -173,6 +173,15 @@ class Program {
       }
     }
   }
+
+  static async deleteProgram(ProgramID) {
+    const connection = await mysql.createConnection(dbConfig);
+    const sqlQuery = `
+            DELETE FROM Program WHERE ProgramID = ?;`;
+
+    const [result] = await connection.execute(sqlQuery, [ProgramID]);
+    connection.end();
+  }
 }
 
 module.exports = Program;

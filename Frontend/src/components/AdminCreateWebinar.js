@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Container, Row, Col, Button, Form } from "react-bootstrap";
+import { Container, Row, Col, Button, Form, Modal } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
@@ -12,6 +12,9 @@ const AdminCreateWebinar = () => {
   const [endTime, setEndTime] = useState("");
   const [speaker, setSpeaker] = useState("");
   const [image, setImage] = useState(null);
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+
   const navigate = useNavigate();
 
   const handleImageChange = (e) => {
@@ -48,7 +51,8 @@ const AdminCreateWebinar = () => {
 
       if (response.status === 201) {
         console.log("Webinar created:", response.data);
-        navigate("/admin-view-webinar");
+        setShowConfirmModal(false);
+        setShowSuccessModal(true);
       } else {
         console.error("Failed to create webinar");
       }
@@ -58,7 +62,7 @@ const AdminCreateWebinar = () => {
   };
 
   const handleCancel = () => {
-    navigate("/admin-view-webinar");
+    navigate(-1); // Go back to the previous page
   };
 
   return (
@@ -175,7 +179,7 @@ const AdminCreateWebinar = () => {
             onMouseOver={(e) => (e.target.style.backgroundColor = "#f59e0b")}
             onMouseOut={(e) => (e.target.style.backgroundColor = "#fbbf24")}
             className="me-3"
-            onClick={handleCreateWebinar}
+            onClick={() => setShowConfirmModal(true)} // Show confirmation modal
           >
             Create Webinar
           </Button>
@@ -194,6 +198,52 @@ const AdminCreateWebinar = () => {
           </Button>
         </div>
       </Form>
+
+      {/* Confirmation Modal */}
+      <Modal
+        show={showConfirmModal}
+        onHide={() => setShowConfirmModal(false)}
+        centered
+      >
+        <Modal.Header closeButton>
+          <Modal.Title>Confirm Webinar Creation</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>Are you sure you want to create this webinar?</Modal.Body>
+        <Modal.Footer>
+          <Button variant="primary" onClick={handleCreateWebinar}>
+            Confirm
+          </Button>
+          <Button
+            variant="secondary"
+            onClick={() => setShowConfirmModal(false)}
+          >
+            Cancel
+          </Button>
+        </Modal.Footer>
+      </Modal>
+
+      {/* Success Modal */}
+      <Modal
+        show={showSuccessModal}
+        onHide={() => setShowSuccessModal(false)}
+        centered
+      >
+        <Modal.Header closeButton>
+          <Modal.Title>Webinar Created</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>The webinar has been created successfully.</Modal.Body>
+        <Modal.Footer>
+          <Button
+            variant="primary"
+            onClick={() => {
+              setShowSuccessModal(false);
+              navigate(-1); // Go back to the previous page
+            }}
+          >
+            Close
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </Container>
   );
 };

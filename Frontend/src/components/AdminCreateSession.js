@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Container, Row, Col, Button, Form } from "react-bootstrap";
+import { Container, Row, Col, Button, Form, Modal } from "react-bootstrap";
 import { useNavigate, useParams } from "react-router-dom";
 
 const AdminCreateSession = () => {
@@ -8,6 +8,9 @@ const AdminCreateSession = () => {
   const [time, setTime] = useState("");
   const [location, setLocation] = useState("");
   const [vacancy, setVacancy] = useState("");
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+
   const navigate = useNavigate();
   const { id: programID } = useParams();
 
@@ -35,7 +38,8 @@ const AdminCreateSession = () => {
       }
 
       console.log("Session Created:", sessionDetails);
-      navigate(`/admin-programs/${programID}/sessions`);
+      setShowConfirmModal(false);
+      setShowSuccessModal(true);
     } catch (error) {
       console.error("Error creating session:", error);
     }
@@ -109,7 +113,7 @@ const AdminCreateSession = () => {
           <Button
             variant="warning"
             className="create-session-button"
-            onClick={handleCreateSession}
+            onClick={() => setShowConfirmModal(true)} // Show confirmation modal
           >
             Create
           </Button>
@@ -122,6 +126,52 @@ const AdminCreateSession = () => {
           </Button>
         </div>
       </Form>
+
+      {/* Confirmation Modal */}
+      <Modal
+        show={showConfirmModal}
+        onHide={() => setShowConfirmModal(false)}
+        centered
+      >
+        <Modal.Header closeButton>
+          <Modal.Title>Confirm Session Creation</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>Are you sure you want to create this session?</Modal.Body>
+        <Modal.Footer>
+          <Button variant="primary" onClick={handleCreateSession}>
+            Confirm
+          </Button>
+          <Button
+            variant="secondary"
+            onClick={() => setShowConfirmModal(false)}
+          >
+            Cancel
+          </Button>
+        </Modal.Footer>
+      </Modal>
+
+      {/* Success Modal */}
+      <Modal
+        show={showSuccessModal}
+        onHide={() => setShowSuccessModal(false)}
+        centered
+      >
+        <Modal.Header closeButton>
+          <Modal.Title>Session Created</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>The session has been created successfully.</Modal.Body>
+        <Modal.Footer>
+          <Button
+            variant="primary"
+            onClick={() => {
+              setShowSuccessModal(false);
+              navigate(-1); // Go back to the previous page
+            }}
+          >
+            Close
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </Container>
   );
 };
