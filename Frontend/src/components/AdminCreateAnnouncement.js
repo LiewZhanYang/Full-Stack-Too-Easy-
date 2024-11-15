@@ -7,6 +7,7 @@ const AdminCreateAnnouncement = () => {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
   const navigate = useNavigate();
 
   const handleCreateAnnouncement = async () => {
@@ -18,7 +19,8 @@ const AdminCreateAnnouncement = () => {
 
       if (response.status === 201) {
         console.log("Announcement Created:", response.data);
-        navigate("/AdminHome"); // Navigate to the dashboard after successful creation
+        setShowConfirmModal(false);
+        setShowSuccessModal(true); // Show success modal on successful creation
       }
     } catch (error) {
       console.error("Error creating announcement:", error);
@@ -27,7 +29,7 @@ const AdminCreateAnnouncement = () => {
   };
 
   const handleCancel = () => {
-    navigate("/AdminHome");
+    navigate(-1); // Go back to the previous page
   };
 
   return (
@@ -99,6 +101,29 @@ const AdminCreateAnnouncement = () => {
             onClick={() => setShowConfirmModal(false)}
           >
             Cancel
+          </Button>
+        </Modal.Footer>
+      </Modal>
+
+      {/* Success Modal */}
+      <Modal
+        show={showSuccessModal}
+        onHide={() => setShowSuccessModal(false)}
+        centered
+      >
+        <Modal.Header closeButton>
+          <Modal.Title>Announcement Created</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>The announcement has been created successfully.</Modal.Body>
+        <Modal.Footer>
+          <Button
+            variant="primary"
+            onClick={() => {
+              setShowSuccessModal(false);
+              navigate(-1); // Go back to the previous page
+            }}
+          >
+            Close
           </Button>
         </Modal.Footer>
       </Modal>
