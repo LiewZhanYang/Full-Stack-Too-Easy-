@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Container, Form, Card, Button } from "react-bootstrap";
+import { Container, Form, Card, Button, Modal } from "react-bootstrap";
 import axios from "axios";
 import { FaEye, FaEdit, FaTrash } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
@@ -9,6 +9,8 @@ const AdminViewAnnouncement = () => {
   const [announcements, setAnnouncements] = useState([]);
   const [sortedAnnouncements, setSortedAnnouncements] = useState([]);
   const [sortOption, setSortOption] = useState("Latest");
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [announcementToDelete, setAnnouncementToDelete] = useState(null);
 
   const fetchAnnouncements = async () => {
     try {
@@ -24,14 +26,22 @@ const AdminViewAnnouncement = () => {
     fetchAnnouncements();
   }, []);
 
-  const handleDeleteClick = async (id) => {
-    if (window.confirm("Are you sure you want to delete this announcement?")) {
+  const handleDeleteClick = (id) => {
+    setAnnouncementToDelete(id);
+    setShowConfirmModal(true);
+  };
+
+  const confirmDelete = async () => {
+    if (announcementToDelete) {
       try {
-        await axios.delete(`http://localhost:8000/announcement/${id}`);
+        await axios.delete(
+          `http://localhost:8000/announcement/${announcementToDelete}`
+        );
         alert("Announcement deleted successfully");
 
-        // Refresh the list after deletion
         fetchAnnouncements();
+        setShowConfirmModal(false);
+        setAnnouncementToDelete(null);
       } catch (error) {
         console.error("Error deleting announcement:", error);
         alert("There was an error deleting the announcement.");
@@ -71,55 +81,81 @@ const AdminViewAnnouncement = () => {
   };
 
   return (
-    <Container fluid className="admin-view-announcement p-4">
-      <h2 className="mb-4">Announcements</h2>
+    <Container fluid className="admin-announcements-page p-4">
+      <h2 className="precoaching-title">Announcements</h2>
       <div className="d-flex justify-content-between align-items-center mb-4">
-        <span>Latest</span>
+        <span style={{ fontSize: "0.9em" }}>Sort by:</span>
         <Form.Select
           value={sortOption}
           onChange={handleSortChange}
           className="sort-select"
+          style={{ width: "200px" }}
         >
-          <option value="Latest">Sort by</option>
+          <option value="Latest">Latest</option>
           <option value="Month">Month</option>
           <option value="Year">Year</option>
         </Form.Select>
       </div>
 
       {sortedAnnouncements.map((announcement) => (
-        <Card key={announcement.AnnouncementID} className="mb-3 shadow-sm">
+        <Card key={announcement.AnnouncementID} className="mb-3 shadow-sm text-start">
           <Card.Body>
-            <Card.Title>Title: {announcement.Title}</Card.Title>
-            <Card.Text>
-              Date Created:{" "}
-              {new Date(announcement.PostedDate).toLocaleDateString()}
-            </Card.Text>
-            <Card.Text>id : {announcement.AnnouncementID}</Card.Text>
-            <div className="d-flex justify-content-end">
-              <Button
-                variant="light"
-                className="me-2"
-                onClick={() => handleViewClick(announcement.AnnouncementID)}
-              >
-                <FaEye />
-              </Button>
-              <Button
-                variant="light"
-                className="me-2"
-                onClick={() => handleEditClick(announcement.AnnouncementID)}
-              >
-                <FaEdit />
-              </Button>
-              <Button
-                variant="danger"
-                onClick={() => handleDeleteClick(announcement.AnnouncementID)}
-              >
-                <FaTrash />
-              </Button>
+            <Card.Title>{announcement.Title}</Card.Title>
+            <Card.Text>{new Date(announcement.PostedDate).toLocaleDateString()}</Card.Text>
+            <div className="d-flex justify-content-between align-items-center">
+              <Card.Text className="mb-0">ID: {announcement.AnnouncementID}</Card.Text>
+              <div className="d-flex gap-2">
+                <Button
+                  variant="light"
+                  className="d-flex align-items-center"
+                  onClick={() => handleViewClick(announcement.AnnouncementID)}
+                >
+                  <FaEye className="me-1" /> View
+                </Button>
+                <Button
+                  variant="light"
+                  className="d-flex align-items-center"
+                  onClick={() => handleEditClick(announcement.AnnouncementID)}
+                >
+                  <FaEdit className="me-1" /> Edit
+                </Button>
+                <Button
+                  variant="danger"
+                  className="d-flex align-items-center"
+                  onClick={() => handleDeleteClick(announcement.AnnouncementID)}
+                >
+                  <FaTrash className="me-1" /> Delete
+                </Button>
+              </div>
             </div>
           </Card.Body>
         </Card>
       ))}
+
+      {/* Delete Confirmation Modal */}
+      <Modal
+        show={showConfirmModal}
+        onHide={() => setShowConfirmModal(false)}
+        centered
+      >
+        <Modal.Header closeButton>
+          <Modal.Title>Confirm Delete</Modal.Title>
+        </Modal.Header>
+        <Modal.Body className="text-start">
+          Are you sure you want to delete this announcement?
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="danger" onClick={confirmDelete}>
+            Delete
+          </Button>
+          <Button
+            variant="secondary"
+            onClick={() => setShowConfirmModal(false)}
+          >
+            Cancel
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </Container>
   );
 };

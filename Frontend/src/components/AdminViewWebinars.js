@@ -1,5 +1,13 @@
 import React, { useEffect, useState } from "react";
-import { Container, Row, Col, Card, Button, Form } from "react-bootstrap";
+import {
+  Container,
+  Row,
+  Col,
+  Card,
+  Button,
+  Form,
+  Modal,
+} from "react-bootstrap";
 import { FaSearch, FaEdit, FaPlus, FaTrash } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 
@@ -7,6 +15,8 @@ const AdminViewWebinars = () => {
   const [webinars, setWebinars] = useState([]);
   const [filteredWebinars, setFilteredWebinars] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [webinarToDelete, setWebinarToDelete] = useState(null); // Store ID of webinar to delete
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -17,7 +27,6 @@ const AdminViewWebinars = () => {
           throw new Error(`Error: ${response.statusText}`);
         }
         const data = await response.json();
-        console.log("Fetched webinars:", data);
         setWebinars(data);
         setFilteredWebinars(data);
       } catch (error) {
@@ -43,24 +52,34 @@ const AdminViewWebinars = () => {
     navigate(`/admin-edit-webinar/${webinarId}`);
   };
 
-  const handleDeleteClick = async (webinarId) => {
-    if (window.confirm("Are you sure you want to delete this webinar?")) {
+  const handleDeleteClick = (webinarId) => {
+    setWebinarToDelete(webinarId); // Set the ID of the webinar to be deleted
+    setShowConfirmModal(true); // Show confirmation modal
+  };
+
+  const confirmDelete = async () => {
+    if (webinarToDelete) {
       try {
         const response = await fetch(
-          `http://localhost:8000/webinar/${webinarId}`,
+          `http://localhost:8000/webinar/${webinarToDelete}`,
           {
             method: "DELETE",
           }
         );
 
         if (response.ok) {
-          console.log("Webinar deleted successfully");
           setWebinars((prevWebinars) =>
-            prevWebinars.filter((webinar) => webinar.WebinarID !== webinarId)
+            prevWebinars.filter(
+              (webinar) => webinar.WebinarID !== webinarToDelete
+            )
           );
           setFilteredWebinars((prevWebinars) =>
-            prevWebinars.filter((webinar) => webinar.WebinarID !== webinarId)
+            prevWebinars.filter(
+              (webinar) => webinar.WebinarID !== webinarToDelete
+            )
           );
+          setShowConfirmModal(false); // Close modal after deletion
+          setWebinarToDelete(null); // Clear the stored ID
         } else {
           console.error("Failed to delete webinar");
         }
@@ -76,7 +95,7 @@ const AdminViewWebinars = () => {
 
   return (
     <Container fluid className="admin-webinar-page p-4">
-      <h1 className="admin-webinar-title fw-bold">Webinars</h1>
+      <h2 className="precoaching-title">Webinars</h2>
 
       {/* Search Section */}
       <div className="admin-webinar-controls d-flex align-items-center my-3">
@@ -109,7 +128,7 @@ const AdminViewWebinars = () => {
               <div className="admin-webinar-card-image-container">
                 <Card.Img
                   variant="top"
-                  src={webinar.imageUrl || "/img/default.jpg"} // Use 'imageUrl' from backend
+                  src={webinar.imageUrl || "/img/default.jpg"}
                   alt={webinar.WebinarName}
                   className="admin-webinar-card-image"
                 />
@@ -149,7 +168,7 @@ const AdminViewWebinars = () => {
         ))}
       </Row>
 
-      {/* Create Webinar Button (Bottom Right) */}
+      {/* Create Webinar Button */}
       <Button
         variant="success"
         className="admin-create-webinar-button d-flex align-items-center"
@@ -157,6 +176,29 @@ const AdminViewWebinars = () => {
       >
         <FaPlus className="me-1" /> <span>Create Webinar</span>
       </Button>
+
+      {/* Delete Confirmation Modal */}
+      <Modal
+        show={showConfirmModal}
+        onHide={() => setShowConfirmModal(false)}
+        centered
+      >
+        <Modal.Header closeButton>
+          <Modal.Title>Confirm Delete</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>Are you sure you want to delete this webinar?</Modal.Body>
+        <Modal.Footer>
+          <Button variant="danger" onClick={confirmDelete}>
+            Delete
+          </Button>
+          <Button
+            variant="secondary"
+            onClick={() => setShowConfirmModal(false)}
+          >
+            Cancel
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </Container>
   );
 };

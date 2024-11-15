@@ -935,16 +935,7 @@ code {
   color: white;
 }
 
-/* Admin View Webinar Page */
-.admin-create-webinar-button {
-  position: fixed;
-  bottom: 20px;
-  right: 80px;
-  z-index: 1000;
-  padding: 10px 20px;
-  font-weight: bold;
-  border-radius: 50px;
-}
+
 /* Announcements */
 .announcement {
   margin-top: 20px;
@@ -1005,27 +996,4 @@ code {
   width: 120px;
 }
 
-/* AdminViewAnnouncement.css */
-
-.admin-view-announcement {
-  max-width: 800px;
-  margin: 0 auto;
-}
-
-.admin-view-announcement h2 {
-  font-weight: bold;
-  font-size: 1.5em;
-}
-
-.admin-view-announcement .card {
-  border-radius: 8px;
-}
-
-.admin-view-announcement .card .card-title {
-  font-weight: bold;
-}
-
-.admin-view-announcement .sort-select {
-  width: 200px;
-}
 

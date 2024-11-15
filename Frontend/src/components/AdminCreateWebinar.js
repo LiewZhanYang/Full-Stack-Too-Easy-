@@ -17,13 +17,11 @@ const AdminCreateWebinar = () => {
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-
-      setImage(file); // Store the file directly
+      setImage(file);
     }
   };
 
   const handleCreateWebinar = async () => {
-
     const formData = new FormData();
     formData.append("WebinarName", name);
     formData.append("WebinarDesc", description);
@@ -34,7 +32,7 @@ const AdminCreateWebinar = () => {
     formData.append("Speaker", speaker);
 
     if (image) {
-      formData.append("file", image); // Add the file to FormData
+      formData.append("file", image);
     }
 
     try {
@@ -43,15 +41,14 @@ const AdminCreateWebinar = () => {
         formData,
         {
           headers: {
-            "Content-Type": "multipart/form-data", // Important for file uploads
+            "Content-Type": "multipart/form-data",
           },
         }
       );
 
       if (response.status === 201) {
-        const result = response.data;
-        console.log("Webinar created:", result);
-        navigate("/admin-view-webinar"); // Redirect after successful creation
+        console.log("Webinar created:", response.data);
+        navigate("/admin-view-webinar");
       } else {
         console.error("Failed to create webinar");
       }
@@ -82,7 +79,6 @@ const AdminCreateWebinar = () => {
 
         <Form.Group controlId="webinarImage" className="mb-3">
           <Form.Label>Upload Image</Form.Label>
-
           <Form.Control
             type="file"
             accept="image/*"
@@ -167,12 +163,33 @@ const AdminCreateWebinar = () => {
         <div className="admin-create-button-group mt-4">
           <Button
             variant="warning"
-            className="me-3 px-4"
+            style={{
+              backgroundColor: "#fbbf24",
+              color: "black",
+              borderRadius: "8px",
+              padding: "8px 16px",
+              fontSize: "14px",
+              fontWeight: "500",
+              border: "none",
+            }}
+            onMouseOver={(e) => (e.target.style.backgroundColor = "#f59e0b")}
+            onMouseOut={(e) => (e.target.style.backgroundColor = "#fbbf24")}
+            className="me-3"
             onClick={handleCreateWebinar}
           >
             Create Webinar
           </Button>
-          <Button variant="danger" className="px-4" onClick={handleCancel}>
+          <Button
+            variant="danger"
+            style={{
+              borderRadius: "8px",
+              padding: "8px 16px",
+              fontSize: "14px",
+              fontWeight: "500",
+              border: "none",
+            }}
+            onClick={handleCancel}
+          >
             Cancel
           </Button>
         </div>

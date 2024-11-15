@@ -21,7 +21,7 @@ const AdminHome = () => {
         <p className="text-muted">{formattedDate}</p>
         <br></br>
         <p className="admin-status">You have...</p>
-        <h4 className="pending-invoices">10 Pending Invoice Confirmations</h4>
+        <h4 className="pending-invoices">3 Pending Invoice Confirmations</h4>
 
         <h5 className="shortcuts-title mt-4">Access:</h5>
         <Row className="mt-3">

@@ -3,7 +3,7 @@ import { Container, Row, Col, Button, Form, Modal } from "react-bootstrap";
 import { useNavigate, useParams } from "react-router-dom";
 import { FaArrowLeft } from "react-icons/fa";
 
-const AdminConfirmPayment = () => {
+const AdminConfirmPayment = () => { // 
   const [paymentDetails, setPaymentDetails] = useState({});
   const [rejectionReason, setRejectionReason] = useState("");
   const [showConfirmModal, setShowConfirmModal] = useState(false);
@@ -124,7 +124,7 @@ const AdminConfirmPayment = () => {
     <Container fluid className="admin-confirm-payment-page p-4">
       <Row className="mb-3">
         <Col>
-          <h2 className="admin-confirm-title">Admin Console</h2>
+          <h2 className="admin-confirm-title">Confirm Payment</h2>
         </Col>
         <Col className="text-end">
           <Button
