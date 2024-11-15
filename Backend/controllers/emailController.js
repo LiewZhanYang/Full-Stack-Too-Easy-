@@ -6,17 +6,46 @@ const { sendEmail } = require("../models/email");
  * @param {string} recipientEmail - The recipient's email address.
  * @param {string} filename - The name of the uploaded file.
  */
-exports.sendEmailNotification = async (recipientEmail, filename) => {
+
+exports.sendEmailNotification = async (recipientEmail, paymentDetails) => {
   // Validate inputs
-  if (!recipientEmail || !filename) {
-    throw new Error("Recipient email and filename are required.");
+  if (!recipientEmail) {
+    throw new Error("Recipient email is required.");
   }
 
-  try {
-    const subject = "New File Uploaded to S3";
-    const textContent = `The file "${filename}" was successfully uploaded to S3.`;
+  // Destructure and extract relevant details from paymentDetails
+  const {
+    OrderID,
+    ProgramName,
+    Amount,
+    CustomerName,
+    CustomerPhone,
+    CreatedAt,
+  } = paymentDetails;
 
-    // Call the model function to send the email
+  try {
+    // Prepare email content
+    const subject = "Payment Receipt - Thank you for your payment!";
+    const textContent = `
+      Dear ${CustomerName || "Customer"},
+      
+      Thank you for your payment. Here are the details of your transaction:
+
+      Order ID: ${OrderID || "N/A"}
+      Program Name: ${ProgramName || "N/A"}
+      Amount Paid: ${Amount ? `$${Amount}` : "N/A"}
+      Payment Date: ${CreatedAt || "N/A"}
+      Phone Number: ${CustomerPhone || "N/A"}
+      
+      If you have any questions or concerns regarding your payment, please feel free to contact us.
+      
+      Thank you for choosing our services!
+
+      Best regards,
+      [Your Company Name]
+    `;
+
+    // Send the email using the sendEmail function from the model
     const emailResponse = await sendEmail(recipientEmail, subject, textContent);
 
     console.log("Email sent successfully:", emailResponse);
