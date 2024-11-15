@@ -13,12 +13,14 @@ const calculateAge = (dob) => {
   const today = new Date();
   let age = today.getFullYear() - birthDate.getFullYear();
   const monthDifference = today.getMonth() - birthDate.getMonth();
-  if (monthDifference < 0 || (monthDifference === 0 && today.getDate() < birthDate.getDate())) {
+  if (
+    monthDifference < 0 ||
+    (monthDifference === 0 && today.getDate() < birthDate.getDate())
+  ) {
     age--;
   }
   return age;
 };
-
 
 function Payment() {
   const location = useLocation();
@@ -43,7 +45,6 @@ function Payment() {
   const [orderId, setOrderId] = useState(null);
   const [activeTab, setActiveTab] = useState("Overview");
   const [isMemberActive, setIsMemberActive] = useState(false);
-
 
   useEffect(() => {
     const fetchMembershipStatus = async () => {
@@ -114,7 +115,7 @@ function Payment() {
     const pricePerChild = parseFloat(price?.replace("$", "") || 0);
     setTotalPrice(pricePerChild * selectedChildren.length);
   }, [selectedChildren, price]);
-  
+
   const handleChildSelection = (childId) => {
     setSelectedChildren((prevSelected) => {
       if (prevSelected.some((child) => child.ChildID === childId)) {
@@ -125,8 +126,6 @@ function Payment() {
       return [...prevSelected, { ChildID: childId, lunchOption: "" }];
     });
   };
-  
-
 
   const handleLunchOptionChange = (childId, lunchOption) => {
     setSelectedChildren((prevSelected) =>
@@ -192,7 +191,6 @@ function Payment() {
           }))
         )
       );
-
 
       // Send the FormData using axios
       const response = await axios.post(
@@ -308,7 +306,8 @@ function Payment() {
             className={`pb-2`}
             style={{
               cursor: "pointer",
-              borderBottom: activeTab === "Payment" ? "2px solid #FFC107" : "none",
+              borderBottom:
+                activeTab === "Payment" ? "2px solid #FFC107" : "none",
               marginBottom: "-1px",
             }}
             onClick={() => setActiveTab("Payment")}
@@ -352,42 +351,48 @@ function Payment() {
               ))}
             </ul>
           </div>
-          
+
           <h3 className="fs-5 mb-3">Select Children Attending</h3>
           <div className="mb-4">
-          {children.map((child) => (
-    <div key={child.ChildID} className="form-check mb-3">
-      <input
-        type="checkbox"
-        className="form-check-input"
-        id={`child-${child.ChildID}`}
-        checked={selectedChildren.some((c) => c.ChildID === child.ChildID)}
-        onChange={() => handleChildSelection(child.ChildID)}
-      />
-      <label
-        className="form-check-label"
-        htmlFor={`child-${child.ChildID}`}
-      >
-        {child.Name} (Age: {calculateAge(child.DOB)})
-      </label>
+            {children.map((child) => (
+              <div key={child.ChildID} className="form-check mb-3">
+                <input
+                  type="checkbox"
+                  className="form-check-input"
+                  id={`child-${child.ChildID}`}
+                  checked={selectedChildren.some(
+                    (c) => c.ChildID === child.ChildID
+                  )}
+                  onChange={() => handleChildSelection(child.ChildID)}
+                />
+                <label
+                  className="form-check-label"
+                  htmlFor={`child-${child.ChildID}`}
+                >
+                  {child.Name} (Age: {calculateAge(child.DOB)})
+                </label>
 
-      {selectedChildren.some((c) => c.ChildID === child.ChildID) && (
-        <div className="mt-2">
-          <label className="form-label">Lunch Option:</label>
-          <select
-            className="form-select"
-            value={
-              selectedChildren.find((c) => c.ChildID === child.ChildID)?.lunchOption || ""
-            }
-            onChange={(e) => handleLunchOptionChange(child.ChildID, e.target.value)}
-          >
-            <option value="">Select lunch option</option>
-            <option value="chicken">Chicken Rice</option>
-            <option value="fish">Fish & Chips</option>
-            <option value="veggie">Vegetarian</option>
-          </select>
-        </div>
-      )}
+                {selectedChildren.some((c) => c.ChildID === child.ChildID) && (
+                  <div className="mt-2">
+                    <label className="form-label">Lunch Option:</label>
+                    <select
+                      className="form-select"
+                      value={
+                        selectedChildren.find(
+                          (c) => c.ChildID === child.ChildID
+                        )?.lunchOption || ""
+                      }
+                      onChange={(e) =>
+                        handleLunchOptionChange(child.ChildID, e.target.value)
+                      }
+                    >
+                      <option value="">Select lunch option</option>
+                      <option value="chicken">Chicken Rice</option>
+                      <option value="fish">Fish & Chips</option>
+                      <option value="veggie">Vegetarian</option>
+                    </select>
+                  </div>
+                )}
               </div>
             ))}
           </div>
