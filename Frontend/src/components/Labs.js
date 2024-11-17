@@ -1,16 +1,11 @@
-import React from 'react';  
-import Sidebar from './Sidebar';  
+import React from "react";
 
-function ComponentName() {  
-  return (  
-    <div className="flex min-h-screen bg-gray-50">  
-      <Sidebar />  
-      <div className="flex-1 p-8">  
-        <h1>ComponentName Page</h1>  
-        {/* Component content here */}  
-      </div>  
-    </div>  
-  );  
-}  
+function Default() {
+  return (
+    <div style={{ textAlign: "center", marginTop: "20%", fontSize: "24px", fontWeight: "bold" }}>
+      Coming Soon. Stay Tuned!
+    </div>
+  );
+}
 
-export default ComponentName;  
+export default Default;
