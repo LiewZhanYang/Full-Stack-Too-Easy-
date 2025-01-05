@@ -8,6 +8,7 @@ function Precoaching() {
   const [bookingData, setBookingData] = useState(null);
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [statusMessage, setStatusMessage] = useState("");
+  const [isSynced, setIsSynced] = useState(false); // State for tracking calendar sync
   const navigate = useNavigate();
 
   // Navigate to the booking page
@@ -80,21 +81,17 @@ function Precoaching() {
     }
   };
 
-  // sync to google calendar
+  // Sync to Google Calendar
   const handleSyncToGoogleCalendar = () => {
     if (bookingData) {
       const { Date: bookingDateISO, StartTime, EndTime } = bookingData;
-
-      console.log("Raw Date Value:", bookingDateISO);
-      console.log("Raw Start Time Value:", StartTime);
-      console.log("Raw End Time Value:", EndTime);
 
       if (!bookingDateISO || !StartTime || !EndTime) {
         console.error("Missing booking data for Google Calendar sync.");
         return;
       }
 
-      // change timings
+      // Format the date and time
       const deriveDateTime = (date, time) => {
         const [hours, minutes, seconds] = time.split(":").map(Number);
         const derivedDate = new Date(date);
@@ -104,9 +101,6 @@ function Precoaching() {
 
       const startDate = deriveDateTime(bookingDateISO, StartTime);
       const endDate = deriveDateTime(bookingDateISO, EndTime);
-
-      console.log("Derived Start Date:", startDate);
-      console.log("Derived End Date:", endDate);
 
       const formatDateTime = (date) => {
         const pad = (num) => String(num).padStart(2, "0");
@@ -130,10 +124,12 @@ function Precoaching() {
       const details = encodeURIComponent("Join your session with Josh Tan.");
       const location = encodeURIComponent("www.mindsphere.sg");
 
-      // create url
+      // Create the Google Calendar URL
       const calendarUrl = `https://calendar.google.com/calendar/u/0/r/eventedit?text=${title}&dates=${formattedStart}/${formattedEnd}&details=${details}&location=${location}`;
-      console.log("Google Calendar URL:", calendarUrl);
       window.open(calendarUrl, "_blank");
+
+      // Set the sync status to true
+      setIsSynced(true);
     }
   };
 
@@ -198,11 +194,13 @@ function Precoaching() {
                   Cancel
                 </Button>
                 <Button
-                  className="btn btn-success px-4 calendar-sync-button"
+                  className={`btn px-4 calendar-sync-button ${
+                    isSynced ? "btn-success" : "btn-outline-success"
+                  }`}
                   style={{ fontWeight: 500 }}
                   onClick={handleSyncToGoogleCalendar}
                 >
-                  Sync to Google Calendar
+                  {isSynced ? "✔ Synced" : "Sync to Google Calendar"}
                 </Button>
               </div>
             </div>
