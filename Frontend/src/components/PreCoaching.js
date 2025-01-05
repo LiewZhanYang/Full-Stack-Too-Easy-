@@ -179,9 +179,9 @@ function Precoaching() {
                 <strong>Status:</strong> {statusMessage}
               </p>
 
-              <div className="d-flex justify-content-start mt-3">
+              <div className="d-flex justify-content-start gap-3 mt-3">
                 <Button
-                  className="btn btn-warning me-3 px-4 join-button"
+                  className="btn btn-warning px-4 join-button"
                   style={{ fontWeight: 500 }}
                   onClick={() =>
                     handleNavigateToCoaching(bookingData.BookingID)
@@ -198,8 +198,7 @@ function Precoaching() {
                   Cancel
                 </Button>
                 <Button
-                  variant="outline-primary"
-                  className="px-4 calendar-sync-button"
+                  className="btn btn-success px-4 calendar-sync-button"
                   style={{ fontWeight: 500 }}
                   onClick={handleSyncToGoogleCalendar}
                 >
