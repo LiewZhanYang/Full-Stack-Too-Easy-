@@ -8,7 +8,6 @@ function Precoaching() {
   const [bookingData, setBookingData] = useState(null);
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [statusMessage, setStatusMessage] = useState("");
-  const [isSynced, setIsSynced] = useState(false); // State for tracking calendar sync
   const navigate = useNavigate();
 
   // Navigate to the booking page
@@ -127,9 +126,6 @@ function Precoaching() {
       // Create the Google Calendar URL
       const calendarUrl = `https://calendar.google.com/calendar/u/0/r/eventedit?text=${title}&dates=${formattedStart}/${formattedEnd}&details=${details}&location=${location}`;
       window.open(calendarUrl, "_blank");
-
-      // Set the sync status to true
-      setIsSynced(true);
     }
   };
 
@@ -194,17 +190,23 @@ function Precoaching() {
                   Cancel
                 </Button>
                 <Button
-                  className={`btn px-4 calendar-sync-button ${
-                    isSynced ? "btn-success" : "btn-outline-success"
-                  }`}
+                  className="btn btn-outline-success px-4 calendar-sync-button"
                   style={{ fontWeight: 500 }}
                   onClick={handleSyncToGoogleCalendar}
                 >
-                  {isSynced ? "✔ Synced" : "Sync to Google Calendar"}
+                  Add to Google Calendar
                 </Button>
               </div>
             </div>
           </div>
+          {/* Message below the card */}
+          <p
+            className="text-muted text-center mt-3"
+            style={{ fontSize: "0.85rem" }}
+          >
+            <i className="bi bi-info-circle me-1"></i> You can only book one
+            coaching session at a time.
+          </p>
         </>
       ) : (
         <div className="no-bookings text-start">
