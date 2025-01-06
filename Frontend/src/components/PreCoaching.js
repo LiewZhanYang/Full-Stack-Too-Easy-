@@ -10,14 +10,17 @@ function Precoaching() {
   const [statusMessage, setStatusMessage] = useState("");
   const navigate = useNavigate();
 
+  // Navigate to the booking page
   const handleNavigateToBooking = () => {
     navigate("/booking");
   };
 
+  // Navigate to a specific coaching session
   const handleNavigateToCoaching = (id) => {
     navigate(`/coaching/${id}`);
   };
 
+  // Fetch booking data on mount
   useEffect(() => {
     const fetchBookingByAccountID = async () => {
       const id = localStorage.getItem("userId");
@@ -25,7 +28,7 @@ function Precoaching() {
         try {
           const response = await fetch(`http://localhost:8000/booking/${id}`);
           const data = await response.json();
-          console.log("Fetched Booking Data:", data); // Debugging data
+          console.log("Fetched Booking Data:", data);
           if (data && data.length > 0) {
             setBookingData(data[0]);
             setHasBooking(true);
@@ -37,18 +40,18 @@ function Precoaching() {
         }
       }
     };
-
     fetchBookingByAccountID();
   }, []);
 
+  // Dynamically update session status message
   useEffect(() => {
     if (bookingData) {
-      console.log("Booking data set, running initial status update"); // Check if this logs
-      updateStatusMessage(); // Initial call to set status message
+      console.log("Booking data set, running initial status update");
+      updateStatusMessage();
       const interval = setInterval(() => {
         updateStatusMessage();
       }, 60000); // Update every minute
-      return () => clearInterval(interval); // Clear interval on cleanup
+      return () => clearInterval(interval);
     }
   }, [bookingData]);
 
@@ -60,22 +63,17 @@ function Precoaching() {
         EndTime: endTimeStr,
       } = bookingData;
 
-      // Log the raw data values to check their format
       console.log("Raw Date Value:", bookingDateISO);
       console.log("Raw Start Time Value:", startTimeStr);
       console.log("Raw End Time Value:", endTimeStr);
 
-      // Parse the ISO date string
       const baseDate = new Date(bookingDateISO);
 
-      // Check if the base date is valid
       if (!isNaN(baseDate) && startTimeStr && endTimeStr) {
-        // Split start and end times into hours and minutes
         const startTimeParts = startTimeStr.split(":").map(Number);
         const endTimeParts = endTimeStr.split(":").map(Number);
 
         if (startTimeParts.length >= 2 && endTimeParts.length >= 2) {
-          // Create start and end Date objects by modifying the base date
           const startTime = new Date(baseDate);
           startTime.setHours(startTimeParts[0], startTimeParts[1], 0, 0);
 
@@ -84,23 +82,15 @@ function Precoaching() {
 
           const now = new Date();
 
-          console.log("Current Time:", now);
-          console.log("Meeting Start Time:", startTime);
-          console.log("Meeting End Time:", endTime);
-
-          const timeDifference = (startTime - now) / 60000; 
+          const timeDifference = (startTime - now) / 60000; // in minutes
 
           if (now >= startTime && now <= endTime) {
-            console.log("Condition met: Within meeting time range");
             setStatusMessage("You can join the meeting now.");
           } else if (timeDifference > 10) {
-            console.log("Condition met: More than 10 minutes before meeting");
             setStatusMessage("Meeting has not started.");
           } else if (timeDifference <= 10 && now < startTime) {
-            console.log("Condition met: 10 minutes before meeting start");
             setStatusMessage("The meeting will start soon. Get ready to join.");
           } else if (now > endTime) {
-            console.log("Condition met: Meeting has ended");
             setStatusMessage("The meeting has ended.");
           }
         } else {
@@ -116,6 +106,7 @@ function Precoaching() {
     }
   };
 
+  // Format time for display
   const formatTime = (time) => {
     const [hours, minutes, seconds] = time.split(":").map(Number);
     const date = new Date();
@@ -127,6 +118,7 @@ function Precoaching() {
     });
   };
 
+  // Cancel the booking
   const handleCancelBooking = async () => {
     if (bookingData && bookingData.BookingID) {
       try {
@@ -148,6 +140,53 @@ function Precoaching() {
       } finally {
         setShowCancelModal(false);
       }
+    }
+  };
+
+  // Sync to Google Calendar
+  const handleSyncToGoogleCalendar = () => {
+    if (bookingData) {
+      const { Date: bookingDateISO, StartTime, EndTime } = bookingData;
+
+      if (!bookingDateISO || !StartTime || !EndTime) {
+        console.error("Missing booking data for Google Calendar sync.");
+        return;
+      }
+
+      const deriveDateTime = (date, time) => {
+        const [hours, minutes, seconds] = time.split(":").map(Number);
+        const derivedDate = new Date(date);
+        derivedDate.setHours(hours, minutes, seconds || 0);
+        return derivedDate;
+      };
+
+      const startDate = deriveDateTime(bookingDateISO, StartTime);
+      const endDate = deriveDateTime(bookingDateISO, EndTime);
+
+      const formatDateTime = (date) => {
+        const pad = (num) => String(num).padStart(2, "0");
+        return (
+          date.getFullYear() +
+          pad(date.getMonth() + 1) +
+          pad(date.getDate()) +
+          "T" +
+          pad(date.getHours()) +
+          pad(date.getMinutes()) +
+          "00"
+        );
+      };
+
+      const formattedStart = formatDateTime(startDate);
+      const formattedEnd = formatDateTime(endDate);
+
+      const title = encodeURIComponent(
+        "Mindsphere: 1 to 1 Virtual Coaching Session"
+      );
+      const details = encodeURIComponent("Join your session with Josh Tan.");
+      const location = encodeURIComponent("www.mindsphere.sg");
+
+      const calendarUrl = `https://calendar.google.com/calendar/u/0/r/eventedit?text=${title}&dates=${formattedStart}/${formattedEnd}&details=${details}&location=${location}`;
+      window.open(calendarUrl, "_blank");
     }
   };
 
@@ -193,9 +232,9 @@ function Precoaching() {
                 <strong>Status:</strong> {statusMessage}
               </p>
 
-              <div className="d-flex justify-content-start mt-3">
+              <div className="d-flex justify-content-start gap-3 mt-3">
                 <Button
-                  className="btn btn-warning me-3 px-4 join-button"
+                  className="btn btn-warning px-4 join-button"
                   style={{ fontWeight: 500 }}
                   onClick={() =>
                     handleNavigateToCoaching(bookingData.BookingID)
@@ -211,16 +250,23 @@ function Precoaching() {
                 >
                   Cancel
                 </Button>
+                <Button
+                  className="btn btn-outline-success px-4 calendar-sync-button"
+                  style={{ fontWeight: 500 }}
+                  onClick={handleSyncToGoogleCalendar}
+                >
+                  Add to Google Calendar
+                </Button>
               </div>
             </div>
-            <p
-              className="text-muted text-center mt-3"
-              style={{ fontSize: "0.85rem" }}
-            >
-              <i className="bi bi-info-circle me-1"></i> Only one session may be
-              booked at a time.
-            </p>
           </div>
+          <p
+            className="text-muted text-center mt-3"
+            style={{ fontSize: "0.85rem" }}
+          >
+            <i className="bi bi-info-circle me-1"></i> You can only book one
+            coaching session at a time.
+          </p>
         </>
       ) : (
         <div className="no-bookings text-start">
@@ -236,7 +282,6 @@ function Precoaching() {
         </div>
       )}
 
-      {/* Cancellation Confirmation Modal */}
       <Modal
         show={showCancelModal}
         onHide={() => setShowCancelModal(false)}
