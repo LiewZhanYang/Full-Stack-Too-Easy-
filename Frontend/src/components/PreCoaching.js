@@ -43,6 +43,69 @@ function Precoaching() {
     fetchBookingByAccountID();
   }, []);
 
+  // Dynamically update session status message
+  useEffect(() => {
+    if (bookingData) {
+      console.log("Booking data set, running initial status update");
+      updateStatusMessage();
+      const interval = setInterval(() => {
+        updateStatusMessage();
+      }, 60000); // Update every minute
+      return () => clearInterval(interval);
+    }
+  }, [bookingData]);
+
+  const updateStatusMessage = () => {
+    if (bookingData) {
+      const {
+        Date: bookingDateISO,
+        StartTime: startTimeStr,
+        EndTime: endTimeStr,
+      } = bookingData;
+
+      console.log("Raw Date Value:", bookingDateISO);
+      console.log("Raw Start Time Value:", startTimeStr);
+      console.log("Raw End Time Value:", endTimeStr);
+
+      const baseDate = new Date(bookingDateISO);
+
+      if (!isNaN(baseDate) && startTimeStr && endTimeStr) {
+        const startTimeParts = startTimeStr.split(":").map(Number);
+        const endTimeParts = endTimeStr.split(":").map(Number);
+
+        if (startTimeParts.length >= 2 && endTimeParts.length >= 2) {
+          const startTime = new Date(baseDate);
+          startTime.setHours(startTimeParts[0], startTimeParts[1], 0, 0);
+
+          const endTime = new Date(baseDate);
+          endTime.setHours(endTimeParts[0], endTimeParts[1], 0, 0);
+
+          const now = new Date();
+
+          const timeDifference = (startTime - now) / 60000; // in minutes
+
+          if (now >= startTime && now <= endTime) {
+            setStatusMessage("You can join the meeting now.");
+          } else if (timeDifference > 10) {
+            setStatusMessage("Meeting has not started.");
+          } else if (timeDifference <= 10 && now < startTime) {
+            setStatusMessage("The meeting will start soon. Get ready to join.");
+          } else if (now > endTime) {
+            setStatusMessage("The meeting has ended.");
+          }
+        } else {
+          console.log(
+            "Invalid time format for Start or End time. Expected HH:MM or HH:MM:SS."
+          );
+        }
+      } else {
+        console.log("Invalid base date or missing time data.");
+      }
+    } else {
+      console.log("No booking data available to determine status");
+    }
+  };
+
   // Format time for display
   const formatTime = (time) => {
     const [hours, minutes, seconds] = time.split(":").map(Number);
@@ -90,7 +153,6 @@ function Precoaching() {
         return;
       }
 
-      // Format the date and time
       const deriveDateTime = (date, time) => {
         const [hours, minutes, seconds] = time.split(":").map(Number);
         const derivedDate = new Date(date);
@@ -123,7 +185,6 @@ function Precoaching() {
       const details = encodeURIComponent("Join your session with Josh Tan.");
       const location = encodeURIComponent("www.mindsphere.sg");
 
-      // Create the Google Calendar URL
       const calendarUrl = `https://calendar.google.com/calendar/u/0/r/eventedit?text=${title}&dates=${formattedStart}/${formattedEnd}&details=${details}&location=${location}`;
       window.open(calendarUrl, "_blank");
     }
@@ -199,7 +260,6 @@ function Precoaching() {
               </div>
             </div>
           </div>
-          {/* Message below the card */}
           <p
             className="text-muted text-center mt-3"
             style={{ fontSize: "0.85rem" }}
