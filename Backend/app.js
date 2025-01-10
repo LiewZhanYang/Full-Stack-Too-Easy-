@@ -29,6 +29,7 @@ const uploadRoutes = require("./routes/uploadRoutes");
 const emailRoutes = require("./routes/emailRoutes");
 const meetingRoutes = require("./routes/meetingRoutes");
 const announceRoutes = require("./routes/announcementRoutes")
+const reviewRoutes = require("./routes/reviewRoutes")
 
 app.use("/customer", customerRoutes);
 app.use("/admin", adminRoutes);
@@ -45,6 +46,7 @@ app.use("/upload", uploadRoutes);
 app.use("/email", emailRoutes);
 app.use("/meeting", meetingRoutes);
 app.use("/announcement", announceRoutes);
+app.use("/review", reviewRoutes);
 
 //const testController = require('./controllers/testController');
 
