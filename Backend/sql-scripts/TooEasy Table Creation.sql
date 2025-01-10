@@ -128,6 +128,18 @@ CREATE TABLE Announcement (
     PostedDate DATE NOT NULL
 );
 
+CREATE TABLE Review (
+	ReviewID INT PRIMARY KEY AUTO_INCREMENT,
+    Content VARCHAR(200) NOT NULL,
+    Star INT NOT NULL,
+    Date DATE NOT NULL,
+    AccountID INT NOT NULL,
+    ProgramID INT NOT NULL,
+    
+    FOREIGN KEY (AccountID) REFERENCES Customer(AccountID),
+    FOREIGN KEY (ProgramID) REFERENCES Program(ProgramID)
+);
+
 -- Data Insertion
 USE TooEasyDB;
 
@@ -219,6 +231,13 @@ VALUES
 (2, 'New promotions', 'In lieu of certain events and happenings, new promotions are to be rolled out! Members can await for the arrival soon!', '2024-11-13'),
 (3, 'Christmas Promotion', 'New year new me! Enjoy upcoming promotions that are being pushed out in light of the New Year! Have a happy holidays!', '2023-11-13'),
 (4, 'Halloween Specials', 'Trick or treat! This year halloween is a very special one, for there are more programs that are to be enrolled on how you can spook your competitors!', '2024-10-13');
+
+INSERT INTO Review (ReviewID, Content, Star, Date, AccountID, ProgramID)
+VALUES
+(1, 'This program is awesome! I love it so much!!!', 5, '2025-1-10', 1, 1),
+(2, 'Would enjoy if there were more content that was being taught!! However, overall I enjoyed the program a lot.', 4, '2025-1-10', 2, 1),
+(3, 'I loved this program! After going through it, I felt more confident in my writing and speaking skills!', 5, '2025-1-10', 3, 1),
+(4, 'My son said that he was better prepared for PSLE after going through it, turns out he got all As!!!!', 5, '2025-1-10', 4, 4);
 
 Trigger
 
