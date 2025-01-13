@@ -22,5 +22,6 @@
     "mysql2": "^3.11.3",
     "nodemailer": "^6.9.16",
     "stripe": "^17.5.0"
-  }
+    "node-schedule": "^2.1.1",
+  },
 }
