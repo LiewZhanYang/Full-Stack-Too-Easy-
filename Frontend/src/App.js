@@ -48,6 +48,7 @@ import AdminViewSingleAnnouncement from "./components/AdminViewSingleAnnouncemen
 import StripePayment from "./components/StripePayment.js";
 import CompletePage from "./components/CompletePage.js";
 import "./App.css";
+import "./StripePayment.css";
 
 // Layout component to handle conditional rendering
 function Layout({ children }) {
