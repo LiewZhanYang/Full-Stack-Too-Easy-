@@ -26,7 +26,8 @@ export default function StripePayment() {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             // $50 = amount: 5000 (must multiply by 100)
-            body: JSON.stringify({ amount: amount }),
+            // YOU HAVE TO CHANGE 1000 TO A VARIABLE
+            body: JSON.stringify({ amount: 1000 }),
         })
         .then((res) => res.json())
         .then((data) => setClientSecret(data.clientSecret));
