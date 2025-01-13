@@ -1,5 +1,6 @@
 // models/emailModel.js
 const nodemailer = require("nodemailer");
+const schedule = require("node-schedule");
 
 // Create a transporter using environment variables
 const transporter = nodemailer.createTransport({
@@ -7,6 +8,9 @@ const transporter = nodemailer.createTransport({
   auth: {
     user: process.env.GMAIL_USER, // Your Gmail address from environment variable
     pass: process.env.GMAIL_PASS, // Your Gmail password or App Password from environment variable
+  },
+  tls: {
+    rejectUnauthorized: false, // WARNING: Bypasses SSL validation
   },
 });
 

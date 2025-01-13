@@ -28,8 +28,8 @@ const authController = require("./controllers/authController");
 const uploadRoutes = require("./routes/uploadRoutes");
 const emailRoutes = require("./routes/emailRoutes");
 const meetingRoutes = require("./routes/meetingRoutes");
-const announceRoutes = require("./routes/announcementRoutes")
-const reviewRoutes = require("./routes/reviewRoutes")
+const announceRoutes = require("./routes/announcementRoutes");
+const reviewRoutes = require("./routes/reviewRoutes");
 
 app.use("/customer", customerRoutes);
 app.use("/admin", adminRoutes);
@@ -122,6 +122,17 @@ app.listen(port, async () => {
     process.exit(0); // Exit with code 0 indicating successful shutdown
   });
 });
+const schedule = require("node-schedule");
+
+const testDate = new Date();
+testDate.setMinutes(testDate.getMinutes() + 1); // Schedule 1 minute from now
+
+console.log(`Scheduling task for: ${testDate}`);
+
+schedule.scheduleJob(testDate, () => {
+  console.log("Task executed at:", new Date());
+});
+
 // Past Code
 
 // const customerRoutes = require("./routes/customerRoutes");
