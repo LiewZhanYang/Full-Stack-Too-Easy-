@@ -100,6 +100,38 @@ app.listen(port, async () => {
 });
 */
 
+// Stripe Implementation 
+
+// This is your test secret API key.
+const stripe = require("stripe")('sk_test_51QRx0kG1MaTqtP83Z47pxbPyInBiDQ9bBfhbePUsWSYXq4q3C2ouNE9jv3r90GAzPDYOAKoHUkvPvKcCwLkAmIpL00zMovbfi2');
+
+app.post("/create-payment-intent", async (req, res) => {
+  const amount = req.body.amount;
+
+  // Create a PaymentIntent with the order amount and currency
+  const paymentIntent = await stripe.paymentIntents.create({
+    amount: amount,
+    currency: "sgd",
+    // In the latest version of the API, specifying the `automatic_payment_methods` parameter is optional because Stripe enables its functionality by default.
+    automatic_payment_methods: {
+      enabled: true,
+    },
+  });
+
+  res.send({
+    clientSecret: paymentIntent.client_secret,
+  });
+});
+
+// // Invoke this method in your webhook handler when `payment_intent.succeeded` webhook is received
+// const handlePaymentIntentSucceeded = async (paymentIntent) => {
+//   // Create a Tax Transaction for the successful payment
+//   stripe.tax.transactions.createFromCalculation({
+//     calculation: paymentIntent.metadata['tax_calculation'],
+//     reference: 'myOrder_123', // Replace with a unique reference from your checkout/order system
+//   });
+// };
+
 app.listen(port, async () => {
   let connection;
   try {
