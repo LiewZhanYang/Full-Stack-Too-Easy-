@@ -169,13 +169,15 @@ const AdminViewWebinars = () => {
       </Row>
 
       {/* Create Webinar Button */}
-      <Button
-        variant="success"
-        className="admin-create-webinar-button d-flex align-items-center"
-        onClick={handleCreateWebinarClick}
-      >
-        <FaPlus className="me-1" /> <span>Create Webinar</span>
-      </Button>
+      <div className="mt-4">
+        <Button
+          variant="success"
+          className="admin-create-webinar-button d-flex align-items-center"
+          onClick={handleCreateWebinarClick}
+        >
+          <FaPlus className="me-1" /> <span>Create Webinar</span>
+        </Button>
+      </div>
 
       {/* Delete Confirmation Modal */}
       <Modal
