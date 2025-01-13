@@ -45,7 +45,10 @@ import AdminCreateAnnouncement from "./components/AdminCreateAnnouncement.js";
 import AdminViewAnnouncement from "./components/AdminViewAnnouncement.js";
 import AdminEditAnnouncement from "./components/AdminEditAnnouncement.js"; // Import the componen
 import AdminViewSingleAnnouncement from "./components/AdminViewSingleAnnouncement";
+import StripePayment from "./components/StripePayment.js";
+import CompletePage from "./components/CompletePage.js";
 import "./App.css";
+import "./StripePayment.css";
 
 // Layout component to handle conditional rendering
 function Layout({ children }) {
@@ -109,6 +112,8 @@ function App() {
                   <Route path="/preCoaching" element={<PreCoaching />} />
                   <Route path="/coaching/:id" element={<Coaching />} />
                   <Route path="/chatbot" element={<Chatbot />} />
+                  <Route path="/stripepayment" element={<StripePayment />} />
+                  <Route path="/complete" element={<CompletePage />} />          
                   {/* Admin routes */}
                   <Route path="/adminhome" element={<AdminHome />} />
                   <Route
