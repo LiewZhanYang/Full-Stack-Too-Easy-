@@ -1,14 +1,13 @@
 import React, { useState, useEffect } from "react";
-import { Container, Form, Card, Button, Modal } from "react-bootstrap";
-import axios from "axios";
+import { Container, Row, Col, Nav, Card, Button, Modal } from "react-bootstrap";
 import { FaEye, FaEdit, FaTrash } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 const AdminViewAnnouncement = () => {
   const navigate = useNavigate();
   const [announcements, setAnnouncements] = useState([]);
-  const [sortedAnnouncements, setSortedAnnouncements] = useState([]);
-  const [sortOption, setSortOption] = useState("Latest");
+  const [activeTab, setActiveTab] = useState("active");
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [announcementToDelete, setAnnouncementToDelete] = useState(null);
 
@@ -16,7 +15,6 @@ const AdminViewAnnouncement = () => {
     try {
       const response = await axios.get("http://localhost:8000/announcement/");
       setAnnouncements(response.data);
-      setSortedAnnouncements(response.data);
     } catch (error) {
       console.error("Error fetching announcements:", error);
     }
@@ -34,11 +32,8 @@ const AdminViewAnnouncement = () => {
   const confirmDelete = async () => {
     if (announcementToDelete) {
       try {
-        await axios.delete(
-          `http://localhost:8000/announcement/${announcementToDelete}`
-        );
+        await axios.delete(`http://localhost:8000/announcement/${announcementToDelete}`);
         alert("Announcement deleted successfully");
-
         fetchAnnouncements();
         setShowConfirmModal(false);
         setAnnouncementToDelete(null);
@@ -57,80 +52,127 @@ const AdminViewAnnouncement = () => {
     navigate(`/admin-edit-announcement/${id}`);
   };
 
-  const handleSortChange = (event) => {
-    const option = event.target.value;
-    setSortOption(option);
-    sortAnnouncements(option);
+  const handleTabSelect = (selectedTab) => {
+    setActiveTab(selectedTab);
   };
 
-  const sortAnnouncements = (option) => {
-    let sorted = [...announcements];
-    if (option === "Month") {
-      sorted.sort(
-        (a, b) =>
-          new Date(a.PostedDate).getMonth() - new Date(b.PostedDate).getMonth()
+  const filterAnnouncements = () => {
+    const currentDate = new Date();
+    if (activeTab === "active") {
+      return announcements.filter(
+        (announcement) => new Date(announcement.PostedDate) >= currentDate
       );
-    } else if (option === "Year") {
-      sorted.sort(
-        (a, b) =>
-          new Date(b.PostedDate).getFullYear() -
-          new Date(a.PostedDate).getFullYear()
+    } else if (activeTab === "past") {
+      return announcements.filter(
+        (announcement) => new Date(announcement.PostedDate) < currentDate
       );
     }
-    setSortedAnnouncements(sorted);
+    return announcements;
+  };
+
+  const renderAnnouncements = () => {
+    const filteredAnnouncements = filterAnnouncements();
+
+    if (activeTab === "active" && filteredAnnouncements.length === 0) {
+      return <p ><br></br>No upcoming announcements.</p>;
+    }
+
+    return filteredAnnouncements.map((announcement) => (
+      <Card
+        key={announcement.AnnouncementID}
+        className="admin-payment-card mb-3 p-3"
+        style={{ cursor: "pointer" }}
+      >
+        <Card.Body>
+          <Card.Title className="admin-payment-order-id">{announcement.Title}</Card.Title>
+          <Card.Text className="admin-payment-text">{new Date(announcement.PostedDate).toLocaleDateString()}</Card.Text>
+          <div className="d-flex justify-content-between align-items-center">
+            <Card.Text>ID: {announcement.AnnouncementID}</Card.Text>
+            <div className="d-flex gap-2">
+              <Button
+                variant="light"
+                className="d-flex align-items-center"
+                onClick={() => handleViewClick(announcement.AnnouncementID)}
+              >
+                <FaEye className="me-1" /> View
+              </Button>
+              <Button
+                variant="light"
+                className="d-flex align-items-center"
+                onClick={() => handleEditClick(announcement.AnnouncementID)}
+              >
+                <FaEdit className="me-1" /> Edit
+              </Button>
+              <Button
+                variant="danger"
+                className="d-flex align-items-center"
+                onClick={() => handleDeleteClick(announcement.AnnouncementID)}
+              >
+                <FaTrash className="me-1" /> Delete
+              </Button>
+            </div>
+          </div>
+        </Card.Body>
+      </Card>
+    ));
   };
 
   return (
-    <Container fluid className="admin-announcements-page p-4">
-      <h2 className="precoaching-title">Announcements</h2>
-      <div className="d-flex justify-content-between align-items-center mb-4">
-        <span style={{ fontSize: "0.9em" }}>Sort by:</span>
-        <Form.Select
-          value={sortOption}
-          onChange={handleSortChange}
-          className="sort-select"
-          style={{ width: "200px" }}
-        >
-          <option value="Latest">Latest</option>
-          <option value="Month">Month</option>
-          <option value="Year">Year</option>
-        </Form.Select>
-      </div>
+    <Container fluid className="admin-payments-page p-4">
+      <h2 className="admin-payments-title">Announcements</h2>
+      <hr className="admin-payments-divider mb-4" />
 
-      {sortedAnnouncements.map((announcement) => (
-        <Card key={announcement.AnnouncementID} className="mb-3 shadow-sm text-start">
-          <Card.Body>
-            <Card.Title>{announcement.Title}</Card.Title>
-            <Card.Text>{new Date(announcement.PostedDate).toLocaleDateString()}</Card.Text>
-            <div className="d-flex justify-content-between align-items-center">
-              <Card.Text className="mb-0">ID: {announcement.AnnouncementID}</Card.Text>
-              <div className="d-flex gap-2">
-                <Button
-                  variant="light"
-                  className="d-flex align-items-center"
-                  onClick={() => handleViewClick(announcement.AnnouncementID)}
-                >
-                  <FaEye className="me-1" /> View
-                </Button>
-                <Button
-                  variant="light"
-                  className="d-flex align-items-center"
-                  onClick={() => handleEditClick(announcement.AnnouncementID)}
-                >
-                  <FaEdit className="me-1" /> Edit
-                </Button>
-                <Button
-                  variant="danger"
-                  className="d-flex align-items-center"
-                  onClick={() => handleDeleteClick(announcement.AnnouncementID)}
-                >
-                  <FaTrash className="me-1" /> Delete
-                </Button>
-              </div>
-            </div>
-          </Card.Body>
-        </Card>
-      ))}
+      {/* Tabs for Active and Past Announcements */}
+      <Nav
+        variant="tabs"
+        activeKey={activeTab}
+        onSelect={handleTabSelect}
+        className="mb-3"
+        style={{
+          display: "flex",
+          justifyContent: "flex-start",
+          borderBottom: "2px solid #e5e7eb",
+        }}
+      >
+        <Nav.Item>
+          <Nav.Link
+            eventKey="active"
+            className="admin-payments-tab"
+            style={{
+              color: activeTab === "active" ? "#f59e0b" : "#6b7280",
+              fontWeight: activeTab === "active" ? "bold" : "normal",
+              padding: "10px 20px",
+              textAlign: "center",
+              borderBottom: activeTab === "active" ? "2px solid #f59e0b" : "2px solid transparent",
+              cursor: "pointer",
+              transition: "color 0.3s ease, border-bottom-color 0.3s ease",
+            }}
+          >
+            Active
+          </Nav.Link>
+        </Nav.Item>
+        <Nav.Item>
+          <Nav.Link
+            eventKey="past"
+            className="admin-payments-tab"
+            style={{
+              color: activeTab === "past" ? "#f59e0b" : "#6b7280",
+              fontWeight: activeTab === "past" ? "bold" : "normal",
+              padding: "10px 20px",
+              textAlign: "center",
+              borderBottom: activeTab === "past" ? "2px solid #f59e0b" : "2px solid transparent",
+              cursor: "pointer",
+              transition: "color 0.3s ease, border-bottom-color 0.3s ease",
+            }}
+          >
+            Past
+          </Nav.Link>
+        </Nav.Item>
+      </Nav>
+
+      <Row>
+        <Col>{renderAnnouncements()}</Col>
+      </Row>
 
       {/* Delete Confirmation Modal */}
       <Modal
@@ -148,10 +190,7 @@ const AdminViewAnnouncement = () => {
           <Button variant="danger" onClick={confirmDelete}>
             Delete
           </Button>
-          <Button
-            variant="secondary"
-            onClick={() => setShowConfirmModal(false)}
-          >
+          <Button variant="secondary" onClick={() => setShowConfirmModal(false)}>
             Cancel
           </Button>
         </Modal.Footer>
