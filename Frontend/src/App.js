@@ -10,6 +10,7 @@ import { AppProvider } from "./AppContext";
 import Sidebar from "./components/Sidebar";
 import Header from "./components/Header";
 import Dashboard from "./components/Dashboard.js";
+import Workshops from "./components/Workshops.js";
 import WorkshopPrice from "./components/WorkshopPrice.js";
 import Camps from "./components/Camps";
 import Labs from "./components/Labs";
@@ -92,6 +93,7 @@ function App() {
                   />
                   {/* Main routes */}
                   <Route path="/dashboard" element={<Dashboard />} />
+                  <Route path="/workshops" element={<Workshops />} />
                   <Route path="/workshopPrice" element={<WorkshopPrice />} />
                   <Route path="/payment" element={<Payment />} />
                   <Route path="/camps" element={<Camps />} />
