@@ -103,6 +103,33 @@ class Program {
     });
   }
 
+  static async getProgramsByType(typeID) {
+    const connection = await mysql.createConnection(dbConfig);
+    const sqlQuery = `
+      SELECT * FROM program WHERE TypeID = ?
+    `;
+    const [rows] = await connection.execute(sqlQuery, [typeID]);
+    connection.end();
+
+    if (rows.length === 0) {
+      return [];
+    }
+
+    return rows.map((row) => {
+      return new Program(
+        row.ProgramID,
+        row.ProgramName,
+        row.ProgramDesc,
+        row.Cost,
+        row.DiscountedCost,
+        row.LunchProvided,
+        row.Duration,
+        row.ClassSize,
+        row.TypeID
+      );
+    });
+  }
+
   static async postProgram(programDetails) {
     let connection;
     try {

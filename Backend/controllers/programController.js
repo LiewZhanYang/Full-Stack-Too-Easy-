@@ -143,11 +143,26 @@ const deleteProgram = async (req, res) => {
   }
 }
 
+const getProgramsByProgramType = async (req, res) => {
+  const { typeID } = req.params;
+  try {
+    const programs = await Program.getProgramsByType(typeID);
+    if (!programs || programs.length === 0) {
+      return res.status(404).json({ message: "No programs found for this type" });
+    }
+    res.json(programs);
+  } catch (error) {
+    console.error("Error retrieving programs by type:", error);
+    res.status(500).json({ message: "Error retrieving programs by type" });
+  }
+};
+
 module.exports = {
   getAllPrograms,
   postProgram,
   updateProgram,
   getProgramById,
   getProgramBySignUp,
-  deleteProgram
+  deleteProgram,
+  getProgramsByProgramType
 };
