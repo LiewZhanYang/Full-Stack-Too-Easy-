@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from "react";
-import { Container, Row, Col, Card, Button } from "react-bootstrap";
+import { Container, Row, Col, Card, Button, Nav } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 
 const AdminViewBooking = () => {
   const [bookings, setBookings] = useState([]);
+  const [activeTab, setActiveTab] = useState("upcoming");
   const navigate = useNavigate();
 
   // Fetch all bookings from backend
@@ -32,6 +33,19 @@ const AdminViewBooking = () => {
     fetchBookings();
   }, []);
 
+  // Filter bookings based on the active tab
+  const filterBookings = () => {
+    const currentDate = new Date();
+    if (activeTab === "upcoming") {
+      return bookings.filter(
+        (booking) => new Date(booking.Date) >= currentDate
+      );
+    } else if (activeTab === "past") {
+      return bookings.filter((booking) => new Date(booking.Date) < currentDate);
+    }
+    return bookings;
+  };
+
   // Navigate directly to AdminCoaching page for the specific booking
   const handleStartCoaching = (bookingID) => {
     navigate(`/admin-coaching/${bookingID}`);
@@ -50,7 +64,13 @@ const AdminViewBooking = () => {
   };
 
   const renderBookings = () => {
-    return bookings.map((booking) => (
+    const filteredBookings = filterBookings();
+
+    if (filteredBookings.length === 0) {
+      return <p className="text-muted text-center">No bookings available</p>;
+    }
+
+    return filteredBookings.map((booking) => (
       <Card
         key={booking.BookingID}
         className="admin-booking-card mb-3 p-3"
@@ -67,26 +87,28 @@ const AdminViewBooking = () => {
             Time: {formatTime(booking.StartTime)} -{" "}
             {formatTime(booking.EndTime)}
           </Card.Text>
-          <Button
-            onClick={() => handleStartCoaching(booking.BookingID)}
-            style={{
-              backgroundColor: "#fbbf24",
-              color: "black",
-              borderRadius: "8px",
-              padding: "8px 16px",
-              fontSize: "14px",
-              fontWeight: "500",
-              textDecoration: "none",
-              transition: "background-color 0.2s ease-in-out",
-              cursor: "pointer",
-              border: "none",
-              marginTop: "20px",
-            }}
-            onMouseOver={(e) => (e.target.style.backgroundColor = "#f59e0b")}
-            onMouseOut={(e) => (e.target.style.backgroundColor = "#fbbf24")}
-          >
-            Start Coaching
-          </Button>
+          {activeTab === "upcoming" && (
+            <Button
+              onClick={() => handleStartCoaching(booking.BookingID)}
+              style={{
+                backgroundColor: "#fbbf24",
+                color: "black",
+                borderRadius: "8px",
+                padding: "8px 16px",
+                fontSize: "14px",
+                fontWeight: "500",
+                textDecoration: "none",
+                transition: "background-color 0.2s ease-in-out",
+                cursor: "pointer",
+                border: "none",
+                marginTop: "20px",
+              }}
+              onMouseOver={(e) => (e.target.style.backgroundColor = "#f59e0b")}
+              onMouseOut={(e) => (e.target.style.backgroundColor = "#fbbf24")}
+            >
+              Start Coaching
+            </Button>
+          )}
         </Card.Body>
       </Card>
     ));
@@ -95,7 +117,61 @@ const AdminViewBooking = () => {
   return (
     <Container fluid className="admin-bookings-page p-4">
       <h2 className="precoaching-title">All Bookings</h2>
-      <br />
+
+      {/* Tabs for Upcoming and Past Bookings */}
+      <Nav
+        variant="tabs"
+        activeKey={activeTab}
+        onSelect={(selectedTab) => setActiveTab(selectedTab)}
+        className="mb-3"
+        style={{
+          display: "flex",
+          justifyContent: "flex-start",
+          borderBottom: "2px solid #e5e7eb",
+        }}
+      >
+        <Nav.Item>
+          <Nav.Link
+            eventKey="upcoming"
+            className="admin-bookings-tab"
+            style={{
+              color: activeTab === "upcoming" ? "#f59e0b" : "#6b7280",
+              fontWeight: activeTab === "upcoming" ? "bold" : "normal",
+              padding: "10px 20px",
+              textAlign: "center",
+              borderBottom:
+                activeTab === "upcoming"
+                  ? "2px solid #f59e0b"
+                  : "2px solid transparent",
+              cursor: "pointer",
+              transition: "color 0.3s ease, border-bottom-color 0.3s ease",
+            }}
+          >
+            Upcoming
+          </Nav.Link>
+        </Nav.Item>
+        <Nav.Item>
+          <Nav.Link
+            eventKey="past"
+            className="admin-bookings-tab"
+            style={{
+              color: activeTab === "past" ? "#f59e0b" : "#6b7280",
+              fontWeight: activeTab === "past" ? "bold" : "normal",
+              padding: "10px 20px",
+              textAlign: "center",
+              borderBottom:
+                activeTab === "past"
+                  ? "2px solid #f59e0b"
+                  : "2px solid transparent",
+              cursor: "pointer",
+              transition: "color 0.3s ease, border-bottom-color 0.3s ease",
+            }}
+          >
+            Past
+          </Nav.Link>
+        </Nav.Item>
+      </Nav>
+
       <Row>
         <Col>{renderBookings()}</Col>
       </Row>
