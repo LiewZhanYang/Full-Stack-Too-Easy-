@@ -70,6 +70,7 @@ CREATE TABLE Session (
     Time TIME NOT NULL,
     Location VARCHAR(100) NOT NULL,
 	Vacancy INT NOT NULL DEFAULT 0,
+    Status ENUM('Active', 'Cancelled') NOT NULL DEFAULT 'Active',
     ProgramID INT, 
     
     FOREIGN KEY (ProgramID) REFERENCES Program(ProgramID)
@@ -308,4 +309,41 @@ BEGIN
     WHERE SessionID = OLD.SessionID;
 END;
 //
+DELIMITER ;
+
+DELIMITER //
+
+CREATE TRIGGER reassign_session
+AFTER UPDATE ON Session
+FOR EACH ROW
+BEGIN
+	DECLARE v_NextSessionID INT;
+    
+    -- Call the procedure and assign the output to the variable
+	CALL GetNextSessionID(OLD.StartDate, OLD.ProgramID, @v_NextSessionID); 
+
+	UPDATE SignUp
+	SET SessionID = @v_NextSessionID
+	WHERE SessionID = OLD.SessionID;
+
+END;
+//
+
+DELIMITER ;
+
+DELIMITER //
+
+CREATE PROCEDURE GetNextSessionID(
+    IN p_StartDate DATE,
+    IN p_ProgramID INT,
+    OUT p_NextSessionID INT
+)
+BEGIN
+    SELECT SessionID
+    INTO p_NextSessionID
+	FROM Session
+	WHERE p_ProgramID AND StartDate > p_StartDate
+	LIMIT 1;
+END //
+
 DELIMITER ;
