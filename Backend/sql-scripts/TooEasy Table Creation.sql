@@ -70,6 +70,7 @@ CREATE TABLE Session (
     Time TIME NOT NULL,
     Location VARCHAR(100) NOT NULL,
 	Vacancy INT NOT NULL DEFAULT 0,
+    Status ENUM('Active', 'Cancelled') NOT NULL DEFAULT 'Active',
     ProgramID INT, 
     
     FOREIGN KEY (ProgramID) REFERENCES Program(ProgramID)

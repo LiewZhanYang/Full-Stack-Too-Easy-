@@ -2,13 +2,14 @@ const dbConfig = require("../dbConfig");
 const mysql = require("mysql2/promise");
 
 class Session {
-  constructor(SessionID, StartDate, EndDate, Time, Location, Vacancy, ProgramID) {
+  constructor(SessionID, StartDate, EndDate, Time, Location, Vacancy, Status ,ProgramID) {
     this.SessionID = SessionID;
     this.StartDate = StartDate;
     this.EndDate = EndDate;
     this.Time = Time;
     this.Location = Location;
     this.Vacancy = Vacancy;
+    this.Status = Status;
     this.ProgramID = ProgramID;
   }
 
@@ -29,6 +30,7 @@ class Session {
         row.Time,
         row.Location,
         row.Vacancy,
+        row.Status,
         row.ProgramID
       );
     });
@@ -59,7 +61,7 @@ class Session {
 
     const sqlQuery = `
             UPDATE session 
-            SET StartDate = ?, EndDate = ?, Time = ?, Location = ?
+            SET StartDate = ?, EndDate = ?, Time = ?, Location = ?, Status = ?
             WHERE sessionID = ?
         `;
 
@@ -68,6 +70,7 @@ class Session {
       SessionDetails.EndDate,
       SessionDetails.Time,
       SessionDetails.Location,
+      SessionDetails.Status,
       SessionID,
     ];
 
@@ -108,6 +111,7 @@ class Session {
       row.Time,
       row.Location,
       row.Vacancy,
+      row.Status,
       row.ProgramID
     );
   }
