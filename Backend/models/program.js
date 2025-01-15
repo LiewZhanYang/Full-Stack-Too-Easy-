@@ -6,21 +6,11 @@ class Program {
     ProgramID,
     ProgrameName,
     ProgramDesc,
-    Cost,
-    DiscountedCost,
-    LunchProvided,
-    Duration,
-    ClassSize,
     TypeID
   ) {
     this.ProgramID = ProgramID;
     this.ProgrameName = ProgrameName;
     this.ProgramDesc = ProgramDesc;
-    this.LunchProvided = LunchProvided;
-    this.Duration = Duration;
-    this.ClassSize = ClassSize;
-    this.Cost = Cost;
-    this.DiscountedCost = DiscountedCost;
     this.TypeID = TypeID;
   }
 
@@ -41,43 +31,33 @@ class Program {
       row.ProgramID,
       row.ProgramName,
       row.ProgramDesc,
-      row.Cost,
-      row.DiscountedCost,
-      row.LunchProvided,
-      row.Duration,
-      row.ClassSize,
       row.TypeID
     );
   }
 
-  static async getProgramBySignUp(AccountID) {
-    const connection = await mysql.createConnection(dbConfig);
-    const sqlQuery = `
-        SELECT * FROM Program WHERE ProgramID IN (
-        SELECT ProgramID FROM Session 
-        WHERE SessionID IN (SELECT SessionID FROM SignUp WHERE AccountID = ?));
-    `;
-    const [rows] = await connection.execute(sqlQuery, [AccountID]);
-    connection.end();
+  // static async getProgramBySignUp(AccountID) {
+  //   const connection = await mysql.createConnection(dbConfig);
+  //   const sqlQuery = `
+  //       SELECT * FROM Program WHERE ProgramID IN (
+  //       SELECT ProgramID FROM Session 
+  //       WHERE SessionID IN (SELECT SessionID FROM SignUp WHERE AccountID = ?));
+  //   `;
+  //   const [rows] = await connection.execute(sqlQuery, [AccountID]);
+  //   connection.end();
 
-    if (rows.length === 0) {
-      return null; // Return null if no program found with the given ID
-    }
+  //   if (rows.length === 0) {
+  //     return null; // Return null if no program found with the given ID
+  //   }
 
-    return rows.map((row) => {
-      return new Program(
-        row.ProgramID,
-        row.ProgramName,
-        row.ProgramDesc,
-        row.Cost,
-        row.DiscountedCost,
-        row.LunchProvided,
-        row.Duration,
-        row.ClassSize,
-        row.TypeID
-      );
-    });
-  }
+  //   return rows.map((row) => {
+  //     return new Program(
+  //       row.ProgramID,
+  //       row.ProgramName,
+  //       row.ProgramDesc,
+  //       row.TypeID
+  //     );
+  //   });
+  // }
 
   static async getAllPrograms() {
     const connection = await mysql.createConnection(dbConfig);
@@ -93,11 +73,6 @@ class Program {
         row.ProgramID,
         row.ProgramName,
         row.ProgramDesc,
-        row.Cost,
-        row.DiscountedCost,
-        row.LunchProvided,
-        row.Duration,
-        row.ClassSize,
         row.TypeID
       );
     });
@@ -108,16 +83,12 @@ class Program {
     try {
       connection = await mysql.createConnection(dbConfig);
       const sqlQuery = `
-      INSERT INTO program (ProgramName, ProgramDesc, Cost, LunchProvided, Duration, ClassSize, TypeID)
-      VALUES (?, ?, ?, ?, ?, ?, ?)
+      INSERT INTO program (ProgramName, ProgramDesc, TypeID)
+      VALUES (?, ?, ?)
     `;
       const values = [
         programDetails.ProgramName,
         programDetails.ProgramDesc,
-        programDetails.Cost,
-        programDetails.LunchProvided,
-        programDetails.Duration,
-        programDetails.ClassSize,
         programDetails.TypeID,
       ];
 

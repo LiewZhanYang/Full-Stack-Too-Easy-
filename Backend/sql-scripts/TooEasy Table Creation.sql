@@ -39,17 +39,29 @@ CREATE TABLE ProgramType (
 );
 
 CREATE TABLE Program (
-	ProgramID INT PRIMARY KEY AUTO_INCREMENT,
-    ProgramName  VARCHAR(50) NOT NULL,
+    ProgramID INT PRIMARY KEY AUTO_INCREMENT,
+    ProgramName VARCHAR(50) NOT NULL,
     ProgramDesc VARCHAR(100) NOT NULL,
+    TypeID INT NOT NULL,
+    FOREIGN KEY (TypeID) REFERENCES ProgramType(TypeID)
+);
+
+CREATE TABLE Tier (
+    TierID INT PRIMARY KEY AUTO_INCREMENT,
+    Name VARCHAR(100) NOT NULL,
+    ClassSize INT NOT NULL,
     Cost INT NOT NULL,
     DiscountedCost INT NOT NULL DEFAULT 0,
-    LunchProvided BOOL NOT NULL,
-    Duration INT NOT NULL,
-    ClassSize INT NOT NULL,
-    TypeID INT NOT NULL,
-    
-    FOREIGN KEY (TypeID) REFERENCES ProgramType(TypeID)
+    LunchProvided BOOLEAN,
+    Duration INT NOT NULL
+);
+
+CREATE TABLE ProgramTier (
+    ProgramID INT,
+    TierID INT,
+    PRIMARY KEY (ProgramID, TierID),
+    FOREIGN KEY (ProgramID) REFERENCES Program(ProgramID),
+    FOREIGN KEY (TierID) REFERENCES Tier(TierID)
 );
 
 CREATE TABLE Webinar (
@@ -71,9 +83,9 @@ CREATE TABLE Session (
     Location VARCHAR(100) NOT NULL,
 	Vacancy INT NOT NULL DEFAULT 0,
     Status ENUM('Active', 'Cancelled') NOT NULL DEFAULT 'Active',
-    ProgramID INT, 
+    TierID INT, 
     
-    FOREIGN KEY (ProgramID) REFERENCES Program(ProgramID)
+    FOREIGN KEY (TierID) REFERENCES Tier(TierID)
 );
 
 CREATE TABLE Lunch (
@@ -173,13 +185,26 @@ VALUES
 (3, 'Labs'),
 (4, 'Professional');
 
-INSERT INTO Program (ProgramName, ProgramDesc, Cost, DiscountedCost, LunchProvided, Duration, ClassSize, TypeID)
+INSERT INTO Tier (Name, ClassSize, Cost, DiscountedCost, LunchProvided, Duration) 
+VALUES 
+('Beginner', 15, 788, 709.2, TRUE, 8),
+('Intermediate', 10, 988, 889.2, TRUE, 15),
+('Advanced', 10, 1388, 1249.2, TRUE, 10),
+('PSLE Power Up', 15, 388, 349.2, FALSE, 20),
+('PSLE Chinese Oral Booster', 10, 488, 439.2, FALSE, 15); 
+
+INSERT INTO Program (ProgramName, ProgramDesc, TypeID)
 VALUES
-('Public Speaking Workshop - Beginner', 'Learn the basics of public speaking', 788, 709.2, TRUE, 8, 15, 1),
-('Public Speaking Workshop - Intermediate', 'Improve your public speaking skills', 988, 889.2, TRUE, 8, 15, 1),
-('Public Speaking Workshop - Advanced', 'Master the art of public speaking', 1388, 1249.2, TRUE, 8, 10, 1),
-('PSLE Power Up Camp - PSLE Power Up', 'Comprehensive PSLE revision', 388, 349.2, FALSE, 2, 20, 2),
-('PSLE Power Up Camp - PSLE Chinese Oral Booster', 'Boost your Chinese oral skills', 488, 439.2, FALSE, 2, 15, 2);
+('Public Speaking Workshop', 'Learn the basics of public speaking', 1),
+('PSLE Power Up Camp - PSLE Power Up', 'Comprehensive PSLE revision', 2);
+
+INSERT INTO ProgramTier 
+VALUES
+	(1, 1),
+    (1, 2),
+    (1, 3),
+    (2, 4),
+    (2, 5);
 
 INSERT INTO Webinar (WebinarName, WebinarDesc, Link, Date, StartTime, EndTime, Speaker)
 VALUES
@@ -189,7 +214,7 @@ VALUES
 ('AI and Machine Learning', 'Explore the world of artificial intelligence and machine learning', 'https://www.machinelearningmastery.com/', '2024-12-04', '14:00:00', '16:00:00', 'Ms. AI'),
 ('Cybersecurity Basics', 'Learn how to protect your digital assets', 'https://www.cybersecurityventures.com/', '2024-12-11', '11:00:00', '13:00:00', 'Captain Cyber');
 
-INSERT INTO Session (SessionID, StartDate, EndDate, Time, Location, Vacancy, ProgramID)
+INSERT INTO Session (SessionID, StartDate, EndDate, Time, Location, Vacancy, TierID)
 VALUES
 (1, '2025-01-04', '2025-01-05', '10:00:00', 'Auditorium A', 15, 1),
 (2, '2025-07-11', '2025-07-12', '14:00:00', 'Classroom B', 15, 1),
@@ -238,7 +263,7 @@ VALUES
 (1, 'This program is awesome! I love it so much!!!', 5, '2025-1-10', 1, 1),
 (2, 'Would enjoy if there were more content that was being taught!! However, overall I enjoyed the program a lot.', 4, '2025-1-10', 2, 1),
 (3, 'I loved this program! After going through it, I felt more confident in my writing and speaking skills!', 5, '2025-1-10', 3, 1),
-(4, 'My son said that he was better prepared for PSLE after going through it, turns out he got all As!!!!', 5, '2025-1-10', 4, 4);
+(4, 'My son said that he was better prepared for PSLE after going through it, turns out he got all As!!!!', 5, '2025-1-10', 4, 2);
 
 Trigger
 
@@ -267,7 +292,7 @@ DELIMITER ;
 -- Add Discount Cost On Insertion
 DELIMITER //
 CREATE TRIGGER update_discount_cost
-BEFORE INSERT ON Program
+BEFORE INSERT ON Tier
 FOR EACH ROW
 BEGIN
     SET NEW.DiscountedCost = NEW.Cost * 0.9;
@@ -278,7 +303,7 @@ DELIMITER ;
 -- Update Discount Cost on Update
 DELIMITER //
 CREATE TRIGGER update_discount_cost_on_update
-BEFORE UPDATE ON Program
+BEFORE UPDATE ON Tier
 FOR EACH ROW
 BEGIN
     SET NEW.DiscountedCost = NEW.Cost * 0.9;
@@ -320,7 +345,7 @@ BEGIN
 	DECLARE v_NextSessionID INT;
     
     -- Call the procedure and assign the output to the variable
-	CALL GetNextSessionID(OLD.StartDate, OLD.ProgramID, @v_NextSessionID); 
+	CALL GetNextSessionID(OLD.StartDate, OLD.TierID, @v_NextSessionID); 
 
 	UPDATE SignUp
 	SET SessionID = @v_NextSessionID
@@ -335,15 +360,56 @@ DELIMITER //
 
 CREATE PROCEDURE GetNextSessionID(
     IN p_StartDate DATE,
-    IN p_ProgramID INT,
+    IN p_TierID INT,
     OUT p_NextSessionID INT
 )
 BEGIN
     SELECT SessionID
     INTO p_NextSessionID
 	FROM Session
-	WHERE p_ProgramID AND StartDate > p_StartDate
+	WHERE p_TierID AND StartDate > p_StartDate
 	LIMIT 1;
+END //
+
+DELIMITER ;
+
+DELIMITER //
+
+CREATE PROCEDURE DeleteTier(IN p_TierID INT)
+BEGIN
+    -- Delete associated entries in ProgramTier
+    DELETE FROM ProgramTier 
+    WHERE TierID = p_TierID;
+
+    -- Delete the Tier
+    DELETE FROM Tier 
+    WHERE TierID = p_TierID;
+END //
+
+DELIMITER ;
+
+DELIMITER //
+
+CREATE PROCEDURE CreateTier(
+	IN p_ProgramID INT,
+	IN p_Name VARCHAR(100),
+    IN p_ClassSize INT,
+    IN p_Cost INT,
+    IN p_DiscountedCost INT,
+    IN p_LunchProvided BOOLEAN,
+    IN p_Duration INT
+)
+BEGIN
+    -- Insert a new Tier
+    INSERT INTO Tier (Name, ClassSize, Cost, DiscountedCost, LunchProvided, Duration)
+    VALUES (p_Name, p_ClassSize, p_Cost, p_DiscountedCost, p_LunchProvided, p_Duration);
+
+    -- Get the newly inserted TierID
+    SET @new_TierID := LAST_INSERT_ID();
+
+    -- Insert a record into ProgramTier
+    INSERT INTO ProgramTier (ProgramID, TierID)
+    VALUES (p_ProgramID, @new_TierID); 
 END //
 
 DELIMITER ;

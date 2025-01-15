@@ -2,7 +2,7 @@ const dbConfig = require("../dbConfig");
 const mysql = require("mysql2/promise");
 
 class Session {
-  constructor(SessionID, StartDate, EndDate, Time, Location, Vacancy, Status ,ProgramID) {
+  constructor(SessionID, StartDate, EndDate, Time, Location, Vacancy, Status ,TierID) {
     this.SessionID = SessionID;
     this.StartDate = StartDate;
     this.EndDate = EndDate;
@@ -10,16 +10,16 @@ class Session {
     this.Location = Location;
     this.Vacancy = Vacancy;
     this.Status = Status;
-    this.ProgramID = ProgramID;
+    this.TierID = TierID;
   }
 
-  static async getSessionsByProgramID(ProgramID) {
+  static async getSessionsByTierID(TierID) {
     const connection = await mysql.createConnection(dbConfig);
 
     const sqlQuery = `
-        SELECT * FROM session WHERE ProgramID = ? AND StartDate > CURDATE()
+        SELECT * FROM session WHERE TierID = ? AND StartDate > CURDATE()
         `;
-    const [result] = await connection.execute(sqlQuery, [ProgramID]);
+    const [result] = await connection.execute(sqlQuery, [TierID]);
 
     connection.end();
     return result.map((row) => {
@@ -31,7 +31,7 @@ class Session {
         row.Location,
         row.Vacancy,
         row.Status,
-        row.ProgramID
+        row.TierID
       );
     });
   }
@@ -39,7 +39,7 @@ class Session {
   static async postSession(sessionDetails) {
     const connection = await mysql.createConnection(dbConfig);
     const sqlQuery = `
-            INSERT INTO session (StartDate, EndDate, Time, Location, Vacancy, ProgramID)
+            INSERT INTO session (StartDate, EndDate, Time, Location, Vacancy, TierID)
             VALUES (?, ?, ?, ?, ?, ?)`;
 
     const values = [
@@ -49,7 +49,7 @@ class Session {
       sessionDetails.Location,
       // this should not be changed
       sessionDetails.Vacancy,
-      sessionDetails.ProgramID,
+      sessionDetails.TierID,
     ];
 
     const [result] = await connection.execute(sqlQuery, values);
@@ -112,7 +112,7 @@ class Session {
       row.Location,
       row.Vacancy,
       row.Status,
-      row.ProgramID
+      row.TierID
     );
   }
 }

@@ -1,9 +1,9 @@
 const Session = require("../models/session");
 
-const getSessionsByProgramID = async (req, res) => {
-  const programID = req.params.id;
+const getSessionsByTierID = async (req, res) => {
+  const tierID = req.params.id;
   try {
-    const sessions = await Session.getSessionsByProgramID(programID);
+    const sessions = await Session.getSessionsByTierID(tierID);
     if (sessions.length === 0) {
       return res.status(404).send("Sessions not found");
     }
@@ -74,7 +74,7 @@ const getSessionBySessionID = async (req, res) => {
 };
 
 module.exports = {
-  getSessionsByProgramID,
+  getSessionsByTierID,
   postSession,
   updateSession,
   deleteSession,
