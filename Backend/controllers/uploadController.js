@@ -20,7 +20,7 @@ exports.uploadFile = async (file, OrderID) => {
     console.log("File uploaded successfully:", data);
 
     // Optional: Notify via email if needed (ensure this is intended)
-
+    /*
     const emailResponse = await sendEmailNotification(
       process.env.ADMIN_EMAIL,
       file.originalname
@@ -30,6 +30,7 @@ exports.uploadFile = async (file, OrderID) => {
       data,
       emailResponse,
     };
+    */
   } catch (error) {
     console.error("Error during file upload or email notification:", error);
     throw new Error("Error processing file upload.");

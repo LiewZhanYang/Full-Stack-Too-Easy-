@@ -2,23 +2,24 @@ const dbConfig = require("../dbConfig");
 const mysql = require("mysql2/promise");
 
 class Session {
-  constructor(SessionID, StartDate, EndDate, Time, Location, Vacancy, ProgramID) {
+  constructor(SessionID, StartDate, EndDate, Time, Location, Vacancy, Status ,TierID) {
     this.SessionID = SessionID;
     this.StartDate = StartDate;
     this.EndDate = EndDate;
     this.Time = Time;
     this.Location = Location;
     this.Vacancy = Vacancy;
-    this.ProgramID = ProgramID;
+    this.Status = Status;
+    this.TierID = TierID;
   }
 
-  static async getSessionsByProgramID(ProgramID) {
+  static async getSessionsByTierID(TierID) {
     const connection = await mysql.createConnection(dbConfig);
 
     const sqlQuery = `
-        SELECT * FROM session WHERE ProgramID = ? AND StartDate > CURDATE()
+        SELECT * FROM session WHERE TierID = ? AND StartDate > CURDATE()
         `;
-    const [result] = await connection.execute(sqlQuery, [ProgramID]);
+    const [result] = await connection.execute(sqlQuery, [TierID]);
 
     connection.end();
     return result.map((row) => {
@@ -29,7 +30,8 @@ class Session {
         row.Time,
         row.Location,
         row.Vacancy,
-        row.ProgramID
+        row.Status,
+        row.TierID
       );
     });
   }
@@ -37,7 +39,7 @@ class Session {
   static async postSession(sessionDetails) {
     const connection = await mysql.createConnection(dbConfig);
     const sqlQuery = `
-            INSERT INTO session (StartDate, EndDate, Time, Location, Vacancy, ProgramID)
+            INSERT INTO session (StartDate, EndDate, Time, Location, Vacancy, TierID)
             VALUES (?, ?, ?, ?, ?, ?)`;
 
     const values = [
@@ -47,7 +49,7 @@ class Session {
       sessionDetails.Location,
       // this should not be changed
       sessionDetails.Vacancy,
-      sessionDetails.ProgramID,
+      sessionDetails.TierID,
     ];
 
     const [result] = await connection.execute(sqlQuery, values);
@@ -59,7 +61,7 @@ class Session {
 
     const sqlQuery = `
             UPDATE session 
-            SET StartDate = ?, EndDate = ?, Time = ?, Location = ?
+            SET StartDate = ?, EndDate = ?, Time = ?, Location = ?, Status = ?
             WHERE sessionID = ?
         `;
 
@@ -68,6 +70,7 @@ class Session {
       SessionDetails.EndDate,
       SessionDetails.Time,
       SessionDetails.Location,
+      SessionDetails.Status,
       SessionID,
     ];
 
@@ -108,7 +111,8 @@ class Session {
       row.Time,
       row.Location,
       row.Vacancy,
-      row.ProgramID
+      row.Status,
+      row.TierID
     );
   }
 }
