@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Container, Button, Form, Modal } from "react-bootstrap";
+import { Container, Row, Col, Button, Form, Modal } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
@@ -20,26 +20,22 @@ const AdminCreateAnnouncement = () => {
       if (response.status === 201) {
         console.log("Announcement Created:", response.data);
         setShowConfirmModal(false);
-        setShowSuccessModal(true); // Show success modal on successful creation
+        setShowSuccessModal(true);
       }
     } catch (error) {
       console.error("Error creating announcement:", error);
-      alert("There was an error creating the announcement. Please try again.");
     }
   };
 
   const handleCancel = () => {
-    navigate(-1); // Go back to the previous page
+    navigate(-1);
   };
 
   return (
-    <Container
-      fluid
-      className="admin-create-announcement-page p-4"
-      style={{ maxWidth: "600px" }}
-    >
+    <Container fluid className="admin-create-announcement-page p-4">
       <h2 className="admin-create-title">Create Announcement</h2>
       <hr className="admin-create-divider mb-4" />
+
       <Form>
         <Form.Group controlId="announcementTitle" className="mb-3">
           <Form.Label>Title</Form.Label>
@@ -50,6 +46,7 @@ const AdminCreateAnnouncement = () => {
             onChange={(e) => setTitle(e.target.value)}
           />
         </Form.Group>
+
         <Form.Group controlId="announcementDescription" className="mb-3">
           <Form.Label>Description</Form.Label>
           <Form.Control
@@ -60,15 +57,20 @@ const AdminCreateAnnouncement = () => {
             onChange={(e) => setDescription(e.target.value)}
           />
         </Form.Group>
-        <div className="d-flex justify-content-center mt-4">
+
+        <div className="admin-create-button-group mt-4">
           <Button
             variant="warning"
-            className="me-3"
-            onClick={() => setShowConfirmModal(true)} // Show confirmation modal on Create click
+            className="admin-create-confirm-button me-3"
+            onClick={() => setShowConfirmModal(true)} // Show confirmation modal
           >
             Create
           </Button>
-          <Button variant="danger" onClick={handleCancel}>
+          <Button
+            variant="danger"
+            className="admin-create-cancel-button"
+            onClick={handleCancel}
+          >
             Cancel
           </Button>
         </div>
@@ -87,13 +89,7 @@ const AdminCreateAnnouncement = () => {
           Are you sure you want to create this announcement?
         </Modal.Body>
         <Modal.Footer>
-          <Button
-            variant="primary"
-            onClick={() => {
-              setShowConfirmModal(false); // Close modal
-              handleCreateAnnouncement(); // Proceed with creation
-            }}
-          >
+          <Button variant="primary" onClick={handleCreateAnnouncement}>
             Confirm
           </Button>
           <Button
@@ -120,7 +116,7 @@ const AdminCreateAnnouncement = () => {
             variant="primary"
             onClick={() => {
               setShowSuccessModal(false);
-              navigate(-1); // Go back to the previous page
+              navigate(-1);
             }}
           >
             Close

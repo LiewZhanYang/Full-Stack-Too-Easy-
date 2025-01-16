@@ -13,6 +13,7 @@ router.get("/", programController.getAllPrograms);
 router.get("/:id", programController.getProgramById);
 
 router.get("/signup/:id", programController.getProgramBySignUp);
+router.get("/type/:typeID", programController.getProgramsByProgramType);
 // Route to create a new program (with optional image upload)
 router.post("/", upload.single("file"), programController.postProgram);
 

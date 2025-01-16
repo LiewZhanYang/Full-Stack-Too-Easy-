@@ -167,31 +167,14 @@ const AdminCreateWebinar = () => {
         <div className="admin-create-button-group mt-4">
           <Button
             variant="warning"
-            style={{
-              backgroundColor: "#fbbf24",
-              color: "black",
-              borderRadius: "8px",
-              padding: "8px 16px",
-              fontSize: "14px",
-              fontWeight: "500",
-              border: "none",
-            }}
-            onMouseOver={(e) => (e.target.style.backgroundColor = "#f59e0b")}
-            onMouseOut={(e) => (e.target.style.backgroundColor = "#fbbf24")}
-            className="me-3"
+            className="admin-create-confirm-button me-3"
             onClick={() => setShowConfirmModal(true)} // Show confirmation modal
           >
-            Create Webinar
+            Create
           </Button>
           <Button
             variant="danger"
-            style={{
-              borderRadius: "8px",
-              padding: "8px 16px",
-              fontSize: "14px",
-              fontWeight: "500",
-              border: "none",
-            }}
+            className="admin-create-cancel-button"
             onClick={handleCancel}
           >
             Cancel

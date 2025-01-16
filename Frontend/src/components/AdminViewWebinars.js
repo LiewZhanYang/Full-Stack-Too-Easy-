@@ -168,15 +168,6 @@ const AdminViewWebinars = () => {
         ))}
       </Row>
 
-      {/* Create Webinar Button */}
-      <Button
-        variant="success"
-        className="admin-create-webinar-button d-flex align-items-center"
-        onClick={handleCreateWebinarClick}
-      >
-        <FaPlus className="me-1" /> <span>Create Webinar</span>
-      </Button>
-
       {/* Delete Confirmation Modal */}
       <Modal
         show={showConfirmModal}

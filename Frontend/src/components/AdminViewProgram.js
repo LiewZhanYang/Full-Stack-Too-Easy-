@@ -184,15 +184,6 @@ const AdminViewProgram = () => {
           </Col>
         ))}
       </Row>
-
-      {/* Create Program Button */}
-      <Button
-        variant="success"
-        className="admin-create-webinar-button d-flex align-items-center"
-        onClick={handleCreateProgramClick}
-      >
-        <FaPlus className="me-1" /> <span>Create Program</span>
-      </Button>
     </Container>
   );
 };

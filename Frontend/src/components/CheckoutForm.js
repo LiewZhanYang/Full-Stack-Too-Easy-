@@ -36,7 +36,7 @@ export default function CheckoutForm() {
     return (
         <form id="payment-form" onSubmit={handleSubmit}>
             <PaymentElement />
-            <button disabled={isLoading} id="submit">
+            <button className="stripe-button" disabled={isLoading} id="submit">
                 <span id="button-text">
                     {isLoading ? "Loading ..." : "Submit"}
                 </span>

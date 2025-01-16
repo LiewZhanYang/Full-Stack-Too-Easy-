@@ -241,7 +241,6 @@ function Dashboard() {
         <div className="flex-1">
           <h1 className="text-2xl font-bold mb-6">Welcome Back, {customerName}</h1>
 
-          <div className="flex space-x-4 mb-4 border-b-2 pb-2">
             <button
               onClick={() => setActiveTab("Programmes")}
               style={{
@@ -255,7 +254,6 @@ function Dashboard() {
             >
               Programmes
             </button>
-          </div>
 
           {activeTab === "Programmes" && (
             <div>

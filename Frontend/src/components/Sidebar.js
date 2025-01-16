@@ -107,24 +107,28 @@ function Sidebar() {
                     <Link
                       to="/workshopPrice"
                       className="d-block py-1 text-dark text-decoration-none"
+                      style={{ fontSize: "0.95rem" }}
                     >
                       Workshops
                     </Link>
                     <Link
                       to="/camps"
                       className="d-block py-1 text-dark text-decoration-none"
+                      style={{ fontSize: "0.95rem" }}
                     >
                       Camps
                     </Link>
                     <Link
                       to="/labs"
                       className="d-block py-1 text-dark text-decoration-none"
+                      style={{ fontSize: "0.95rem" }}
                     >
                       Labs
                     </Link>
                     <Link
                       to="/professionals"
                       className="d-block py-1 text-dark text-decoration-none"
+                      style={{ fontSize: "0.95rem" }}
                     >
                       Professionals
                     </Link>
@@ -154,12 +158,14 @@ function Sidebar() {
                       <Link
                         to="/webinars"
                         className="d-block py-1 text-dark text-decoration-none"
+                        style={{ fontSize: "0.95rem" }}
                       >
                         Webinars
                       </Link>
                       <Link
                         to="/precoaching"
                         className="d-block py-1 text-dark text-decoration-none"
+                        style={{ fontSize: "0.95rem" }}
                       >
                         1 to 1 Coaching
                       </Link>
