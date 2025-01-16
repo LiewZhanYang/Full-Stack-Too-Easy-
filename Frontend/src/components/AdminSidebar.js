@@ -60,7 +60,7 @@ function Sidebar() {
             <nav className="mt-3">
               <Link
                 to="/AdminHome"
-                className="d-flex align-items-center px-3 py-2 text-dark fw-bold text-decoration-none"
+                className="btn d-flex align-items-center w-100 text-dark fw-bold px-3 py-2 border-0 bg-transparent"
               >
                 <i className="bi bi-columns-gap me-2"></i>
                 Home
@@ -87,12 +87,14 @@ function Sidebar() {
                     <Link
                       to="/admin-view-program"
                       className="d-block py-1 text-dark text-decoration-none"
+                      style={{ fontSize: "0.95rem" }}
                     >
                       View All
                     </Link>
                     <Link
                       to="/admin-create-program"
                       className="d-block py-1 text-dark text-decoration-none"
+                      style={{ fontSize: "0.95rem" }}
                     >
                       Create
                     </Link>
@@ -121,12 +123,14 @@ function Sidebar() {
                     <Link
                       to="/admin-view-webinars"
                       className="d-block py-1 text-dark text-decoration-none"
+                      style={{ fontSize: "0.95rem" }}
                     >
                       View All
                     </Link>
                     <Link
                       to="/admin-create-webinar"
                       className="d-block py-1 text-dark text-decoration-none"
+                      style={{ fontSize: "0.95rem" }}
                     >
                       Create
                     </Link>
@@ -154,6 +158,7 @@ function Sidebar() {
                     <Link
                       to="/admin-view-booking"
                       className="d-block py-1 text-dark text-decoration-none"
+                      style={{ fontSize: "0.95rem" }}
                     >
                       View All Bookings
                     </Link>
@@ -180,12 +185,14 @@ function Sidebar() {
                       <Link
                         to="/admin-view-announcement"
                         className="d-block py-1 text-dark text-decoration-none"
+                        style={{ fontSize: "0.95rem" }}
                       >
                         View All
                       </Link>
                       <Link
                         to="/admin-create-announcement"
                         className="d-block py-1 text-dark text-decoration-none"
+                        style={{ fontSize: "0.95rem" }}
                       >
                         Create
                       </Link>
@@ -213,6 +220,7 @@ function Sidebar() {
                       <Link
                         to="/admin-view-payment"
                         className="d-block py-1 text-dark text-decoration-none"
+                        style={{ fontSize: "0.95rem" }}
                       >
                         Incoming Payments
                       </Link>

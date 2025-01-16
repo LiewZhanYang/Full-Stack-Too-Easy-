@@ -97,34 +97,17 @@ const AdminViewSessionDetails = () => {
 
   return (
     <Container fluid className="admin-view-session-details-page p-4">
-      <Row className="mb-3">
+      <Row className="align-items-center mb-3">
         <Col>
           <h2 className="page-title">Session Details</h2>
         </Col>
-        <Col className="text-end">
-          <Button
-            variant="secondary"
-            className="back-button"
-            onClick={handleBackClick}
-            style={{
-              display: "flex",
-              alignItems: "center",
-              backgroundColor: "#007bff",
-              color: "#fff",
-              border: "none",
-              borderRadius: "8px",
-              padding: "8px 16px",
-              fontWeight: "500",
-              fontSize: "16px",
-              transition: "background-color 0.3s ease",
-            }}
-            onMouseOver={(e) => (e.target.style.backgroundColor = "#0056b3")}
-            onMouseOut={(e) => (e.target.style.backgroundColor = "#007bff")}
-          >
-            <FaArrowLeft style={{ marginRight: "8px" }} /> Back
+        <Col xs="auto">
+          <Button className="custom-back-button" onClick={handleBackClick}>
+            Back
           </Button>
         </Col>
       </Row>
+
       <hr className="divider-line mb-4" />
 
       {sessionDetails ? (
