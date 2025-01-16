@@ -38,7 +38,7 @@ export default function CheckoutForm() {
             <PaymentElement />
             <button disabled={isLoading} id="submit">
                 <span id="button-text">
-                    {isLoading ? "Loading ..." : "Pay Now"}
+                    {isLoading ? "Loading ..." : "Submit"}
                 </span>
             </button>
         </form>

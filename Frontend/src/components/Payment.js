@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import StripePayment from "./StripePayment";
 import axios from "axios";
 const lunchOptionMapping = {
   chicken: 1,
@@ -45,6 +46,7 @@ function Payment() {
   const [orderId, setOrderId] = useState(null);
   const [activeTab, setActiveTab] = useState("Overview");
   const [isMemberActive, setIsMemberActive] = useState(false);
+  const [showStripePayment, setShowStripePayment] = useState(false);
 
   useEffect(() => {
     const fetchMembershipStatus = async () => {
@@ -485,11 +487,25 @@ function Payment() {
                     <span>${totalPrice.toFixed(2)}</span>
                   </div>
                   <button
+                    onClick={() => setShowStripePayment(true)}
+                    className="btn btn-primary"
+                  >
+                    Pay with Stripe
+                  </button>
+                  {showStripePayment && (
+            <StripePayment
+              totalPrice={totalPrice}
+              programId={programId}
+              selectedChildren={selectedChildren}
+            />
+          )}
+                  <button
                     onClick={() => setShowPaynow(true)}
                     className="btn btn-outline-secondary w-100 mt-3"
                   >
                     Show PayNow QR
                   </button>
+                  
                 </div>
               </div>
             </div>
