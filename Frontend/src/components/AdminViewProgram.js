@@ -144,7 +144,7 @@ const AdminViewProgram = () => {
               <div className="admin-program-card-image-container">
                 <Card.Img
                   variant="top"
-                  src={program.image || "/img/default.jpg"} // Use the image URL or fallback to default
+                  src={program.image || "/img/default.jpg"}
                   alt={program.ProgrameName}
                   className="admin-program-card-image"
                 />
@@ -157,7 +157,7 @@ const AdminViewProgram = () => {
                   {program.ProgrameName}
                 </Card.Title>
                 <Card.Text style={{ textAlign: "left" }}>
-                  Cost: ${program.Cost}
+                  {program.ProgramDesc}
                 </Card.Text>
                 <div className="d-flex gap-2 mt-auto">
                   <Button
