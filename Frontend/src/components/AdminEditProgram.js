@@ -6,10 +6,6 @@ const AdminEditProgram = () => {
   const [name, setName] = useState("");
   const [type, setType] = useState("");
   const [description, setDescription] = useState("");
-  const [cost, setCost] = useState("");
-  const [classSize, setClassSize] = useState("");
-  const [duration, setDuration] = useState("");
-  const [lunchProvided, setLunchProvided] = useState(false);
   const [image, setImage] = useState(null);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
@@ -31,10 +27,6 @@ const AdminEditProgram = () => {
         setName(data.ProgrameName);
         setType(data.TypeID);
         setDescription(data.ProgramDesc);
-        setCost(data.Cost);
-        setClassSize(data.ClassSize);
-        setDuration(data.Duration);
-        setLunchProvided(data.LunchProvided);
         setImagePreview(data.imageUrl || null);
       } catch (error) {
         console.error("Error fetching program details:", error);
@@ -56,10 +48,6 @@ const AdminEditProgram = () => {
       const formData = new FormData();
       formData.append("ProgramName", name);
       formData.append("ProgramDesc", description);
-      formData.append("Cost", cost);
-      formData.append("ClassSize", classSize);
-      formData.append("Duration", duration);
-      formData.append("LunchProvided", lunchProvided);
       formData.append("TypeID", type);
       if (image) {
         formData.append("file", image);
@@ -146,45 +134,6 @@ const AdminEditProgram = () => {
             placeholder="Enter program description"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
-          />
-        </Form.Group>
-
-        <Form.Group controlId="programCost" className="mb-3">
-          <Form.Label>Cost</Form.Label>
-          <Form.Control
-            type="text"
-            placeholder="Enter cost"
-            value={cost}
-            onChange={(e) => setCost(e.target.value)}
-          />
-        </Form.Group>
-
-        <Form.Group controlId="programClassSize" className="mb-3">
-          <Form.Label>Class Size</Form.Label>
-          <Form.Control
-            type="number"
-            placeholder="Enter class size"
-            value={classSize}
-            onChange={(e) => setClassSize(e.target.value)}
-          />
-        </Form.Group>
-
-        <Form.Group controlId="programDuration" className="mb-3">
-          <Form.Label>Duration (in hours)</Form.Label>
-          <Form.Control
-            type="number"
-            placeholder="Enter duration"
-            value={duration}
-            onChange={(e) => setDuration(e.target.value)}
-          />
-        </Form.Group>
-
-        <Form.Group controlId="lunchProvided" className="mb-3">
-          <Form.Check
-            type="checkbox"
-            label="Lunch Provided"
-            checked={lunchProvided}
-            onChange={(e) => setLunchProvided(e.target.checked)}
           />
         </Form.Group>
 
