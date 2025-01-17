@@ -31,6 +31,8 @@ const meetingRoutes = require("./routes/meetingRoutes");
 const announceRoutes = require("./routes/announcementRoutes");
 const reviewRoutes = require("./routes/reviewRoutes");
 const tierRoutes = require("./routes/tierRoutes")
+const sentimentRoutes = require("./routes/sentimentRoutes")
+
 
 app.use("/customer", customerRoutes);
 app.use("/admin", adminRoutes);
@@ -49,6 +51,7 @@ app.use("/meeting", meetingRoutes);
 app.use("/announcement", announceRoutes);
 app.use("/review", reviewRoutes);
 app.use("/tier", tierRoutes)
+app.use("/sentiment", sentimentRoutes);
 
 //const testController = require('./controllers/testController');
 
