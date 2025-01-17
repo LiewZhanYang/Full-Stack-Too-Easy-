@@ -59,11 +59,12 @@ function Dashboard() {
   const calendarDays = generateCalendarDays();
   const upcomingEvents = generateUpcomingEvents();
 
-
   useEffect(() => {
     const fetchCustomerName = async () => {
       try {
-        const response = await axios.get(`http://localhost:8000/customer/id/${userAccountID}`);
+        const response = await axios.get(
+          `http://localhost:8000/customer/id/${userAccountID}`
+        );
         if (response.data && response.data.length > 0) {
           setCustomerName(response.data[0].Name || "User");
         }
@@ -86,57 +87,59 @@ function Dashboard() {
           ? signUpResponse.data
           : [signUpResponse.data];
         console.log("Fetched SignUps:", signUps);
-    
-        // Map Signups with Session Details
-        const signUpsWithSessions = await Promise.all(
+
+        // Map Signups with Session and Tier Details
+        const signUpsWithDetails = await Promise.all(
           signUps.map(async (signup) => {
             if (signup.SessionID) {
               try {
+                // Fetch session details
                 const sessionResponse = await axios.get(
                   `http://localhost:8000/session/SessionID/${signup.SessionID}`
                 );
+
+                const sessionData = sessionResponse.data;
+
+                // Fetch tier details using TierID from the session
+                const tierResponse = await axios.get(
+                  `http://localhost:8000/tier/${sessionData.TierID}`
+                );
+                console.log(tierResponse.data[0].Name);
+
                 return {
                   ...signup,
-                  session: sessionResponse.data,
-                  ProgramID: sessionResponse.data.ProgramID,
+                  session: sessionData,
+                  tier: tierResponse.data, // Include tier details
+                  ProgramName: tierResponse.data.Name, // Use tier name as ProgramName
                 };
               } catch (err) {
                 console.error(
-                  `Failed to fetch session for SessionID: ${signup.SessionID}`,
+                  `Failed to fetch details for SessionID: ${signup.SessionID}`,
                   err
                 );
-                return { ...signup, session: null, ProgramID: null };
+                return {
+                  ...signup,
+                  session: null,
+                  tier: null,
+                  ProgramName: null,
+                };
               }
             } else {
-              return { ...signup, session: null, ProgramID: null };
+              return {
+                ...signup,
+                session: null,
+                tier: null,
+                ProgramName: null,
+              };
             }
           })
         );
-        console.log("SignUps with Session Details:", signUpsWithSessions);
-    
-        // Fetch Programs
-        const programResponse = await axios.get(
-          `http://localhost:8000/program/signup/${userAccountID}`
+        console.log(
+          "SignUps with Session and Tier Details:",
+          signUpsWithDetails
         );
-        const programs = programResponse.data;
-        console.log("Fetched Programs:", programs);
-    
-        // Combine Signups with Programs
-        const combinedData = signUpsWithSessions.map((signup) => {
-          const matchingProgram = programs.find(
-            (program) => Number(program.ProgramID) === Number(signup.ProgramID)
-          );
-          if (!matchingProgram) {
-            console.warn(
-              `No matching program found for ProgramID: ${signup.ProgramID}`
-            );
-          }
-          return { ...signup, program: matchingProgram || null };
-        });
-    
-        console.log("Final Combined Data:", combinedData);
-    
-        setPrograms(combinedData);
+
+        setPrograms(signUpsWithDetails);
       } catch (err) {
         setError("You have not signed up for any programmes.");
         console.error(err);
@@ -190,7 +193,7 @@ function Dashboard() {
             marginBottom: "4px",
           }}
         >
-          {data.program?.ProgrameName || "Unknown Program"}
+          {data.tier[0]?.Name || "Unknown Program"}
         </h3>
         <p
           style={{
@@ -213,7 +216,9 @@ function Dashboard() {
       </div>
 
       <button
-        onClick={() => navigate("/workshopvm", { state: { signUpId: data.SignUpID } })}
+        onClick={() =>
+          navigate("/workshopvm", { state: { signUpId: data.SignUpID } })
+        }
         style={{
           backgroundColor: "#fbbf24",
           color: "white",
@@ -231,7 +236,6 @@ function Dashboard() {
       >
         View More
       </button>
-      
     </div>
   );
 
@@ -239,21 +243,24 @@ function Dashboard() {
     <div className="p-4">
       <div className="flex space-x-8">
         <div className="flex-1">
-          <h1 className="text-2xl font-bold mb-6">Welcome Back, {customerName}</h1>
+          <h1 className="text-2xl font-bold mb-6">
+            Welcome Back, {customerName}
+          </h1>
 
-            <button
-              onClick={() => setActiveTab("Programmes")}
-              style={{
-                fontSize: "16px",
-                fontWeight: activeTab === "Programmes" ? "bold" : "normal",
-                color: activeTab === "Programmes" ? "#f59e0b" : "#6b7280",
-                padding: "8px 16px",
-                borderBottom: activeTab === "Programmes" ? "2px solid #fbbf24" : "none",
-                cursor: "pointer",
-              }}
-            >
-              Programmes
-            </button>
+          <button
+            onClick={() => setActiveTab("Programmes")}
+            style={{
+              fontSize: "16px",
+              fontWeight: activeTab === "Programmes" ? "bold" : "normal",
+              color: activeTab === "Programmes" ? "#f59e0b" : "#6b7280",
+              padding: "8px 16px",
+              borderBottom:
+                activeTab === "Programmes" ? "2px solid #fbbf24" : "none",
+              cursor: "pointer",
+            }}
+          >
+            Programmes
+          </button>
 
           {activeTab === "Programmes" && (
             <div>
@@ -304,17 +311,31 @@ function Dashboard() {
                 <div
                   key={index}
                   className={`flex items-start p-3 rounded-lg ${
-                    event.isToday ? "bg-white shadow-sm border border-gray-100" : "bg-gray-50"
+                    event.isToday
+                      ? "bg-white shadow-sm border border-gray-100"
+                      : "bg-gray-50"
                   }`}
                 >
-                  <div className={`text-xl font-bold w-8 ${event.isToday ? "text-gray-800" : "text-gray-400"}`}>
+                  <div
+                    className={`text-xl font-bold w-8 ${
+                      event.isToday ? "text-gray-800" : "text-gray-400"
+                    }`}
+                  >
                     {event.date}
                   </div>
                   <div className="ml-4">
-                    <div className={`font-medium ${event.isToday ? "text-gray-800" : "text-gray-500"}`}>
+                    <div
+                      className={`font-medium ${
+                        event.isToday ? "text-gray-800" : "text-gray-500"
+                      }`}
+                    >
                       {event.title}
                     </div>
-                    <div className={`text-sm ${event.isToday ? "text-gray-600" : "text-gray-400"}`}>
+                    <div
+                      className={`text-sm ${
+                        event.isToday ? "text-gray-600" : "text-gray-400"
+                      }`}
+                    >
                       {event.time}
                     </div>
                   </div>
