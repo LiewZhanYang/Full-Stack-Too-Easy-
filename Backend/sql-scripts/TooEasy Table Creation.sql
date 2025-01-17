@@ -355,6 +355,7 @@ END;
 //
 
 DELIMITER ;
+DROP TRIGGER tooeasydb.reassign_session;
 
 DELIMITER //
 
