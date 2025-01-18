@@ -217,7 +217,7 @@ function Dashboard() {
 
       <button
         onClick={() =>
-          navigate("/workshopvm", { state: { signUpId: data.SignUpID } })
+          navigate("/workshopvm", { state: { sessionId: data.session?.SessionID } })
         }
         style={{
           backgroundColor: "#fbbf24",
