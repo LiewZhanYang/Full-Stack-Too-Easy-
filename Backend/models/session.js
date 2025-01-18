@@ -67,27 +67,43 @@ class Session {
 
   static async updateSession(SessionID, SessionDetails) {
     const connection = await mysql.createConnection(dbConfig);
-
+  
+    // Set default values if not provided
+    const status = SessionDetails.Status || 'Active';
+  
     const sqlQuery = `
-            UPDATE session 
-            SET StartDate = ?, EndDate = ?, Time = ?, Location = ?, Status = ?
-            WHERE sessionID = ?
-        `;
-
+      UPDATE session 
+      SET StartDate = ?, EndDate = ?, Time = ?, Location = ?, Vacancy = ?, Status = ?
+      WHERE SessionID = ?
+    `;
+  
     const values = [
       SessionDetails.StartDate,
       SessionDetails.EndDate,
       SessionDetails.Time,
       SessionDetails.Location,
-      SessionDetails.Status,
+      SessionDetails.Vacancy,
+      status,
       SessionID,
     ];
-
-    const [result] = await connection.execute(sqlQuery, values);
-    connection.end();
-
-    return result.affectedRows > 0; // Return true if the signup was updated
+  
+    try {
+      console.log('Session Details:', SessionDetails);
+      console.log('Executing SQL Query:', sqlQuery);
+      console.log('With values:', values);
+  
+      const [result] = await connection.execute(sqlQuery, values);
+      console.log('Update result:', result);
+      return result.affectedRows > 0; // Return true if the session was updated
+    } catch (error) {
+      console.error('Error updating session:', error);
+      throw error; // Rethrow the error after logging it
+    } finally {
+      await connection.end(); // Ensure the connection is closed
+    }
   }
+  
+  
 
   static async deleteSession(SessionID) {
     const connection = await mysql.createConnection(dbConfig);
