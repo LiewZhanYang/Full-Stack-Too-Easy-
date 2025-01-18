@@ -342,20 +342,30 @@ CREATE TRIGGER reassign_session
 AFTER UPDATE ON Session
 FOR EACH ROW
 BEGIN
-	DECLARE v_NextSessionID INT;
-    
-    -- Call the procedure and assign the output to the variable
-	CALL GetNextSessionID(OLD.StartDate, OLD.TierID, @v_NextSessionID); 
+    DECLARE v_NextSessionID INT;
 
-	UPDATE SignUp
-	SET SessionID = @v_NextSessionID
-	WHERE SessionID = OLD.SessionID;
+    -- Check if the session status has changed to 'Cancelled'
+    IF OLD.Status <> NEW.Status AND NEW.Status = 'Cancelled' THEN
 
-END;
-//
+        -- Call the procedure to get the next available session ID
+        CALL GetNextSessionID(OLD.StartDate, OLD.TierID, v_NextSessionID);
+
+        -- Update the SignUp table to reassign participants
+        IF v_NextSessionID IS NOT NULL THEN
+            UPDATE SignUp
+            SET SessionID = v_NextSessionID
+            WHERE SessionID = OLD.SessionID;
+        ELSE
+            -- Handle cases where no future session is available
+            -- For example, you might want to notify administrators or log this event
+            SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'No future session available for reassignment';
+        END IF;
+
+    END IF;
+END //
 
 DELIMITER ;
-DROP TRIGGER tooeasydb.reassign_session;
+
 
 DELIMITER //
 
@@ -367,9 +377,10 @@ CREATE PROCEDURE GetNextSessionID(
 BEGIN
     SELECT SessionID
     INTO p_NextSessionID
-	FROM Session
-	WHERE p_TierID AND StartDate > p_StartDate
-	LIMIT 1;
+    FROM Session
+    WHERE TierID = p_TierID AND StartDate > p_StartDate
+    ORDER BY StartDate
+    LIMIT 1;
 END //
 
 DELIMITER ;
