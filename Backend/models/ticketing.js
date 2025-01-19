@@ -37,6 +37,27 @@ class Ticketing {
     connection.end();
     return result;
   }
+
+  static async updateTicketStatus(ticketID, newStatus) {
+    const connection = await mysql.createConnection(dbConfig);
+    const sqlQuery = `
+      UPDATE Ticketing
+      SET Status = ?
+      WHERE TicketID = ?`;
+  
+    const values = [newStatus, ticketID];
+  
+    try {
+      const [result] = await connection.execute(sqlQuery, values);
+      connection.end();
+      return result;
+    } catch (error) {
+      console.error("Error updating ticket status:", error);
+      connection.end();
+      throw error;
+    }
+  }
+  
 }
 
 module.exports = Ticketing;
