@@ -153,6 +153,27 @@ CREATE TABLE Review (
     FOREIGN KEY (ProgramID) REFERENCES Program(ProgramID)
 );
 
+CREATE TABLE Ticketing (
+    TicketID INT PRIMARY KEY AUTO_INCREMENT,
+    AccountID INT NOT NULL,
+    Category ENUM('Payment', 'Technical', 'General', 'Other') NOT NULL,
+    Content TEXT NOT NULL,
+    StartDate TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    Status ENUM('Open', 'In Progress', 'Resolved', 'Closed') DEFAULT 'Open',
+    FOREIGN KEY (AccountID) REFERENCES Customer(AccountID)
+);
+
+CREATE TABLE Comments (
+    CommentID INT PRIMARY KEY AUTO_INCREMENT,
+    TicketID INT NOT NULL,
+    CommenterID INT NOT NULL,
+    IsAdmin BOOLEAN NOT NULL,
+    Content TEXT NOT NULL,
+    CommentDate TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (TicketID) REFERENCES Ticketing(TicketID) ON DELETE CASCADE
+);
+
+
 -- Data Insertion
 USE TooEasyDB;
 
@@ -264,6 +285,27 @@ VALUES
 (2, 'Would enjoy if there were more content that was being taught!! However, overall I enjoyed the program a lot.', 4, '2025-1-10', 2, 1),
 (3, 'I loved this program! After going through it, I felt more confident in my writing and speaking skills!', 5, '2025-1-10', 3, 1),
 (4, 'My son said that he was better prepared for PSLE after going through it, turns out he got all As!!!!', 5, '2025-1-10', 4, 2);
+
+INSERT INTO Ticketing (TicketID, AccountID, Category, Content, StartDate, Status)
+VALUES
+(1, 1, 'Payment', 'I cannot pay using PayNow.', '2025-01-18 10:00:00', 'Open'),
+(2, 2, 'Technical', 'The system keeps crashing when I log in.', '2025-01-18 11:00:00', 'In Progress'),
+(3, 3, 'General', 'I need help understanding the program schedule.', '2025-01-18 12:00:00', 'Resolved');
+
+INSERT INTO Comments (CommentID, TicketID, CommenterID, IsAdmin, Content, CommentDate)
+VALUES
+-- Comments for Ticket 1
+(1, 1, 2, TRUE, 'Don’t worry, we’ll check the issue with PayNow.', '2025-01-18 10:05:00'),
+(2, 1, 1, FALSE, 'Thanks for the update! Please let me know ASAP.', '2025-01-18 10:10:00'),
+
+-- Comments for Ticket 2
+(3, 2, 3, FALSE, 'This issue happens on both mobile and desktop.', '2025-01-18 11:05:00'),
+(4, 2, 2, TRUE, 'I’ll escalate this to the tech team for a deeper look.', '2025-01-18 11:15:00'),
+
+-- Comments for Ticket 3
+(5, 3, 3, FALSE, 'Can someone assist me with this?', '2025-01-18 12:05:00'),
+(6, 3, 2, TRUE, 'The program schedule is available in your dashboard.', '2025-01-18 12:10:00');
+
 
 Trigger
 
@@ -425,3 +467,4 @@ BEGIN
 END //
 
 DELIMITER ;
+
