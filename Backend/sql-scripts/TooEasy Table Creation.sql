@@ -29,6 +29,8 @@ CREATE TABLE Child (
     DOB DATE NOT NULL,
     Age INT NOT NULL DEFAULT 0,
     AccountID INT NOT NULL,
+    SpecialLearningNeeds VARCHAR(255) DEFAULT NULL,
+    DietaryRestrictions VARCHAR(255) DEFAULT NULL,
 
     FOREIGN KEY (AccountID) REFERENCES Customer(AccountID)
 );

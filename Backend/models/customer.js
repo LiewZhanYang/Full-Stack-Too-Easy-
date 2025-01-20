@@ -157,6 +157,39 @@ class Customer {
       throw error;
     }
   }
+  static async getTopPayingCustomers(limit = 5) {
+    const connection = await mysql.createConnection(dbConfig);
+    console.log(limit);
+
+    // Inline the limit value directly into the query
+    const sqlQuery = `
+    SELECT 
+        p.PaidBy AS AccountID,
+        c.Name AS CustomerName,
+        SUM(p.Amount) AS TotalSpending,
+        MAX(s.EndDate) AS LastSessionDate,
+        t.Name AS LastSessionTier
+    FROM 
+        Payment p
+    JOIN 
+        Session s ON p.SessionID = s.SessionID
+    JOIN 
+        Tier t ON s.TierID = t.TierID
+    JOIN 
+        Customer c ON p.PaidBy = c.AccountID
+    WHERE 
+        p.Status = 'Approved'
+    GROUP BY 
+        p.PaidBy, c.Name, t.Name
+    ORDER BY 
+        TotalSpending DESC
+    LIMIT ${limit};
+  `;
+
+    const [result] = await connection.execute(sqlQuery);
+    connection.end();
+    return result; // Return the result as an array
+  }
 
   static async getAllCustomers() {
     const connection = await mysql.createConnection(dbConfig);
