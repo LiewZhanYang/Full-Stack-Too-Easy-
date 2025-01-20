@@ -12,6 +12,9 @@ function Dashboard() {
   const [error, setError] = useState(null);
   const [activeTab, setActiveTab] = useState("Programmes");
   const [customerName, setCustomerName] = useState("");
+  const [reviewPrompt, setReviewPrompt] = useState(null); // Store program for review
+  const [reviewContent, setReviewContent] = useState(""); // Review input from user
+  const [reviewRating, setReviewRating] = useState(5); // Default rating
 
   const userAccountID = localStorage.getItem("userId"); // Assuming user ID is stored in localStorage
 
@@ -79,66 +82,62 @@ function Dashboard() {
   useEffect(() => {
     const fetchProgramsAndSessions = async () => {
       try {
-        // Fetch Signups
         const signUpResponse = await axios.get(
           `http://localhost:8000/signup/${userAccountID}`
         );
         const signUps = Array.isArray(signUpResponse.data)
           ? signUpResponse.data
           : [signUpResponse.data];
-        console.log("Fetched SignUps:", signUps);
-
-        // Map Signups with Session and Tier Details
+  
         const signUpsWithDetails = await Promise.all(
           signUps.map(async (signup) => {
             if (signup.SessionID) {
-              try {
-                // Fetch session details
-                const sessionResponse = await axios.get(
-                  `http://localhost:8000/session/SessionID/${signup.SessionID}`
-                );
-
-                const sessionData = sessionResponse.data;
-
-                // Fetch tier details using TierID from the session
-                const tierResponse = await axios.get(
-                  `http://localhost:8000/tier/${sessionData.TierID}`
-                );
-                console.log(tierResponse.data[0].Name);
-
-                return {
-                  ...signup,
-                  session: sessionData,
-                  tier: tierResponse.data, // Include tier details
-                  ProgramName: tierResponse.data.Name, // Use tier name as ProgramName
-                };
-              } catch (err) {
-                console.error(
-                  `Failed to fetch details for SessionID: ${signup.SessionID}`,
-                  err
-                );
-                return {
-                  ...signup,
-                  session: null,
-                  tier: null,
-                  ProgramName: null,
-                };
-              }
-            } else {
+              const sessionResponse = await axios.get(
+                `http://localhost:8000/session/SessionID/${signup.SessionID}`
+              );
+              const tierResponse = await axios.get(
+                `http://localhost:8000/tier/${sessionResponse.data.TierID}`
+              );
+  
               return {
                 ...signup,
-                session: null,
-                tier: null,
-                ProgramName: null,
+                session: sessionResponse.data,
+                tier: tierResponse.data,
               };
             }
+            return { ...signup, session: null, tier: null };
           })
         );
-        console.log(
-          "SignUps with Session and Tier Details:",
-          signUpsWithDetails
-        );
-
+  
+        console.log("Sign-ups with details:", signUpsWithDetails);
+  
+        const endedPrograms = signUpsWithDetails.find((program) => {
+          if (program.session && program.session.EndDate) {
+            const endDate = new Date(program.session.EndDate);
+            console.log(
+              "Checking program:",
+              program,
+              "End Date:",
+              endDate,
+              "Current Date:",
+              currentDate,
+              "Comparison Result:",
+              endDate < currentDate
+            );
+            return endDate < currentDate; // Compare dates
+          }
+          return false;
+        });
+        
+        console.log("Ended Programs Result:", endedPrograms);
+        
+  
+        console.log("Ended Programs:", endedPrograms);
+  
+        if (endedPrograms) {
+          setReviewPrompt(endedPrograms);
+        }
+  
         setPrograms(signUpsWithDetails);
       } catch (err) {
         setError("You have not signed up for any programmes.");
@@ -147,9 +146,58 @@ function Dashboard() {
         setLoading(false);
       }
     };
+  
     fetchProgramsAndSessions();
   }, [userAccountID]);
+  
+  
 
+  const handleReviewSubmit = async () => {
+    if (!reviewContent.trim()) {
+      alert("Please write a review before submitting.");
+      return;
+    }
+  
+    // Ensure ProgramID is valid
+    const programID = reviewPrompt?.session?.ProgramID;
+    if (!programID) {
+      alert("Program ID is missing. Unable to submit review.");
+      return;
+    }
+  
+    const payload = {
+      Content: reviewContent,
+      Star: reviewRating,
+      AccountID: userAccountID, // User submitting the review
+      Date: new Date().toISOString(), // Current date and time
+    };
+  
+    console.log(`Submitting review for ProgramID: ${programID}`, payload);
+  
+    try {
+      const response = await axios.post(`http://localhost:8000/review/${programID}`, payload);
+  
+      // Log success response
+      console.log("Review submission successful:", response.data);
+  
+      alert("Thank you for your review!");
+      setReviewPrompt(null); // Close the review prompt
+      setReviewContent("");
+      setReviewRating(5); // Reset review form
+    } catch (error) {
+      console.error("Error submitting review:", error);
+  
+      if (error.response) {
+        console.error("Server responded with:", error.response.data);
+        alert(`Failed to submit review: ${error.response.data.message || "Unknown error"}`);
+      } else {
+        alert("Failed to submit review. Please check your network connection.");
+      }
+    }
+  };
+  
+  
+  
   const renderProgramCard = (data) => (
     <div
       key={data.SignUpID}
@@ -343,6 +391,95 @@ function Dashboard() {
               ))}
             </div>
           </div>
+
+                {/* Review Prompt Modal */}
+      {reviewPrompt &&  (
+        <div
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            width: "100%",
+            height: "100%",
+            backgroundColor: "rgba(0, 0, 0, 0.5)",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          <div
+            style={{
+              backgroundColor: "white",
+              padding: "20px",
+              borderRadius: "8px",
+              maxWidth: "500px",
+              width: "90%",
+            }}
+          >
+            <h2 style={{ marginBottom: "10px", fontSize: "18px", fontWeight: "bold" }}>
+              Leave a Review for {reviewPrompt.tier[0]?.Name}
+            </h2>
+            <textarea
+              value={reviewContent}
+              onChange={(e) => setReviewContent(e.target.value)}
+              placeholder="Write your review here..."
+              style={{
+                width: "100%",
+                height: "100px",
+                marginBottom: "10px",
+                padding: "10px",
+                borderRadius: "4px",
+                border: "1px solid #ddd",
+              }}
+            />
+            <div style={{ marginBottom: "10px" }}>
+              <label>Rating: </label>
+              <select
+                value={reviewRating}
+                onChange={(e) => setReviewRating(Number(e.target.value))}
+                style={{
+                  padding: "5px",
+                  borderRadius: "4px",
+                  border: "1px solid #ddd",
+                }}
+              >
+                {[1, 2, 3, 4, 5].map((rating) => (
+                  <option key={rating} value={rating}>
+                    {rating} ⭐
+                  </option>
+                ))}
+              </select>
+            </div>
+            <button
+              onClick={handleReviewSubmit}
+              style={{
+                backgroundColor: "#4CAF50",
+                color: "white",
+                padding: "10px 20px",
+                border: "none",
+                borderRadius: "4px",
+                cursor: "pointer",
+                marginRight: "10px",
+              }}
+            >
+              Submit
+            </button>
+            <button
+              onClick={() => setReviewPrompt(null)}
+              style={{
+                backgroundColor: "#f44336",
+                color: "white",
+                padding: "10px 20px",
+                border: "none",
+                borderRadius: "4px",
+                cursor: "pointer",
+              }}
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
         </div>
       </div>
     </div>

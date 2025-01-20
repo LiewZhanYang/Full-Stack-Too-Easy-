@@ -3,6 +3,7 @@ const reviewController = require("../controllers/reviewController");
 
 const getReviewsByProgram = async (req, res) => {
     const id = req.params.id;
+    console.log(`Program ID: ${id}`); // Debugging line
     try {
         const reviews = await Review.getReviewsByProgram(id);
         res.status(200).json(reviews);
