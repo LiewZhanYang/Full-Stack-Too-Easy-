@@ -64,29 +64,64 @@ const AdminCreateProgram = () => {
   };
 
   const handleCreateProgram = async () => {
-    const typeId = programTypeMapping[type] || null;
-
-    const formData = new FormData();
-    formData.append("ProgramName", name);
-    formData.append("ProgramDesc", description);
-    formData.append("TypeID", typeId);
-    if (image) formData.append("file", image);
-    formData.append("tiers", JSON.stringify(tiers));
-
     try {
-      const response = await fetch("http://localhost:8000/program", {
+      // Create program details
+      const typeId = programTypeMapping[type] || null;
+
+      const programData = new FormData();
+      programData.append("ProgramName", name);
+      programData.append("ProgramDesc", description);
+      programData.append("TypeID", typeId);
+
+      if (image) programData.append("file", image);
+
+      // API call to create program
+      const programResponse = await fetch("http://localhost:8000/program", {
         method: "POST",
-        body: formData,
+        body: programData,
       });
 
-      if (!response.ok) {
+      if (!programResponse.ok) {
         throw new Error("Failed to create program");
       }
 
+      const createdProgram = await programResponse.json();
+
+      // Create tiers for the program
+      const programID = createdProgram.ProgramID;
+
+      for (const tier of tiers) {
+        const tierData = {
+          Name: tier.tierName,
+          Cost: tier.cost,
+          ClassSize: tier.classSize,
+          LunchProvided: tier.lunchProvided,
+          Duration: tier.duration,
+          DiscountedCost: tier.cost * 0.9, // Calculated discounted cost
+        };
+
+        const tierResponse = await fetch(
+          `http://localhost:8000/tier/${programID}`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(tierData),
+          }
+        );
+
+        if (!tierResponse.ok) {
+          throw new Error(`Failed to create tier: ${tier.tierName}`);
+        }
+      }
+
+      // If all API calls are successful
       setShowConfirmModal(false);
       setShowSuccessModal(true);
     } catch (error) {
-      console.error("Error creating program:", error);
+      console.error("Error creating program and tiers:", error);
+      alert("Error creating program. Please try again.");
     }
   };
 
@@ -161,12 +196,11 @@ const AdminCreateProgram = () => {
             key={index}
             className="tier-section mb-4 p-3 rounded"
             style={{
-              backgroundColor: "#f9f9f9", 
+              backgroundColor: "#f9f9f9",
               border: "1px solid #ddd",
             }}
           >
-            <h5 className="mb-3">Tier {index + 1}:</h5>{" "}
-            {/* Bold tier heading */}
+            <h5 className="mb-3">Tier {index + 1}:</h5>
             <Form.Group controlId={`tierName-${index}`} className="mb-3">
               <Form.Label>Tier Name</Form.Label>
               <Form.Control
