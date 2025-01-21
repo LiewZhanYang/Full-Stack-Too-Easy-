@@ -23,7 +23,7 @@ const AdminViewSession = () => {
           throw new Error("Failed to fetch program details");
         }
         const programData = await response.json();
-        setProgramName(programData.ProgrameName); // Set the program name
+        setProgramName(programData.ProgramName); // Set the program name
       } catch (error) {
         console.error("Error fetching program details:", error);
       }

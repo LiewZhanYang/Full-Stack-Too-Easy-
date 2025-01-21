@@ -48,7 +48,7 @@ const AdminViewProgram = () => {
 
   useEffect(() => {
     const filtered = programs.filter((program) => {
-      const matchesSearchTerm = program.ProgrameName.toLowerCase().includes(
+      const matchesSearchTerm = program.ProgramName.toLowerCase().includes(
         searchTerm.toLowerCase()
       );
       const matchesType =
@@ -145,7 +145,7 @@ const AdminViewProgram = () => {
                 <Card.Img
                   variant="top"
                   src={program.image || "/img/default.jpg"}
-                  alt={program.ProgrameName}
+                  alt={program.ProgramName}
                   className="admin-program-card-image"
                 />
               </div>
@@ -154,7 +154,7 @@ const AdminViewProgram = () => {
                   className="admin-program-card-title"
                   style={{ textAlign: "left" }}
                 >
-                  {program.ProgrameName}
+                  {program.ProgramName}
                 </Card.Title>
                 <Card.Text style={{ textAlign: "left" }}>
                   {program.ProgramDesc}

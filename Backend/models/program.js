@@ -4,12 +4,12 @@ const mysql = require("mysql2/promise");
 class Program {
   constructor(
     ProgramID,
-    ProgrameName,
+    ProgramName,
     ProgramDesc,
     TypeID
   ) {
     this.ProgramID = ProgramID;
-    this.ProgrameName = ProgrameName;
+    this.ProgramName = ProgramName;
     this.ProgramDesc = ProgramDesc;
     this.TypeID = TypeID;
   }

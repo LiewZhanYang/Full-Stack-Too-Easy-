@@ -190,7 +190,7 @@ function Dashboard() {
             marginBottom: "4px",
           }}
         >
-          {data.program?.ProgrameName || "Unknown Program"}
+          {data.program?.ProgramName || "Unknown Program"}
         </h3>
         <p
           style={{

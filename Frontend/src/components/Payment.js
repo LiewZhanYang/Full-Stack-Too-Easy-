@@ -81,7 +81,7 @@ function Payment() {
           `http://localhost:8000/program/${programId}`
         );
         console.log("Program response:", response);
-        setProgramName(response.data.ProgrameName);
+        setProgramName(response.data.ProgramName);
       } catch (error) {
         console.error("Error fetching program name:", error);
       }

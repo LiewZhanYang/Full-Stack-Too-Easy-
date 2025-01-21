@@ -49,7 +49,7 @@ const Workshops = () => {
                 <Card.Img
                   variant="top"
                   src={program.image || "/img/default.jpg"}
-                  alt={program.ProgrameName}
+                  alt={program.ProgramName}
                   className="workshops-card-image"
                 />
               </div>
@@ -58,7 +58,7 @@ const Workshops = () => {
                   className="workshops-card-title"
                   style={{ textAlign: "left" }}
                 >
-                  {program.ProgrameName}
+                  {program.ProgramName}
                 </Card.Title>
               </Card.Body>
             </Card>
