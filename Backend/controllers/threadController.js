@@ -1,5 +1,5 @@
 const Thread = require("../models/Thread");
-const reviewController = require("../controllers/reviewController");
+const sentimentController = require("../controllers/sentimentController");
 
 const getThreads = async (req, res) => {
     try {
@@ -50,9 +50,7 @@ const likeThread = async (req, res) => {
     const id = parseInt(req.params.id);
     try {
         const result = await Thread.likeThread(id);
-        if (result.affectedRows === 0) {
-            return res.status(404).json({ message: "Thread not found" });
-        }
+        console.log(result);
         res.json({ message: "Thread updated successfully" });
     } catch (error) {
         console.error("Error updating thread:", error);
@@ -64,9 +62,6 @@ const dislikeThread = async (req, res) => {
     const id = parseInt(req.params.id);
     try {
         const result = await Thread.dislikeThread(id);
-        if (result.affectedRows === 0) {
-            return res.status(404).json({ message: "Thread not found" });
-        }
         res.json({ message: "Thread updated successfully" });
     } catch (error) {
         console.error("Error updating thread:", error);

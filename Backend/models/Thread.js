@@ -1,5 +1,7 @@
 const dbConfig = require("../dbConfig");
 const mysql = require("mysql2/promise");
+const Sentiment = require("sentiment");
+const sentiment = new Sentiment();
 
 class Thread {
     constructor(
@@ -78,14 +80,16 @@ class Thread {
 
     static async postThread(threadDetails) {
         const connection = await mysql.createConnection(dbConfig);
+        const sentimentResult = sentiment.analyze(threadDetails.Body);
         const sqlQuery = `
             INSERT INTO Thread (Title, Body, CreatedOn, SentimentValue, PostedBy, Topic, ReplyTo)
             VALUES (?, ?, CURRENT_DATE, ?, ?, ?, NULL)`;
 
+        console.log(sentimentResult.comparative)
         const values = [
             threadDetails.Title, 
             threadDetails.Body, 
-            threadDetails.SentimentValue,
+            sentimentResult.comparative,
             threadDetails.PostedBy,
             threadDetails.Topic
         ];
@@ -96,13 +100,14 @@ class Thread {
 
     static async postComment(commentDetails) {
         const connection = await mysql.createConnection(dbConfig);
+        const sentimentResult = sentiment.analyze(commentDetails.Body);
         const sqlQuery = `
             INSERT INTO Thread (Title, Body, CreatedOn, SentimentValue, PostedBy, Topic, ReplyTo)
             VALUES (NULL, ?, CURRENT_DATE, ?, ?, ?, ?)`;
 
         const values = [
             commentDetails.Body, 
-            commentDetails.SentimentValue,
+            sentimentResult.comparative,
             commentDetails.PostedBy,
             commentDetails.Topic,
             commentDetails.ReplyTo
