@@ -112,7 +112,7 @@ class Thread {
         connection.end();
     }
 
-    static async updateThreadLike(id) {
+    static async likeThread(id) {
         const connection = await mysql.createConnection(dbConfig);
         const sqlQuery = `
             UPDATE Thread
@@ -121,6 +121,45 @@ class Thread {
 
         const [result] = await connection.execute(sqlQuery, [id]);
         connection.end();
+    }
+
+    static async dislikeThread(id) {
+        const connection = await mysql.createConnection(dbConfig);
+        const sqlQuery = `
+            UPDATE Thread
+            SET Likes = Likes - 1
+            WHERE ThreadID = ?;`;
+
+        const [result] = await connection.execute(sqlQuery, [id]);
+        connection.end();
+    }
+
+    static async topSentimentThreadsByForumID(forumID) {
+        const connection = await mysql.createConnection(dbConfig);
+    
+        const sqlQuery = `
+            use tooeasydb;
+            SELECT * FROM Thread
+            WHERE Topic = ?
+            ORDER BY SentimentValue DESC
+            LIMIT 5;;
+        `;
+        const [result] = await connection.execute(sqlQuery, [forumID]);
+    
+        connection.end();
+        return result.map((row) => {
+            return new Thread(
+                row.ThreadID,
+                row.Title, 
+                row.Body,
+                row.CreatedOn, 
+                row.Likes,
+                row.SentimentValue,
+                row.Postedby,
+                row.Topic,
+                row.ReplyTo
+            );
+        });
     }
 
 }
