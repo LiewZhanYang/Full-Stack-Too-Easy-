@@ -64,7 +64,7 @@ class Tier {
                 tierDetails.Name,
                 tierDetails.ClassSize,
                 tierDetails.Cost,
-                tierDetails.DiscountedCost,
+                tierDetails.DiscountedCost || null,
                 tierDetails.LunchProvided,
                 tierDetails.Duration
             ];
