@@ -2,7 +2,16 @@ const dbConfig = require("../dbConfig");
 const mysql = require("mysql2/promise");
 
 class Session {
-  constructor(SessionID, StartDate, EndDate, Time, Location, Vacancy, Status ,TierID) {
+  constructor(
+    SessionID,
+    StartDate,
+    EndDate,
+    Time,
+    Location,
+    Vacancy,
+    Status,
+    TierID
+  ) {
     this.SessionID = SessionID;
     this.StartDate = StartDate;
     this.EndDate = EndDate;
@@ -15,12 +24,12 @@ class Session {
 
   static async getSessionsByTierID(TierID) {
     const connection = await mysql.createConnection(dbConfig);
-
+    console.log(`Executing query for TierID: ${TierID}`);
     const sqlQuery = `
         SELECT * FROM session WHERE TierID = ? AND StartDate > CURDATE()
-        `;
+    `;
     const [result] = await connection.execute(sqlQuery, [TierID]);
-
+    console.log(`Query result:`, result);
     connection.end();
     return result.map((row) => {
       return new Session(

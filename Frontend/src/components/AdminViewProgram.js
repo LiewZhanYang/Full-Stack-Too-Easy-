@@ -176,7 +176,7 @@ const AdminViewProgram = () => {
                     className="admin-program-edit-session-button d-flex align-items-center"
                     onClick={() => handleEditSessionClick(program.ProgramID)}
                   >
-                    <FaList className="me-1" /> <span>View Sessions</span>
+                    <FaList className="me-1" /> <span>View Tiers and Sessions</span>
                   </Button>
                 </div>
               </Card.Body>

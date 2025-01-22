@@ -3,13 +3,15 @@ const Session = require("../models/session");
 const getSessionsByTierID = async (req, res) => {
   const tierID = req.params.id;
   try {
+    console.log(`Fetching sessions for TierID: ${tierID}`);
     const sessions = await Session.getSessionsByTierID(tierID);
+    console.log(`Sessions retrieved:`, sessions);
     if (sessions.length === 0) {
-      return res.status(404).send("Sessions not found");
+      return res.status(404).send("No sessions found for this TierID");
     }
     res.json(sessions);
   } catch (error) {
-    console.error(error);
+    console.error("Error retrieving sessions:", error);
     res.status(500).send("Error retrieving sessions");
   }
 };

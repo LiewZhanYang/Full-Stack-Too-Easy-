@@ -614,14 +614,14 @@ code {
 .session-container {
   border: 1px solid #ddd;
   border-radius: 10px;
-  background-color: #f9f9f9;
+  background-color: transparent;
   padding: 0.5rem !important;
 }
 
-.session-table {
-  width: 100%;
-  margin: 0;
+.session-container {
+  border: none !important;
   background-color: transparent;
+  padding: 0.5rem !important;
 }
 
 .session-table th,
@@ -630,7 +630,7 @@ code {
   font-size: 1rem;
   color: #333;
   vertical-align: middle;
-  background-color: #f9f9f9;
+  background-color: transparent;
   border: none;
 }
 
@@ -638,6 +638,7 @@ code {
   font-weight: 500;
   color: #666;
 }
+
 
 .action-icon {
   color: #333;
