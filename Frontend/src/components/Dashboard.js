@@ -12,6 +12,9 @@ function Dashboard() {
   const [error, setError] = useState(null);
   const [activeTab, setActiveTab] = useState("Programmes");
   const [customerName, setCustomerName] = useState("");
+  const [reviewPrompt, setReviewPrompt] = useState(null); // Store program for review
+  const [reviewContent, setReviewContent] = useState(""); // Review input from user
+  const [reviewRating, setReviewRating] = useState(5); // Default rating
 
   const userAccountID = localStorage.getItem("userId"); // Assuming user ID is stored in localStorage
 
@@ -59,11 +62,12 @@ function Dashboard() {
   const calendarDays = generateCalendarDays();
   const upcomingEvents = generateUpcomingEvents();
 
-
   useEffect(() => {
     const fetchCustomerName = async () => {
       try {
-        const response = await axios.get(`http://localhost:8000/customer/id/${userAccountID}`);
+        const response = await axios.get(
+          `http://localhost:8000/customer/id/${userAccountID}`
+        );
         if (response.data && response.data.length > 0) {
           setCustomerName(response.data[0].Name || "User");
         }
@@ -78,65 +82,63 @@ function Dashboard() {
   useEffect(() => {
     const fetchProgramsAndSessions = async () => {
       try {
-        // Fetch Signups
         const signUpResponse = await axios.get(
           `http://localhost:8000/signup/${userAccountID}`
         );
         const signUps = Array.isArray(signUpResponse.data)
           ? signUpResponse.data
           : [signUpResponse.data];
-        console.log("Fetched SignUps:", signUps);
-    
-        // Map Signups with Session Details
-        const signUpsWithSessions = await Promise.all(
+  
+        const signUpsWithDetails = await Promise.all(
           signUps.map(async (signup) => {
             if (signup.SessionID) {
-              try {
-                const sessionResponse = await axios.get(
-                  `http://localhost:8000/session/SessionID/${signup.SessionID}`
-                );
-                return {
-                  ...signup,
-                  session: sessionResponse.data,
-                  ProgramID: sessionResponse.data.ProgramID,
-                };
-              } catch (err) {
-                console.error(
-                  `Failed to fetch session for SessionID: ${signup.SessionID}`,
-                  err
-                );
-                return { ...signup, session: null, ProgramID: null };
-              }
-            } else {
-              return { ...signup, session: null, ProgramID: null };
+              const sessionResponse = await axios.get(
+                `http://localhost:8000/session/SessionID/${signup.SessionID}`
+              );
+              const tierResponse = await axios.get(
+                `http://localhost:8000/tier/${sessionResponse.data.TierID}`
+              );
+  
+              return {
+                ...signup,
+                session: sessionResponse.data,
+                tier: tierResponse.data,
+              };
             }
+            return { ...signup, session: null, tier: null };
           })
         );
-        console.log("SignUps with Session Details:", signUpsWithSessions);
-    
-        // Fetch Programs
-        const programResponse = await axios.get(
-          `http://localhost:8000/program/signup/${userAccountID}`
-        );
-        const programs = programResponse.data;
-        console.log("Fetched Programs:", programs);
-    
-        // Combine Signups with Programs
-        const combinedData = signUpsWithSessions.map((signup) => {
-          const matchingProgram = programs.find(
-            (program) => Number(program.ProgramID) === Number(signup.ProgramID)
-          );
-          if (!matchingProgram) {
-            console.warn(
-              `No matching program found for ProgramID: ${signup.ProgramID}`
+  
+        console.log("Sign-ups with details:", signUpsWithDetails);
+  
+        const endedPrograms = signUpsWithDetails.find((program) => {
+          if (program.session && program.session.EndDate) {
+            const endDate = new Date(program.session.EndDate);
+            console.log(
+              "Checking program:",
+              program,
+              "End Date:",
+              endDate,
+              "Current Date:",
+              currentDate,
+              "Comparison Result:",
+              endDate < currentDate
             );
+            return endDate < currentDate; // Compare dates
           }
-          return { ...signup, program: matchingProgram || null };
+          return false;
         });
-    
-        console.log("Final Combined Data:", combinedData);
-    
-        setPrograms(combinedData);
+        
+        console.log("Ended Programs Result:", endedPrograms);
+        
+  
+        console.log("Ended Programs:", endedPrograms);
+  
+        if (endedPrograms) {
+          setReviewPrompt(endedPrograms);
+        }
+  
+        setPrograms(signUpsWithDetails);
       } catch (err) {
         setError("You have not signed up for any programmes.");
         console.error(err);
@@ -144,9 +146,58 @@ function Dashboard() {
         setLoading(false);
       }
     };
+  
     fetchProgramsAndSessions();
   }, [userAccountID]);
+  
+  
 
+  const handleReviewSubmit = async () => {
+    if (!reviewContent.trim()) {
+      alert("Please write a review before submitting.");
+      return;
+    }
+  
+    // Ensure ProgramID is valid
+    const programID = reviewPrompt?.session?.ProgramID;
+    if (!programID) {
+      alert("Program ID is missing. Unable to submit review.");
+      return;
+    }
+  
+    const payload = {
+      Content: reviewContent,
+      Star: reviewRating,
+      AccountID: userAccountID, // User submitting the review
+      Date: new Date().toISOString(), // Current date and time
+    };
+  
+    console.log(`Submitting review for ProgramID: ${programID}`, payload);
+  
+    try {
+      const response = await axios.post(`http://localhost:8000/review/${programID}`, payload);
+  
+      // Log success response
+      console.log("Review submission successful:", response.data);
+  
+      alert("Thank you for your review!");
+      setReviewPrompt(null); // Close the review prompt
+      setReviewContent("");
+      setReviewRating(5); // Reset review form
+    } catch (error) {
+      console.error("Error submitting review:", error);
+  
+      if (error.response) {
+        console.error("Server responded with:", error.response.data);
+        alert(`Failed to submit review: ${error.response.data.message || "Unknown error"}`);
+      } else {
+        alert("Failed to submit review. Please check your network connection.");
+      }
+    }
+  };
+  
+  
+  
   const renderProgramCard = (data) => (
     <div
       key={data.SignUpID}
@@ -190,7 +241,7 @@ function Dashboard() {
             marginBottom: "4px",
           }}
         >
-          {data.program?.ProgramName || "Unknown Program"}
+          {data.tier[0]?.Name || "Unknown Program"}
         </h3>
         <p
           style={{
@@ -213,7 +264,9 @@ function Dashboard() {
       </div>
 
       <button
-        onClick={() => navigate("/workshopvm", { state: { signUpId: data.SignUpID } })}
+        onClick={() =>
+          navigate("/workshopvm", { state: { sessionId: data.session?.SessionID } })
+        }
         style={{
           backgroundColor: "#fbbf24",
           color: "white",
@@ -231,7 +284,6 @@ function Dashboard() {
       >
         View More
       </button>
-      
     </div>
   );
 
@@ -239,21 +291,24 @@ function Dashboard() {
     <div className="p-4">
       <div className="flex space-x-8">
         <div className="flex-1">
-          <h1 className="text-2xl font-bold mb-6">Welcome Back, {customerName}</h1>
+          <h1 className="text-2xl font-bold mb-6">
+            Welcome Back, {customerName}
+          </h1>
 
-            <button
-              onClick={() => setActiveTab("Programmes")}
-              style={{
-                fontSize: "16px",
-                fontWeight: activeTab === "Programmes" ? "bold" : "normal",
-                color: activeTab === "Programmes" ? "#f59e0b" : "#6b7280",
-                padding: "8px 16px",
-                borderBottom: activeTab === "Programmes" ? "2px solid #fbbf24" : "none",
-                cursor: "pointer",
-              }}
-            >
-              Programmes
-            </button>
+          <button
+            onClick={() => setActiveTab("Programmes")}
+            style={{
+              fontSize: "16px",
+              fontWeight: activeTab === "Programmes" ? "bold" : "normal",
+              color: activeTab === "Programmes" ? "#f59e0b" : "#6b7280",
+              padding: "8px 16px",
+              borderBottom:
+                activeTab === "Programmes" ? "2px solid #fbbf24" : "none",
+              cursor: "pointer",
+            }}
+          >
+            Programmes
+          </button>
 
           {activeTab === "Programmes" && (
             <div>
@@ -304,17 +359,31 @@ function Dashboard() {
                 <div
                   key={index}
                   className={`flex items-start p-3 rounded-lg ${
-                    event.isToday ? "bg-white shadow-sm border border-gray-100" : "bg-gray-50"
+                    event.isToday
+                      ? "bg-white shadow-sm border border-gray-100"
+                      : "bg-gray-50"
                   }`}
                 >
-                  <div className={`text-xl font-bold w-8 ${event.isToday ? "text-gray-800" : "text-gray-400"}`}>
+                  <div
+                    className={`text-xl font-bold w-8 ${
+                      event.isToday ? "text-gray-800" : "text-gray-400"
+                    }`}
+                  >
                     {event.date}
                   </div>
                   <div className="ml-4">
-                    <div className={`font-medium ${event.isToday ? "text-gray-800" : "text-gray-500"}`}>
+                    <div
+                      className={`font-medium ${
+                        event.isToday ? "text-gray-800" : "text-gray-500"
+                      }`}
+                    >
                       {event.title}
                     </div>
-                    <div className={`text-sm ${event.isToday ? "text-gray-600" : "text-gray-400"}`}>
+                    <div
+                      className={`text-sm ${
+                        event.isToday ? "text-gray-600" : "text-gray-400"
+                      }`}
+                    >
                       {event.time}
                     </div>
                   </div>
@@ -322,6 +391,95 @@ function Dashboard() {
               ))}
             </div>
           </div>
+
+                {/* Review Prompt Modal */}
+      {reviewPrompt &&  (
+        <div
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            width: "100%",
+            height: "100%",
+            backgroundColor: "rgba(0, 0, 0, 0.5)",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          <div
+            style={{
+              backgroundColor: "white",
+              padding: "20px",
+              borderRadius: "8px",
+              maxWidth: "500px",
+              width: "90%",
+            }}
+          >
+            <h2 style={{ marginBottom: "10px", fontSize: "18px", fontWeight: "bold" }}>
+              Leave a Review for {reviewPrompt.tier[0]?.Name}
+            </h2>
+            <textarea
+              value={reviewContent}
+              onChange={(e) => setReviewContent(e.target.value)}
+              placeholder="Write your review here..."
+              style={{
+                width: "100%",
+                height: "100px",
+                marginBottom: "10px",
+                padding: "10px",
+                borderRadius: "4px",
+                border: "1px solid #ddd",
+              }}
+            />
+            <div style={{ marginBottom: "10px" }}>
+              <label>Rating: </label>
+              <select
+                value={reviewRating}
+                onChange={(e) => setReviewRating(Number(e.target.value))}
+                style={{
+                  padding: "5px",
+                  borderRadius: "4px",
+                  border: "1px solid #ddd",
+                }}
+              >
+                {[1, 2, 3, 4, 5].map((rating) => (
+                  <option key={rating} value={rating}>
+                    {rating} ⭐
+                  </option>
+                ))}
+              </select>
+            </div>
+            <button
+              onClick={handleReviewSubmit}
+              style={{
+                backgroundColor: "#4CAF50",
+                color: "white",
+                padding: "10px 20px",
+                border: "none",
+                borderRadius: "4px",
+                cursor: "pointer",
+                marginRight: "10px",
+              }}
+            >
+              Submit
+            </button>
+            <button
+              onClick={() => setReviewPrompt(null)}
+              style={{
+                backgroundColor: "#f44336",
+                color: "white",
+                padding: "10px 20px",
+                border: "none",
+                borderRadius: "4px",
+                cursor: "pointer",
+              }}
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
         </div>
       </div>
     </div>

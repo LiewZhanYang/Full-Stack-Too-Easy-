@@ -30,12 +30,38 @@ const postSession = async (req, res) => {
 
 const updateSession = async (req, res) => {
   const sessionID = req.params.id;
-  const sessionDetails = req.body; // Program data to be updated
+  const {
+    StartDate,
+    EndDate = null,
+    Time = null,
+    Location = null,
+    Vacancy = null,
+    Status = null,
+    TierID = null,
+  } = req.body;
+
+  // Validate required fields
+  if (StartDate === undefined) {
+    return res.status(400).json({ message: "StartDate is required and cannot be undefined." });
+  }
+
+  const sessionDetails = {
+    StartDate,
+    EndDate,
+    Time,
+    Location,
+    Vacancy,
+    Status,
+    TierID,
+  };
+
+  // Log the session details for debugging
+  console.log('Session Details:', sessionDetails);
 
   try {
     const result = await Session.updateSession(sessionID, sessionDetails);
 
-    if (result.affectedRows === 0) {
+    if (!result) {
       return res.status(404).json({ message: "Session not found" });
     }
 
@@ -45,6 +71,8 @@ const updateSession = async (req, res) => {
     res.status(500).json({ message: "Error updating Session" });
   }
 };
+
+
 
 const deleteSession = async (req, res) => {
   const SessionID = req.params.id;

@@ -10,6 +10,7 @@ function WorkshopPrice() {
   const [activeTab, setActiveTab] = useState("About");
   const navigate = useNavigate();
   const [isMemberActive, setIsMemberActive] = useState(false);
+  const [reviews, setReviews] = useState({});
 
   useEffect(() => {
     setSessionName("Public Speaking Workshop");
@@ -28,7 +29,18 @@ function WorkshopPrice() {
       }
     };
 
+    // Fetch reviews for ProgramID 1
+    const fetchReviewsForProgram1 = async () => {
+      try {
+        const response = await axios.get(`http://localhost:8000/review/1`);
+        setReviews(response.data);
+      } catch (error) {
+        console.error("Error fetching reviews:", error);
+      }
+    };
+
     fetchMembershipStatus();
+    fetchReviewsForProgram1();
   }, [setSessionName]);
 
   const handleGetStarted = (tier) => {
@@ -47,6 +59,8 @@ function WorkshopPrice() {
     });
   };
 
+
+  
   const priceTiers = [
     {
       level: "Beginner",
@@ -249,8 +263,105 @@ function WorkshopPrice() {
                   </button>
                 </div>
               </div>
+              
             );
           })}
+
+{/* Reviews Section */}
+<div
+  className="reviews-section mt-4"
+  style={{
+    marginTop: "2rem",
+    padding: "1.5rem",
+    background: "#f7f9fc",
+    borderRadius: "8px",
+    boxShadow: "0 2px 5px rgba(0, 0, 0, 0.1)",
+  }}
+>
+  <h5
+    className="text-primary mb-4"
+    style={{
+      fontSize: "1.5rem",
+      fontWeight: "bold",
+      color: "#007bff",
+      marginBottom: "1.5rem",
+    }}
+  >
+    What Participants Say About Public Speaking Workshop
+  </h5>
+  {reviews.length > 0 ? (
+    <div
+      className="reviews-container"
+      style={{
+        display: "grid",
+        gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
+        gap: "1.5rem",
+      }}
+    >
+      {reviews.map((review, i) => (
+        <div
+          key={i}
+          className="review-item"
+          style={{
+            background: "#fff",
+            padding: "1.5rem",
+            border: "1px solid #e0e0e0",
+            borderRadius: "8px",
+            boxShadow: "0 1px 3px rgba(0, 0, 0, 0.1)",
+          }}
+        >
+          <p
+            className="review-content"
+            style={{
+              fontSize: "1rem",
+              lineHeight: "1.5",
+              color: "#333",
+              marginBottom: "0.5rem",
+            }}
+          >
+            {review.Content}
+          </p>
+          <div
+            className="review-footer"
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              fontSize: "0.9rem",
+              color: "#888",
+            }}
+          >
+            <span className="review-date">
+              {new Date(review.Date).toLocaleDateString()}
+            </span>
+            <div
+              className="review-rating"
+              style={{
+                color: "#f39c12", // Gold star color
+                fontWeight: "bold",
+              }}
+            >
+              {Array(review.Star)
+                .fill("⭐")
+                .join("")}
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  ) : (
+    <p
+      style={{
+        fontSize: "1rem",
+        color: "#666",
+      }}
+    >
+      Loading reviews...
+    </p>
+  )}
+</div>
+
+
         </div>
       </div>
     </div>

@@ -30,7 +30,10 @@ const emailRoutes = require("./routes/emailRoutes");
 const meetingRoutes = require("./routes/meetingRoutes");
 const announceRoutes = require("./routes/announcementRoutes");
 const reviewRoutes = require("./routes/reviewRoutes");
-const tierRoutes = require("./routes/tierRoutes")
+const tierRoutes = require("./routes/tierRoutes");
+const sentimentRoutes = require("./routes/sentimentRoutes");
+const ticketingRoutes = require("./routes/ticketingRoutes");
+const commentsRoutes = require("./routes/commentsRoutes");
 
 app.use("/customer", customerRoutes);
 app.use("/admin", adminRoutes);
@@ -48,7 +51,10 @@ app.use("/email", emailRoutes);
 app.use("/meeting", meetingRoutes);
 app.use("/announcement", announceRoutes);
 app.use("/review", reviewRoutes);
-app.use("/tier", tierRoutes)
+app.use("/tier", tierRoutes);
+app.use("/sentiment", sentimentRoutes);
+app.use("/ticketing", ticketingRoutes);
+app.use("/comments", commentsRoutes);
 
 //const testController = require('./controllers/testController');
 
@@ -102,10 +108,12 @@ app.listen(port, async () => {
 });
 */
 
-// Stripe Implementation 
+// Stripe Implementation
 
 // This is your test secret API key.
-const stripe = require("stripe")('sk_test_51QRx0kG1MaTqtP83Z47pxbPyInBiDQ9bBfhbePUsWSYXq4q3C2ouNE9jv3r90GAzPDYOAKoHUkvPvKcCwLkAmIpL00zMovbfi2');
+const stripe = require("stripe")(
+  "sk_test_51QRx0kG1MaTqtP83Z47pxbPyInBiDQ9bBfhbePUsWSYXq4q3C2ouNE9jv3r90GAzPDYOAKoHUkvPvKcCwLkAmIpL00zMovbfi2"
+);
 
 app.post("/create-payment-intent", async (req, res) => {
   const amount = req.body.amount;
