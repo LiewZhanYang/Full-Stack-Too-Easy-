@@ -2,25 +2,39 @@ const Thread = require("../models/Thread");
 const sentimentController = require("../controllers/sentimentController");
 
 const getThreads = async (req, res) => {
+    const { topic } = req.query; // Get topic from query parameter
     try {
-        const threads = await Thread.getThreads();
-        res.status(200).json(threads);
+      const threads = await Thread.getThreads(topic); // Pass topic to model
+      res.status(200).json(threads);
     } catch (error) {
-        console.error("Error retrieving threads:", error);
-        res.status(500).json({ message: "Error retrieving threads" });
+      console.error("Error retrieving threads:", error);
+      res.status(500).json({ message: "Error retrieving threads" });
+    }
+  };
+  
+  const getThreadByID = async (req, res) => {
+    try {
+        const threadId = req.params.id;
+        const thread = await Thread.getThreadByID(threadId);
+        res.status(200).json(thread);
+    } catch (error) {
+        console.error("Error fetching thread by ID:", error);
+        res.status(500).json({ error: error.message });
     }
 };
 
-const getCommentByThreadID = async (req, res) => {
-    const id = req.params.id;
+  
+  const getCommentByThreadID = async (req, res) => {
+    const threadId = req.params.id;
     try {
-        const threads = await Thread.getCommentByThreadID(id);
-        res.status(200).json(threads);
+        const comments = await Thread.getCommentByThreadID(threadId);
+        res.status(200).json(comments);
     } catch (error) {
-        console.error("Error retrieving threads:", error);
-        res.status(500).json({ message: "Error retrieving threads" });
+        console.error(`Error fetching comments for thread ID ${threadId}:`, error);
+        res.status(500).json({ message: "Error fetching comments" });
     }
 };
+
 
 const postThread = async (req, res) => {
     const threadDetails = req.body;
@@ -36,15 +50,18 @@ const postThread = async (req, res) => {
 
 const postComment = async (req, res) => {
     const commentDetails = req.body;
+    console.log("Received comment details:", commentDetails); // Add this line
     try {
         const newComment = await Thread.postComment(commentDetails);
         res.status(201).json(newComment);
-        console.log("Successfully posted Comment");
+        console.log("Successfully posted comment:", newComment);
     } catch (error) {
-        console.error(error);
-        res.status(500).send("Error posting Comment");
+        console.error("Error posting comment:", error); // Log the full error
+        res.status(500).send("Error posting comment");
     }
 };
+
+
 
 const likeThread = async (req, res) => {
     const id = parseInt(req.params.id);
@@ -73,6 +90,7 @@ const dislikeThread = async (req, res) => {
 
 module.exports = {
     getThreads, 
+    getThreadByID,
     getCommentByThreadID, 
     postThread,
     postComment,
