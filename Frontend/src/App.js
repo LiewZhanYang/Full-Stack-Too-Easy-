@@ -25,6 +25,7 @@ import PreCoaching from "./components/PreCoaching.js";
 import Coaching from "./components/Coaching.js";
 import AdminHome from "./components/AdminHome.js";
 import AdminViewProgram from "./components/AdminViewProgram.js";
+import AdminViewProgramDetails from "./components/AdminViewProgramDetails.js";
 import AdminViewSession from "./components/AdminViewSession.js";
 import AdminEditSession from "./components/AdminEditSession.js";
 import AdminCreateSession from "./components/AdminCreateSession.js";
@@ -126,6 +127,10 @@ function App() {
                     path="/admin-view-program"
                     element={<AdminViewProgram />}
                   />
+                  <Route
+                    path="/admin-view-program-details/:id"
+                    element={<AdminViewProgramDetails />}
+                    />
                   <Route
                     path="/admin-view-session/:id"
                     element={<AdminViewSession />}

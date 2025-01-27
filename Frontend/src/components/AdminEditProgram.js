@@ -294,9 +294,8 @@ const AdminEditProgram = () => {
               border: "1px solid #ddd",
             }}
           >
-            <h5>Tier {index + 1}</h5>
             <Form.Group controlId={`tierName${index}`} className="mb-3">
-              <Form.Label>Tier Name</Form.Label>
+              <Form.Label>Tier {index + 1} Name</Form.Label>
               <Form.Control
                 type="text"
                 placeholder="Enter tier name"

@@ -8,7 +8,7 @@ import {
   Form,
   Dropdown,
 } from "react-bootstrap";
-import { FaSearch, FaEdit, FaPlus, FaList } from "react-icons/fa";
+import { FaSearch, FaEye, FaPlus, FaList } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 
 const AdminViewProgram = () => {
@@ -162,7 +162,11 @@ const AdminViewProgram = () => {
                 </Card.Text>
                 <div className="d-flex gap-2 mt-auto">
                   <Button
-                    onClick={() => handleEditClick(program.ProgramID)}
+                    onClick={() =>
+                      navigate(
+                        `/admin-view-program-details/${program.ProgramID}`
+                      )
+                    }
                     style={{
                       backgroundColor: "#fbbf24",
                       color: "black",
@@ -170,15 +174,14 @@ const AdminViewProgram = () => {
                     variant="warning"
                     className="admin-program-edit-button d-flex align-items-center"
                   >
-                    <FaEdit className="me-1" /> <span>Edit Details</span>
+                    <FaEye className="me-1" /> <span>View Details</span>
                   </Button>
                   <Button
                     variant="warning"
                     className="admin-program-edit-session-button d-flex align-items-center"
                     onClick={() => handleEditSessionClick(program.ProgramID)}
                   >
-                    <FaList className="me-1" />{" "}
-                    <span>View Tiers and Sessions</span>
+                    <FaList className="me-1" /> <span>View Sessions</span>
                   </Button>
                 </div>
               </Card.Body>
