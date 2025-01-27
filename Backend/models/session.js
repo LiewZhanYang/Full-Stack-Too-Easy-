@@ -47,22 +47,42 @@ class Session {
 
   static async postSession(sessionDetails) {
     const connection = await mysql.createConnection(dbConfig);
+
+    // Validate input
+    if (
+      !sessionDetails.StartDate ||
+      !sessionDetails.EndDate ||
+      !sessionDetails.Time ||
+      !sessionDetails.Location ||
+      !sessionDetails.Vacancy ||
+      !sessionDetails.TierID
+    ) {
+      throw new Error("Missing required session details");
+    }
+
     const sqlQuery = `
-            INSERT INTO session (StartDate, EndDate, Time, Location, Vacancy, TierID)
-            VALUES (?, ?, ?, ?, ?, ?)`;
+        INSERT INTO session (StartDate, EndDate, Time, Location, Vacancy, TierID)
+        VALUES (?, ?, ?, ?, ?, ?)
+    `;
 
     const values = [
       sessionDetails.StartDate,
       sessionDetails.EndDate,
       sessionDetails.Time,
       sessionDetails.Location,
-      // this should not be changed
       sessionDetails.Vacancy,
       sessionDetails.TierID,
     ];
 
-    const [result] = await connection.execute(sqlQuery, values);
-    connection.end();
+    try {
+      const [result] = await connection.execute(sqlQuery, values);
+      connection.end();
+      return result;
+    } catch (error) {
+      console.error("Error executing query:", error);
+      connection.end();
+      throw error;
+    }
   }
 
   static async updateSession(SessionID, SessionDetails) {
