@@ -366,13 +366,21 @@ const AdminEditProgram = () => {
         <div className="admin-create-button-group mt-4">
           <Button
             variant="warning"
+            style={{
+              backgroundColor: "#fbbf24", 
+              color: "black",
+            }}
             className="admin-create-confirm-button me-3"
-            onClick={() => setShowConfirmModal(true)} // Show confirmation modal
+            onClick={() => setShowConfirmModal(true)} 
           >
             Save
           </Button>
           <Button
             variant="danger"
+            style={{
+              backgroundColor: "#dc3545", 
+              color: "white",
+            }}
             className="admin-create-cancel-button"
             onClick={handleCancel}
           >
