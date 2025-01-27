@@ -96,6 +96,7 @@ const AdminViewPayment = () => {
         <Nav.Item>
           <Nav.Link
             eventKey="pending"
+            className="admin-bookings-tab"
             style={{
               color: activeTab === "pending" ? "#f59e0b" : "#6b7280", // Highlight current tab
               fontWeight: activeTab === "pending" ? "bold" : "normal", // Bold text for active

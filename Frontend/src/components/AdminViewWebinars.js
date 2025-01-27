@@ -8,7 +8,7 @@ import {
   Form,
   Modal,
 } from "react-bootstrap";
-import { FaSearch, FaEdit, FaPlus, FaTrash } from "react-icons/fa";
+import { FaSearch, FaEdit, FaTrash } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 
 const AdminViewWebinars = () => {
@@ -16,7 +16,7 @@ const AdminViewWebinars = () => {
   const [filteredWebinars, setFilteredWebinars] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [showConfirmModal, setShowConfirmModal] = useState(false);
-  const [webinarToDelete, setWebinarToDelete] = useState(null); // Store ID of webinar to delete
+  const [webinarToDelete, setWebinarToDelete] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -53,8 +53,8 @@ const AdminViewWebinars = () => {
   };
 
   const handleDeleteClick = (webinarId) => {
-    setWebinarToDelete(webinarId); // Set the ID of the webinar to be deleted
-    setShowConfirmModal(true); // Show confirmation modal
+    setWebinarToDelete(webinarId);
+    setShowConfirmModal(true);
   };
 
   const confirmDelete = async () => {
@@ -78,8 +78,8 @@ const AdminViewWebinars = () => {
               (webinar) => webinar.WebinarID !== webinarToDelete
             )
           );
-          setShowConfirmModal(false); // Close modal after deletion
-          setWebinarToDelete(null); // Clear the stored ID
+          setShowConfirmModal(false);
+          setWebinarToDelete(null);
         } else {
           console.error("Failed to delete webinar");
         }
@@ -87,10 +87,6 @@ const AdminViewWebinars = () => {
         console.error("Error deleting webinar:", error);
       }
     }
-  };
-
-  const handleCreateWebinarClick = () => {
-    navigate("/admin-create-webinar");
   };
 
   return (
@@ -136,20 +132,42 @@ const AdminViewWebinars = () => {
               <Card.Body className="d-flex flex-column justify-content-between">
                 <Card.Title
                   className="admin-webinar-card-title"
-                  style={{ textAlign: "left" }}
+                  style={{
+                    textAlign: "left",
+                    fontSize: "1.25rem", 
+                    fontWeight: "bold",
+                  }}
                 >
                   {webinar.WebinarName}
                 </Card.Title>
-                <Card.Text style={{ textAlign: "left" }}>
+                <Card.Text
+                  style={{
+                    textAlign: "left",
+                    fontSize: "1rem", // Smaller font size for the details
+                    fontWeight: "normal",
+                    color: "#6c757d", // Subtle gray color
+                  }}
+                >
                   Speaker: {webinar.Speaker}
                 </Card.Text>
-                <Card.Text style={{ textAlign: "left" }}>
+                <Card.Text
+                  style={{
+                    textAlign: "left",
+                    fontSize: "1rem",
+                    fontWeight: "normal",
+                    color: "#6c757d",
+                  }}
+                >
                   Date: {new Date(webinar.Date).toLocaleDateString()}
                 </Card.Text>
                 <div className="d-flex gap-2 mt-auto">
                   <Button
                     variant="warning"
                     className="admin-webinar-edit-button d-flex align-items-center"
+                    style={{
+                      backgroundColor: "#fbbf24",
+                      color: "black",
+                    }}
                     onClick={() => handleEditClick(webinar.WebinarID)}
                   >
                     <FaEdit className="me-1" /> <span>Edit</span>
@@ -157,6 +175,11 @@ const AdminViewWebinars = () => {
                   <Button
                     variant="danger"
                     className="admin-webinar-delete-button d-flex align-items-center"
+                    style={{
+                      backgroundColor: "#dc3545",
+                      color: "white",
+                      border: "none",
+                    }}
                     onClick={() => handleDeleteClick(webinar.WebinarID)}
                   >
                     <FaTrash className="me-1" /> <span>Delete</span>
@@ -179,7 +202,17 @@ const AdminViewWebinars = () => {
         </Modal.Header>
         <Modal.Body>Are you sure you want to delete this webinar?</Modal.Body>
         <Modal.Footer>
-          <Button variant="danger" onClick={confirmDelete}>
+          <Button
+            variant="danger"
+            style={{
+              backgroundColor: "#dc3545",
+              color: "white",
+              borderRadius: "8px",
+              padding: "8px 16px",
+              fontWeight: "500",
+            }}
+            onClick={confirmDelete}
+          >
             Delete
           </Button>
           <Button

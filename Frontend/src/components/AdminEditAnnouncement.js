@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from "react";
-import { Container, Button, Form } from "react-bootstrap";
+import { Container, Button, Form, Modal } from "react-bootstrap";
 import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 
 const AdminEditAnnouncement = () => {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
   const navigate = useNavigate();
   const { id } = useParams(); // Get the announcement ID from the URL
 
@@ -17,7 +19,6 @@ const AdminEditAnnouncement = () => {
         );
         const announcement = response.data;
 
-        // Check if the response contains the expected data structure
         if (announcement && announcement.AnnouncementID === parseInt(id)) {
           setTitle(announcement.Title);
           setDescription(announcement.Body);
@@ -45,7 +46,7 @@ const AdminEditAnnouncement = () => {
 
       if (response.status === 200) {
         console.log("Announcement Updated:", response.data);
-        navigate("/admin-view-announcement"); // Redirect to the announcement list after updating
+        setShowSuccessModal(true); // Show success modal on successful update
       }
     } catch (error) {
       console.error("Error updating announcement:", error);
@@ -58,14 +59,16 @@ const AdminEditAnnouncement = () => {
   };
 
   return (
-    <Container
-      fluid
-      className="admin-edit-announcement-page p-4"
-      style={{ maxWidth: "600px" }}
-    >
-      <h2 className="admin-edit-title">Edit Announcement</h2>
+    <Container fluid className="admin-edit-announcement-page p-4">
+      <h2 className="admin-create-title">Edit Announcement</h2>
       <hr className="admin-edit-divider mb-4" />
-      <Form>
+
+      <Form
+        onSubmit={(e) => {
+          e.preventDefault();
+          setShowConfirmModal(true); // Show confirmation modal
+        }}
+      >
         <Form.Group controlId="announcementTitle" className="mb-3">
           <Form.Label>Title</Form.Label>
           <Form.Control
@@ -73,8 +76,10 @@ const AdminEditAnnouncement = () => {
             placeholder="Enter announcement title"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
+            required
           />
         </Form.Group>
+
         <Form.Group controlId="announcementDescription" className="mb-3">
           <Form.Label>Description</Form.Label>
           <Form.Control
@@ -83,21 +88,113 @@ const AdminEditAnnouncement = () => {
             placeholder="Enter announcement description"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
+            required
           />
         </Form.Group>
-        <div className="d-flex justify-content-center mt-4">
+
+        <div className="mt-4">
           <Button
-            variant="primary"
+            variant="warning"
+            type="submit"
             className="me-3"
-            onClick={handleUpdateAnnouncement}
+            style={{
+              backgroundColor: "#fbbf24",
+              color: "black",
+              borderRadius: "8px",
+              padding: "8px 16px",
+              fontSize: "14px",
+              fontWeight: "500",
+              border: "none",
+            }}
+            onMouseOver={(e) => (e.target.style.backgroundColor = "#f59e0b")}
+            onMouseOut={(e) => (e.target.style.backgroundColor = "#fbbf24")}
           >
-            Save Changes
+            Save
           </Button>
-          <Button variant="danger" onClick={handleCancel}>
+          <Button variant="secondary" onClick={handleCancel}>
             Cancel
           </Button>
         </div>
       </Form>
+
+      {/* Confirmation Modal */}
+      <Modal
+        show={showConfirmModal}
+        onHide={() => setShowConfirmModal(false)}
+        centered
+      >
+        <Modal.Header closeButton>
+          <Modal.Title>Confirm Update</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          Are you sure you want to update this announcement?
+        </Modal.Body>
+        <Modal.Footer>
+          <Button
+            variant="warning"
+            style={{
+              backgroundColor: "#fbbf24",
+              color: "black",
+              borderRadius: "8px",
+              padding: "8px 16px",
+              fontSize: "14px",
+              fontWeight: "500",
+              border: "none",
+            }}
+            onMouseOver={(e) => (e.target.style.backgroundColor = "#f59e0b")}
+            onMouseOut={(e) => (e.target.style.backgroundColor = "#fbbf24")}
+            onClick={() => {
+              setShowConfirmModal(false);
+              handleUpdateAnnouncement();
+            }}
+          >
+            Confirm
+          </Button>
+          <Button
+            variant="secondary"
+            onClick={() => setShowConfirmModal(false)}
+          >
+            Cancel
+          </Button>
+        </Modal.Footer>
+      </Modal>
+
+      {/* Success Modal */}
+      <Modal
+        show={showSuccessModal}
+        onHide={() => {
+          setShowSuccessModal(false);
+          navigate("/admin-view-announcement");
+        }}
+        centered
+      >
+        <Modal.Header closeButton>
+          <Modal.Title>Announcement Updated</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>The announcement has been updated successfully.</Modal.Body>
+        <Modal.Footer>
+          <Button
+            variant="warning"
+            style={{
+              backgroundColor: "#fbbf24",
+              color: "black",
+              borderRadius: "8px",
+              padding: "8px 16px",
+              fontSize: "14px",
+              fontWeight: "500",
+              border: "none",
+            }}
+            onMouseOver={(e) => (e.target.style.backgroundColor = "#f59e0b")}
+            onMouseOut={(e) => (e.target.style.backgroundColor = "#fbbf24")}
+            onClick={() => {
+              setShowSuccessModal(false);
+              navigate("/admin-view-announcement");
+            }}
+          >
+            Close
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </Container>
   );
 };

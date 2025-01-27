@@ -9,6 +9,7 @@ const AdminViewAnnouncement = () => {
   const [announcements, setAnnouncements] = useState([]);
   const [activeTab, setActiveTab] = useState("active");
   const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false); // Success modal state
   const [announcementToDelete, setAnnouncementToDelete] = useState(null);
 
   const fetchAnnouncements = async () => {
@@ -32,10 +33,12 @@ const AdminViewAnnouncement = () => {
   const confirmDelete = async () => {
     if (announcementToDelete) {
       try {
-        await axios.delete(`http://localhost:8000/announcement/${announcementToDelete}`);
-        alert("Announcement deleted successfully");
+        await axios.delete(
+          `http://localhost:8000/announcement/${announcementToDelete}`
+        );
+        setShowConfirmModal(false); // Close confirmation modal
+        setShowSuccessModal(true); // Open success modal
         fetchAnnouncements();
-        setShowConfirmModal(false);
         setAnnouncementToDelete(null);
       } catch (error) {
         console.error("Error deleting announcement:", error);
@@ -74,43 +77,98 @@ const AdminViewAnnouncement = () => {
     const filteredAnnouncements = filterAnnouncements();
 
     if (activeTab === "active" && filteredAnnouncements.length === 0) {
-      return <p ><br></br>No upcoming announcements.</p>;
+      return (
+        <p className="text-muted text-center">No upcoming announcements.</p>
+      );
     }
 
     return filteredAnnouncements.map((announcement) => (
       <Card
         key={announcement.AnnouncementID}
         className="admin-payment-card mb-3 p-3"
-        style={{ cursor: "pointer" }}
+        style={{
+          cursor: "pointer",
+          boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)",
+          borderRadius: "8px",
+          border: "1px solid #e5e7eb",
+        }}
       >
-        <Card.Body>
-          <Card.Title className="admin-payment-order-id">{announcement.Title}</Card.Title>
-          <Card.Text className="admin-payment-text">{new Date(announcement.PostedDate).toLocaleDateString()}</Card.Text>
-          <div className="d-flex justify-content-between align-items-center">
-            <Card.Text>ID: {announcement.AnnouncementID}</Card.Text>
-            <div className="d-flex gap-2">
-              <Button
-                variant="light"
-                className="d-flex align-items-center"
-                onClick={() => handleViewClick(announcement.AnnouncementID)}
-              >
-                <FaEye className="me-1" /> View
-              </Button>
-              <Button
-                variant="light"
-                className="d-flex align-items-center"
-                onClick={() => handleEditClick(announcement.AnnouncementID)}
-              >
-                <FaEdit className="me-1" /> Edit
-              </Button>
-              <Button
-                variant="danger"
-                className="d-flex align-items-center"
-                onClick={() => handleDeleteClick(announcement.AnnouncementID)}
-              >
-                <FaTrash className="me-1" /> Delete
-              </Button>
-            </div>
+        <Card.Body
+          className="d-flex justify-content-between align-items-center"
+          style={{ padding: "0.75rem 1.25rem" }}
+        >
+          {/* Left Section: Text */}
+          <div>
+            <Card.Title
+              className="admin-payment-order-id"
+              style={{
+                fontSize: "1.1rem",
+                fontWeight: "bold",
+                color: "#374151",
+                marginBottom: "10px",
+              }}
+            >
+              {announcement.Title}
+            </Card.Title>
+            <Card.Text
+              style={{
+                fontSize: "1rem",
+                color: "#6b7280",
+              }}
+            >
+              ID: {announcement.AnnouncementID}
+            </Card.Text>
+            <Card.Text
+              style={{
+                fontSize: "1rem",
+                color: "#6b7280",
+                marginBottom: "5px",
+              }}
+            >
+              Posted on:{" "}
+              {new Date(announcement.PostedDate).toLocaleDateString()}
+            </Card.Text>
+          </div>
+
+          {/* Right Section: Buttons */}
+          <div className="d-flex gap-2">
+            <Button
+              variant="light"
+              className="d-flex align-items-center"
+              style={{
+                border: "1px solid #e5e7eb",
+                color: "#374151",
+                fontWeight: "500",
+              }}
+              onClick={() => handleViewClick(announcement.AnnouncementID)}
+            >
+              <FaEye className="me-1" /> View
+            </Button>
+            <Button
+              variant="light"
+              className="d-flex align-items-center"
+              style={{
+                border: "1px solid #e5e7eb",
+                color: "#374151",
+                fontWeight: "500",
+              }}
+              onClick={() => handleEditClick(announcement.AnnouncementID)}
+            >
+              <FaEdit className="me-1" /> Edit
+            </Button>
+            <Button
+              variant="danger"
+              className="d-flex align-items-center"
+              style={{
+                backgroundColor: "#dc3545",
+                border: "none",
+                fontWeight: "500",
+                color: "white",
+              }}
+              onClick={() => handleDeleteClick(announcement.AnnouncementID)}
+            >
+              <FaTrash className="me-1" /> Delete
+            </Button>
           </div>
         </Card.Body>
       </Card>
@@ -143,7 +201,10 @@ const AdminViewAnnouncement = () => {
               fontWeight: activeTab === "active" ? "bold" : "normal",
               padding: "10px 20px",
               textAlign: "center",
-              borderBottom: activeTab === "active" ? "2px solid #f59e0b" : "2px solid transparent",
+              borderBottom:
+                activeTab === "active"
+                  ? "2px solid #f59e0b"
+                  : "2px solid transparent",
               cursor: "pointer",
               transition: "color 0.3s ease, border-bottom-color 0.3s ease",
             }}
@@ -160,7 +221,10 @@ const AdminViewAnnouncement = () => {
               fontWeight: activeTab === "past" ? "bold" : "normal",
               padding: "10px 20px",
               textAlign: "center",
-              borderBottom: activeTab === "past" ? "2px solid #f59e0b" : "2px solid transparent",
+              borderBottom:
+                activeTab === "past"
+                  ? "2px solid #f59e0b"
+                  : "2px solid transparent",
               cursor: "pointer",
               transition: "color 0.3s ease, border-bottom-color 0.3s ease",
             }}
@@ -181,17 +245,57 @@ const AdminViewAnnouncement = () => {
         centered
       >
         <Modal.Header closeButton>
-          <Modal.Title>Confirm Delete</Modal.Title>
+          <Modal.Title>Confirm Deletion</Modal.Title>
         </Modal.Header>
-        <Modal.Body className="text-start">
+        <Modal.Body>
           Are you sure you want to delete this announcement?
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="danger" onClick={confirmDelete}>
-            Delete
+          <Button
+            variant="danger"
+            onClick={confirmDelete}
+            style={{
+              backgroundColor: "#dc3545",
+              color: "white",
+              borderRadius: "8px",
+              padding: "8px 16px",
+              fontWeight: "500",
+            }}
+          >
+            Confirm
           </Button>
-          <Button variant="secondary" onClick={() => setShowConfirmModal(false)}>
+          <Button
+            variant="secondary"
+            onClick={() => setShowConfirmModal(false)}
+          >
             Cancel
+          </Button>
+        </Modal.Footer>
+      </Modal>
+
+      {/* Success Modal */}
+      <Modal
+        show={showSuccessModal}
+        onHide={() => setShowSuccessModal(false)}
+        centered
+      >
+        <Modal.Header closeButton>
+          <Modal.Title>Announcement Deleted</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>The announcement has been deleted successfully.</Modal.Body>
+        <Modal.Footer>
+          <Button
+            variant="warning"
+            style={{
+              backgroundColor: "#fbbf24",
+              color: "black",
+              borderRadius: "8px",
+              padding: "8px 16px",
+              fontWeight: "500",
+            }}
+            onClick={() => setShowSuccessModal(false)}
+          >
+            Close
           </Button>
         </Modal.Footer>
       </Modal>
