@@ -38,6 +38,7 @@ import AdminCoaching from "./components/AdminCoaching.js";
 import AdminCreateWebinar from "./components/AdminCreateWebinar.js";
 import AdminEditWebinar from "./components/AdminEditWebinar.js";
 import AdminViewWebinars from "./components/AdminViewWebinars.js";
+import AdminViewWebinarDetails from "./components/AdminViewWebinarDetails.js";
 import AdminViewBooking from "./components/AdminViewBooking.js";
 import AdminViewSessionDetails from "./components/AdminViewSessionDetails.js";
 import Chatbot from "./components/Chatbot.js";
@@ -91,10 +92,7 @@ function App() {
                   {/* Login route */}
                   <Route path="/login" element={<Login />} />
                   {/* Redirect root to dashboard */}
-                  <Route
-                    path="/"
-                    element={<Navigate to="/login" replace />}
-                  />
+                  <Route path="/" element={<Navigate to="/login" replace />} />
                   {/* Main routes */}
                   <Route path="/dashboard" element={<Dashboard />} />
                   <Route path="/workshops" element={<Workshops />} />
@@ -116,7 +114,7 @@ function App() {
                   <Route path="/coaching/:id" element={<Coaching />} />
                   <Route path="/chatbot" element={<Chatbot />} />
                   <Route path="/stripepayment" element={<StripePayment />} />
-                  <Route path="/complete" element={<CompletePage />} />          
+                  <Route path="/complete" element={<CompletePage />} />
                   {/* Admin routes */}
                   <Route path="/adminhome" element={<AdminHome />} />
                   <Route
@@ -130,7 +128,7 @@ function App() {
                   <Route
                     path="/admin-view-program-details/:id"
                     element={<AdminViewProgramDetails />}
-                    />
+                  />
                   <Route
                     path="/admin-view-session/:id"
                     element={<AdminViewSession />}
@@ -192,12 +190,16 @@ function App() {
                     element={<AdminViewWebinars />}
                   />
                   <Route
+                    path="/admin-view-webinar-details/:id"
+                    element={<AdminViewWebinarDetails />}
+                  />
+                  <Route
                     path="/admin-view-booking"
                     element={<AdminViewBooking />}
                   />
                   <Route
                     path="/admin-view-session-details/:id"
-                    element={<AdminViewSessionDetails/>}
+                    element={<AdminViewSessionDetails />}
                   />
                   {/* Logout route redirects to login */}
                   <Route
