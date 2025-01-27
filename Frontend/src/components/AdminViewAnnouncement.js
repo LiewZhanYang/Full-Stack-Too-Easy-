@@ -78,7 +78,7 @@ const AdminViewAnnouncement = () => {
 
     if (activeTab === "active" && filteredAnnouncements.length === 0) {
       return (
-        <p className="text-muted text-center">No upcoming announcements.</p>
+        <p ><br></br>No upcoming announcements.</p>
       );
     }
 
