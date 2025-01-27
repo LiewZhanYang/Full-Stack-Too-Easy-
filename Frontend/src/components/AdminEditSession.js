@@ -91,11 +91,11 @@ const AdminEditSession = () => {
 
       // Assuming you have access to the current session details
       const currentSessionDetails = {
-        StartDate: startDate, // Replace with actual start date
-        EndDate: endDate, // Replace with actual end date
-        Time: time, // Replace with actual time
-        Location: location, // Replace with actual location
-        Vacancy: vacancy, // Replace with actual vacancy
+        StartDate: startDate,
+        EndDate: endDate,
+        Time: time,
+        Location: location,
+        Vacancy: vacancy,
         Status: "Cancelled", // Set status to 'Cancelled'
       };
 
@@ -123,7 +123,7 @@ const AdminEditSession = () => {
 
       console.log("Session canceled successfully");
       setShowCancelModal(false); // Close the cancel confirmation modal
-      setShowSuccessModal(true); // Open the success confirmation modal
+      navigate("/admin-view-program"); // Redirect to the program view page
     } catch (error) {
       console.error("Error canceling session:", error);
     }
@@ -216,8 +216,8 @@ const AdminEditSession = () => {
           <Modal.Title>Cancel Session</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          Are you sure you want to cancel this session? This action cannot be
-          undone.
+          Are you sure you want to stop editing this session? This action cannot
+          be undone.
         </Modal.Body>
         <Modal.Footer>
           <Button variant="danger" onClick={handleCancelSession}>
@@ -228,7 +228,6 @@ const AdminEditSession = () => {
           </Button>
         </Modal.Footer>
       </Modal>
-
       {/* Save Confirmation Modal */}
       <Modal
         show={showSaveModal}

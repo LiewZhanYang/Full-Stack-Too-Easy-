@@ -1,10 +1,14 @@
 import React, { useState, useEffect } from "react";
-import { Container, Button, Table, Row, Col } from "react-bootstrap";
+import { Container, Button, Table, Row, Col, Modal } from "react-bootstrap";
 import { useNavigate, useParams } from "react-router-dom";
 
 const AdminViewSession = () => {
   const [tiers, setTiers] = useState([]);
   const [programName, setProgramName] = useState("");
+  const [errorModal, setErrorModal] = useState(false); // State for error modal
+  const [errorMessage, setErrorMessage] = useState(""); // State for error message
+  const [confirmDelete, setConfirmDelete] = useState(false); // State for delete confirmation
+  const [sessionToDelete, setSessionToDelete] = useState(null); // Session ID to delete
   const navigate = useNavigate();
   const { id: programID } = useParams();
 
@@ -82,6 +86,49 @@ const AdminViewSession = () => {
     navigate(`/admin-view-session-details/${sessionID}`);
   };
 
+  const handleConfirmDelete = (sessionID) => {
+    setSessionToDelete(sessionID); // Store the session ID for deletion
+    setConfirmDelete(true); // Open confirmation modal
+  };
+
+  const handleDeleteSession = async () => {
+    try {
+      const response = await fetch(
+        `http://localhost:8000/session/${sessionToDelete}`,
+        {
+          method: "DELETE",
+        }
+      );
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(errorText || "Failed to delete session");
+      }
+
+      // Refresh tiers and sessions after deletion
+      setTiers((prevTiers) =>
+        prevTiers.map((tier) => ({
+          ...tier,
+          sessions: tier.sessions.filter(
+            (session) => session.SessionID !== sessionToDelete
+          ),
+        }))
+      );
+
+      setConfirmDelete(false); // Close confirmation modal
+      alert("Session deleted successfully!");
+    } catch (error) {
+      console.error("Error deleting session:", error);
+      setErrorMessage(
+        error.message.includes("foreign key")
+          ? "Payments have already been made, and the session cannot be deleted."
+          : "Unable to delete session, payments have already been made."
+      );
+      setConfirmDelete(false); // Close confirmation modal
+      setErrorModal(true); // Open error modal
+    }
+  };
+
   return (
     <Container fluid className="admin-view-session-page p-4">
       <h2 className="page-title">{programName} - Tiers and Sessions</h2>
@@ -134,7 +181,7 @@ const AdminViewSession = () => {
                 <Table className="mb-0" borderless hover>
                   <thead>
                     <tr>
-                      <th>No.</th> {/* Add column header for session number */}
+                      <th>No.</th>
                       <th>Date</th>
                       <th>Time</th>
                       <th>Location</th>
@@ -142,40 +189,44 @@ const AdminViewSession = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    {tier.sessions.map(
-                      (
-                        session,
-                        index // Use map's index parameter for session numbering
-                      ) => (
-                        <tr key={session.SessionID}>
-                          <td>{index + 1}</td> {/* Display session number */}
-                          <td>
-                            {formatDate(session.StartDate)} -{" "}
-                            {formatDate(session.EndDate)}
-                          </td>
-                          <td>{session.Time}</td>
-                          <td>{session.Location}</td>
-                          <td className="text-end">
-                            <Button
-                              variant="link"
-                              onClick={() =>
-                                handleViewSessionClick(session.SessionID)
-                              }
-                            >
-                              View
-                            </Button>
-                            <Button
-                              variant="link"
-                              onClick={() =>
-                                handleEditSessionClick(session.SessionID)
-                              }
-                            >
-                              Edit
-                            </Button>
-                          </td>
-                        </tr>
-                      )
-                    )}
+                    {tier.sessions.map((session, index) => (
+                      <tr key={session.SessionID}>
+                        <td>{index + 1}</td>
+                        <td>
+                          {formatDate(session.StartDate)} -{" "}
+                          {formatDate(session.EndDate)}
+                        </td>
+                        <td>{session.Time}</td>
+                        <td>{session.Location}</td>
+                        <td className="text-end">
+                          <Button
+                            variant="link"
+                            onClick={() =>
+                              handleViewSessionClick(session.SessionID)
+                            }
+                          >
+                            View
+                          </Button>
+                          <Button
+                            variant="link"
+                            onClick={() =>
+                              handleEditSessionClick(session.SessionID)
+                            }
+                          >
+                            Edit
+                          </Button>
+                          <Button
+                            variant="link"
+                            className="text-danger"
+                            onClick={() =>
+                              handleConfirmDelete(session.SessionID)
+                            }
+                          >
+                            Delete
+                          </Button>
+                        </td>
+                      </tr>
+                    ))}
                   </tbody>
                 </Table>
               </div>
@@ -189,6 +240,42 @@ const AdminViewSession = () => {
       ) : (
         <p>No tiers available for this program.</p>
       )}
+
+      {/* Delete Confirmation Modal */}
+      <Modal
+        show={confirmDelete}
+        onHide={() => setConfirmDelete(false)}
+        centered
+      >
+        <Modal.Header closeButton>
+          <Modal.Title>Delete Session</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          Are you sure you want to delete this session? This action cannot be
+          undone.
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="danger" onClick={handleDeleteSession}>
+            Confirm Delete
+          </Button>
+          <Button variant="secondary" onClick={() => setConfirmDelete(false)}>
+            Cancel
+          </Button>
+        </Modal.Footer>
+      </Modal>
+
+      {/* Error Modal */}
+      <Modal show={errorModal} onHide={() => setErrorModal(false)} centered>
+        <Modal.Header closeButton>
+          <Modal.Title>Delete Error</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>{errorMessage}</Modal.Body>
+        <Modal.Footer>
+          <Button variant="primary" onClick={() => setErrorModal(false)}>
+            Close
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </Container>
   );
 };
