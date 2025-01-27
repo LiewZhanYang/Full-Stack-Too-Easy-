@@ -50,6 +50,7 @@ import StripePayment from "./components/StripePayment.js";
 import CompletePage from "./components/CompletePage.js";
 import WorkshopForum from "./components/WorkshopForum.js";
 import ViewPost from "./components/ViewPost.js";
+import Ticketing from "./components/Ticketing.js";
 import "./StripePayment.css";
 
 // Layout component to handle conditional rendering
@@ -105,6 +106,7 @@ function App() {
                   <Route path="/professionals" element={<Professionals />} />
                   <Route path="/webinars" element={<Webinars />} />
                   <Route path="/workshopvm" element={<Workshopvm />} />
+                  <Route path="/ticketing" element={<Ticketing/>} />
                   <Route
                     path="/webinar-details/:id"
                     element={<WebinarDetails />}
