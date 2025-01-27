@@ -40,8 +40,27 @@ const updateTicketStatus = async (req, res) => {
   }
 };
 
+
+//Fetch ticket by TicketID
+const getTicketById = async (req, res) => {
+  const ticketID = req.params.ticketID;
+
+  try {
+    const ticket = await Ticketing.getTicketById(ticketID);
+    if (!ticket) {
+      return res.status(404).json({ message: "Ticket not found" });
+    }
+    res.status(200).json(ticket);
+    console.log(`Successfully fetched ticket with ID ${ticketID}`);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Error fetching ticket by ID");
+  }
+};
+
 module.exports = {
   postTicket,
   getTickets,
   updateTicketStatus,
+  getTicketById,
 };
