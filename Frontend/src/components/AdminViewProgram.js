@@ -155,8 +155,8 @@ const AdminViewProgram = () => {
                   className="admin-program-card-title"
                   style={{
                     textAlign: "left",
-                    fontSize: "1.25rem", // Larger font size for the program name
-                    fontWeight: "bold", // Bold font for emphasis
+                    fontSize: "1.25rem",
+                    fontWeight: "bold", 
                   }}
                 >
                   {program.ProgramName}
@@ -164,9 +164,9 @@ const AdminViewProgram = () => {
                 <Card.Text
                   style={{
                     textAlign: "left",
-                    fontSize: "1rem", // Smaller font size for the description
-                    fontWeight: "normal", // Normal weight for less emphasis
-                    color: "#6c757d", // Subtle gray color for differentiation
+                    fontSize: "1rem",
+                    fontWeight: "normal", 
+                    color: "#6c757d",
                   }}
                 >
                   {program.ProgramDesc}

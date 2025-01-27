@@ -11,6 +11,7 @@ import Sidebar from "./components/Sidebar";
 import Header from "./components/Header";
 import Dashboard from "./components/Dashboard.js";
 import Workshops from "./components/Workshops.js";
+import WorkshopDetails from "./components/WorkshopDetails.js";
 import Camps from "./components/Camps";
 import Labs from "./components/Labs";
 import Professionals from "./components/Professionals";
@@ -95,6 +96,10 @@ function App() {
                   {/* Main routes */}
                   <Route path="/dashboard" element={<Dashboard />} />
                   <Route path="/workshops" element={<Workshops />} />
+                  <Route
+                    path="/workshops/:id"
+                    element={<WorkshopDetails />}
+                  />
                   <Route path="/payment" element={<Payment />} />
                   <Route path="/camps" element={<Camps />} />
                   <Route path="/labs" element={<Labs />} />
