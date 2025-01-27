@@ -13,43 +13,41 @@ const AdminEditProgram = () => {
   const [showSuccessModal, setShowSuccessModal] = useState(false);
 
   const navigate = useNavigate();
-  const { id } = useParams();
+  const { id: programID } = useParams();
 
+  // Fetch program details and tiers using ProgramID
   useEffect(() => {
     const fetchProgramAndTiers = async () => {
       try {
-        console.log(`Fetching program details for ProgramID: ${id}`);
+        console.log(`Fetching program details for ProgramID: ${programID}`);
         const programResponse = await fetch(
-          `http://localhost:8000/program/${id}`
+          `http://localhost:8000/program/${programID}`
         );
 
         if (!programResponse.ok) {
-          console.error(
+          throw new Error(
             `Failed to fetch program details: ${programResponse.statusText}`
           );
-          throw new Error("Failed to fetch program details.");
         }
 
         const programData = await programResponse.json();
-        console.log("Program data fetched:", programData);
         setName(programData.ProgramName);
         setType(programData.TypeID);
         setDescription(programData.ProgramDesc);
         setImagePreview(programData.imageUrl || null);
 
-        console.log(`Fetching tiers for ProgramID: ${id}`);
-        const tierResponse = await fetch(`http://localhost:8000/tier/${id}`);
+        console.log(`Fetching tiers for ProgramID: ${programID}`);
+        const tierResponse = await fetch(
+          `http://localhost:8000/tier/program/${programID}`
+        );
 
         if (!tierResponse.ok) {
-          console.error(
+          throw new Error(
             `Failed to fetch tier details: ${tierResponse.statusText}`
           );
-          throw new Error("Failed to fetch tier details.");
         }
 
         const tierData = await tierResponse.json();
-        console.log("Tier data fetched:", tierData);
-
         setTiers(
           tierData.map((tier) => ({
             tierID: tier.TierID || null,
@@ -57,7 +55,7 @@ const AdminEditProgram = () => {
             cost: tier.Cost || "",
             classSize: tier.ClassSize || "",
             duration: tier.Duration || "",
-            lunchProvided: tier.LunchProvided || false,
+            lunchProvided: !!tier.LunchProvided,
           }))
         );
       } catch (error) {
@@ -67,7 +65,7 @@ const AdminEditProgram = () => {
     };
 
     fetchProgramAndTiers();
-  }, [id]);
+  }, [programID]);
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
@@ -78,19 +76,13 @@ const AdminEditProgram = () => {
   };
 
   const handleTierChange = (index, field, value) => {
-    console.log(
-      `Updating Tier at index ${index}, field: ${field}, value: ${value}`
-    );
     const updatedTiers = [...tiers];
-    updatedTiers[index][field] =
-      field === "lunchProvided" ? value.target.checked : value;
+    updatedTiers[index][field] = field === "lunchProvided" ? value : value;
     setTiers(updatedTiers);
-    console.log("Updated tiers:", updatedTiers);
   };
 
   const addTier = () => {
     if (tiers.length < 3) {
-      console.log("Adding new tier");
       setTiers([
         ...tiers,
         {
@@ -109,8 +101,6 @@ const AdminEditProgram = () => {
 
   const removeTier = async (index) => {
     const tierToDelete = tiers[index];
-    console.log(`Removing tier at index ${index}`, tierToDelete);
-
     if (tierToDelete.tierID) {
       try {
         const response = await fetch(
@@ -121,24 +111,17 @@ const AdminEditProgram = () => {
         );
 
         if (!response.ok) {
-          console.error("Failed to delete tier from backend.");
           throw new Error("Failed to delete tier.");
         }
-
-        console.log("Tier deleted successfully.");
       } catch (error) {
         console.error("Error deleting tier:", error);
         return;
       }
     }
-
     setTiers(tiers.filter((_, i) => i !== index));
-    console.log("Tier removed. Remaining tiers:", tiers);
   };
 
   const handleSaveProgram = async () => {
-    console.log("Saving program and tiers...");
-
     if (
       tiers.some(
         (tier) => !tier.name || !tier.cost || !tier.classSize || !tier.duration
@@ -149,16 +132,14 @@ const AdminEditProgram = () => {
     }
 
     try {
-      console.log("Updating program details...");
       const programDetails = new FormData();
       programDetails.append("ProgramName", name);
       programDetails.append("ProgramDesc", description);
       programDetails.append("TypeID", type);
       if (image) programDetails.append("file", image);
 
-      // Update program details
       const programResponse = await fetch(
-        `http://localhost:8000/program/id/${id}`,
+        `http://localhost:8000/program/id/${programID}`,
         {
           method: "PUT",
           body: programDetails,
@@ -166,16 +147,9 @@ const AdminEditProgram = () => {
       );
 
       if (!programResponse.ok) {
-        console.error(
-          "Failed to save program details:",
-          await programResponse.text()
-        );
         throw new Error("Failed to save program details.");
       }
 
-      console.log("Program details saved successfully.");
-
-      // Update tiers
       for (const tier of tiers) {
         const tierPayload = {
           Name: tier.name,
@@ -188,7 +162,7 @@ const AdminEditProgram = () => {
         const tierResponse = await fetch(
           tier.tierID
             ? `http://localhost:8000/tier/${tier.tierID}`
-            : `http://localhost:8000/tier/${id}`,
+            : `http://localhost:8000/tier/${programID}`,
           {
             method: tier.tierID ? "PUT" : "POST",
             headers: { "Content-Type": "application/json" },
@@ -197,19 +171,12 @@ const AdminEditProgram = () => {
         );
 
         if (!tierResponse.ok) {
-          console.error(
-            `Failed to ${tier.tierID ? "update" : "create"} tier:`,
-            tier.name,
-            "Response:",
-            await tierResponse.text()
+          throw new Error(
+            `Failed to ${tier.tierID ? "update" : "create"} tier.`
           );
-          throw new Error(`Failed to save tier: ${tier.name}`);
         }
-
-        console.log(`Tier ${tier.name} saved successfully.`);
       }
 
-      console.log("All tiers saved successfully.");
       setShowConfirmModal(false);
       setShowSuccessModal(true);
     } catch (error) {
@@ -218,10 +185,7 @@ const AdminEditProgram = () => {
     }
   };
 
-  const handleCancel = () => {
-    console.log("Navigating back to program list.");
-    navigate("/admin-view-program");
-  };
+  const handleCancel = () => navigate("/admin-view-program");
 
   return (
     <Container fluid className="admin-create-program-page p-4">
@@ -367,18 +331,18 @@ const AdminEditProgram = () => {
           <Button
             variant="warning"
             style={{
-              backgroundColor: "#fbbf24", 
+              backgroundColor: "#fbbf24",
               color: "black",
             }}
             className="admin-create-confirm-button me-3"
-            onClick={() => setShowConfirmModal(true)} 
+            onClick={() => setShowConfirmModal(true)}
           >
             Save
           </Button>
           <Button
             variant="danger"
             style={{
-              backgroundColor: "#dc3545", 
+              backgroundColor: "#dc3545",
               color: "white",
             }}
             className="admin-create-cancel-button"

@@ -2,16 +2,18 @@ const Tier = require("../models/tier");
 
 // Retrieve a tier by ID
 const getTierByProgramID = async (req, res) => {
-  const id = req.params.id;
+  const programID = parseInt(req.params.programID);
   try {
-    const tier = await Tier.getTierByProgramID(id);
-    if (!tier) {
-      return res.status(404).json({ message: "Tier not found" });
+    const tiers = await Tier.getTierByProgramID(programID);
+    if (!tiers || tiers.length === 0) {
+      return res
+        .status(404)
+        .json({ message: "No tiers found for this program." });
     }
-    res.json(tier);
+    res.status(200).json(tiers);
   } catch (error) {
-    console.error("Error fetching tier:", error);
-    res.status(500).json({ message: "Error retrieving tier" });
+    console.error("Error fetching tiers by program ID:", error);
+    res.status(500).json({ message: "Error retrieving tiers." });
   }
 };
 // Retrieve a tier by TierID

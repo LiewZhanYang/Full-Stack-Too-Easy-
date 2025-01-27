@@ -11,6 +11,7 @@ function WorkshopDetails() {
   const navigate = useNavigate();
   const [isMemberActive, setIsMemberActive] = useState(false);
   const [reviews, setReviews] = useState({});
+  const [tiers, setTiers] = useState([]); // State to hold fetched tiers
 
   useEffect(() => {
     setSessionName("Public Speaking Workshop");
@@ -43,54 +44,34 @@ function WorkshopDetails() {
     fetchReviewsForProgram1();
   }, [setSessionName]);
 
+  useEffect(() => {
+    const fetchTiers = async () => {
+      try {
+        const response = await axios.get(`http://localhost:8000/tier/1`); // Adjust URL to your backend
+        setTiers(response.data); // Update the state with the fetched tiers
+      } catch (error) {
+        console.error("Error fetching tiers:", error);
+      }
+    };
+
+    fetchTiers(); // Fetch tiers when the component mounts
+  }, []);
+
   const handleGetStarted = (tier) => {
     const discountedPrice = isMemberActive
-      ? parseFloat(tier.price.replace("$", "")) * 0.9
-      : parseFloat(tier.price.replace("$", ""));
+      ? parseFloat(tier.Cost) * 0.9
+      : parseFloat(tier.Cost);
 
     navigate("/payment", {
       state: {
-        programId: tier.programId,
-        tier: tier.level,
-        price: `$${discountedPrice.toFixed(2)}`, // Pass the formatted discounted price or original price
-        classSize: tier.classSize,
-        duration: tier.duration,
+        programId: tier.ProgramID,
+        tier: tier.Name,
+        price: `$${discountedPrice.toFixed(2)}`,
+        classSize: tier.ClassSize,
+        duration: tier.Duration,
       },
     });
   };
-
-  const priceTiers = [
-    {
-      level: "Beginner",
-      programId: 1,
-      programName: "Public Speaking Workshop - Beginner",
-      price: "$204",
-      classSize: "15-20",
-      duration: "3.5 days",
-      lunchProvided: true,
-      bgColor: "#e0f7fa",
-    },
-    {
-      level: "Intermediate",
-      programId: 2,
-      programName: "Public Speaking Workshop - Intermediate",
-      price: "$275",
-      classSize: "10-15",
-      duration: "3.5 days",
-      lunchProvided: true,
-      bgColor: "#e8f5e9",
-    },
-    {
-      level: "Advanced",
-      programId: 3,
-      programName: "Public Speaking Workshop - Advanced",
-      price: "$340",
-      classSize: "5-10",
-      duration: "3.5 days",
-      lunchProvided: true,
-      bgColor: "#f3e5f5",
-    },
-  ];
 
   const skillDevelopmentData = [
     {
@@ -218,18 +199,28 @@ function WorkshopDetails() {
             participants, ensuring personalized attention.
           </p>
           <div className="price-tiers-section mt-4">
-            <div className="row g-4">
-              {priceTiers.map((tier, index) => {
+            <div
+              className="row g-4"
+              style={{
+                justifyContent: tiers.length === 1 ? "center" : "flex-start",
+              }}
+            >
+              {tiers.map((tier, index) => {
                 const discountedPrice = isMemberActive
-                  ? parseFloat(tier.price.replace("$", "")) * 0.9
-                  : parseFloat(tier.price.replace("$", ""));
+                  ? parseFloat(tier.Cost) * 0.9
+                  : parseFloat(tier.Cost);
                 return (
-                  <div key={index} className="col-md-4">
+                  <div
+                    key={index}
+                    className={`col-md-${
+                      tiers.length === 1 ? "6" : "4"
+                    } d-flex justify-content-center`}
+                  >
                     <div
                       className="rounded-4 p-4 h-100 text-center shadow-sm"
-                      style={{ backgroundColor: tier.bgColor }}
+                      style={{ backgroundColor: "#e0f7fa" }}
                     >
-                      <h5>{tier.level}</h5>
+                      <h5>{tier.Name}</h5>
                       <div className="price-amount my-3">
                         {isMemberActive && (
                           <span
@@ -239,7 +230,7 @@ function WorkshopDetails() {
                               marginRight: "10px",
                             }}
                           >
-                            {tier.price}
+                            ${tier.Cost}
                           </span>
                         )}
                         <span>${discountedPrice.toFixed(2)}</span>
@@ -247,16 +238,16 @@ function WorkshopDetails() {
                       <div className="tier-details mt-4 text-start">
                         <div className="d-flex align-items-center mb-2">
                           <i className="bi bi-people-fill me-2"></i>
-                          <span>Class size: {tier.classSize}</span>
+                          <span>Class size: {tier.ClassSize}</span>
                         </div>
                         <div className="d-flex align-items-center mb-2">
                           <i className="bi bi-clock-fill me-2"></i>
-                          <span>Duration: {tier.duration}</span>
+                          <span>Duration: {tier.Duration} days</span>
                         </div>
                         <div className="d-flex align-items-center">
                           <i className="bi bi-check2-circle me-2"></i>
                           <span>
-                            {tier.lunchProvided ? "Lunch Provided" : "No Lunch"}
+                            {tier.LunchProvided ? "Lunch Provided" : "No Lunch"}
                           </span>
                         </div>
                       </div>

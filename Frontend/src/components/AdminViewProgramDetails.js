@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Container, Button, Form, Row, Col, Image } from "react-bootstrap";
+import { Container, Button, Form, Row, Col } from "react-bootstrap";
 import { useNavigate, useParams } from "react-router-dom";
 
 const AdminViewProgramDetails = () => {
@@ -19,6 +19,7 @@ const AdminViewProgramDetails = () => {
   useEffect(() => {
     const fetchProgramAndTiers = async () => {
       try {
+        // Fetch program details
         const programResponse = await fetch(
           `http://localhost:8000/program/${id}`
         );
@@ -28,7 +29,10 @@ const AdminViewProgramDetails = () => {
         const programData = await programResponse.json();
         setProgramDetails(programData);
 
-        const tierResponse = await fetch(`http://localhost:8000/tier/${id}`);
+        // Fetch associated tiers
+        const tierResponse = await fetch(
+          `http://localhost:8000/tier/program/${id}`
+        );
         if (!tierResponse.ok) {
           throw new Error("Failed to fetch tier details.");
         }
@@ -83,52 +87,60 @@ const AdminViewProgramDetails = () => {
         </Form.Group>
 
         <h3 className="mt-4">Cost Tiers</h3>
-        {tiers.map((tier, index) => (
-          <div
-            key={index}
-            className="tier-section mb-4 p-3 rounded"
-            style={{
-              backgroundColor: "#f9f9f9",
-              border: "1px solid #ddd",
-            }}
-          >
-            <Form.Group controlId={`tierName${index}`} className="mb-3">
-              <Form.Label>Tier {index + 1} Name</Form.Label>
-              <Form.Control type="text" value={tier.Name || ""} disabled />
-            </Form.Group>
-            <Form.Group controlId={`tierCost${index}`} className="mb-3">
-              <Form.Label>Cost</Form.Label>
-              <Form.Control type="text" value={tier.Cost || ""} disabled />
-            </Form.Group>
-            <Form.Group controlId={`tierClassSize${index}`} className="mb-3">
-              <Form.Label>Class Size</Form.Label>
-              <Form.Control
-                type="number"
-                value={tier.ClassSize || ""}
-                disabled
-              />
-            </Form.Group>
-            <Form.Group controlId={`tierDuration${index}`} className="mb-3">
-              <Form.Label>Duration (days)</Form.Label>
-              <Form.Control
-                type="number"
-                value={tier.Duration || ""}
-                disabled
-              />
-            </Form.Group>
-            <Form.Group
-              controlId={`tierLunchProvided${index}`}
-              className="mb-3"
+        {tiers.length > 0 ? (
+          tiers.map((tier, index) => (
+            <div
+              key={tier.TierID}
+              className="tier-section mb-4 p-3 rounded"
+              style={{
+                backgroundColor: "#f9f9f9",
+                border: "1px solid #ddd",
+              }}
             >
-              <Form.Check
-                type="checkbox"
-                label="Lunch Provided"
-                checked={tier.LunchProvided || false}
-                disabled
-              />
-            </Form.Group>
-          </div>
-        ))}
+              <Form.Group controlId={`tierName${index}`} className="mb-3">
+                <Form.Label>Tier {index + 1} Name</Form.Label>
+                <Form.Control type="text" value={tier.Name || ""} disabled />
+              </Form.Group>
+              <Form.Group controlId={`tierCost${index}`} className="mb-3">
+                <Form.Label>Cost</Form.Label>
+                <Form.Control
+                  type="text"
+                  value={`$${tier.Cost.toFixed(2) || ""}`}
+                  disabled
+                />
+              </Form.Group>
+              <Form.Group controlId={`tierClassSize${index}`} className="mb-3">
+                <Form.Label>Class Size</Form.Label>
+                <Form.Control
+                  type="number"
+                  value={tier.ClassSize || ""}
+                  disabled
+                />
+              </Form.Group>
+              <Form.Group controlId={`tierDuration${index}`} className="mb-3">
+                <Form.Label>Duration (days)</Form.Label>
+                <Form.Control
+                  type="number"
+                  value={tier.Duration || ""}
+                  disabled
+                />
+              </Form.Group>
+              <Form.Group
+                controlId={`tierLunchProvided${index}`}
+                className="mb-3"
+              >
+                <Form.Check
+                  type="checkbox"
+                  label="Lunch Provided"
+                  checked={tier.LunchProvided || false}
+                  disabled
+                />
+              </Form.Group>
+            </div>
+          ))
+        ) : (
+          <p>No tiers found for this program.</p>
+        )}
 
         <div className="admin-view-button-group mt-4">
           <Button

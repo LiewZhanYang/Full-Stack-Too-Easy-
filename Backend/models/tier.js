@@ -75,24 +75,25 @@ class Tier {
     const [result] = await connection.execute(sqlQuery, [id]);
     connection.end();
   }
-  static async postTier(id, tierDetails) {
+  static async postTier(programID, tierDetails) {
     let connection;
     try {
       connection = await mysql.createConnection(dbConfig);
       const sqlQuery = `
-                CALL CreateTier(?, ?, ?, ?, ?, ?, ?);
-            `;
+        CALL CreateTier(?, ?, ?, ?, ?, ?, ?);
+      `;
       const values = [
-        id,
-        tierDetails.Name,
-        tierDetails.ClassSize,
-        tierDetails.Cost,
-        tierDetails.DiscountedCost,
-        tierDetails.LunchProvided,
-        tierDetails.Duration,
+        programID, // Associate the tier with the correct program
+        tierDetails.Name || null,
+        tierDetails.ClassSize || null,
+        tierDetails.Cost || null,
+        tierDetails.DiscountedCost || null,
+        tierDetails.LunchProvided ? 1 : 0,
+        tierDetails.Duration || null,
       ];
 
       const [result] = await connection.execute(sqlQuery, values);
+      return result;
     } catch (error) {
       console.error("Error creating new tier:", error);
       throw error;
@@ -100,6 +101,7 @@ class Tier {
       if (connection) connection.end();
     }
   }
+
   static async updateTier(id, updateData) {
     let connection;
     try {
