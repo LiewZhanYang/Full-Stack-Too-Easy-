@@ -6,12 +6,18 @@ const AdminCreateProgram = () => {
   const [name, setName] = useState("");
   const [type, setType] = useState("");
   const [description, setDescription] = useState("");
-  const [cost, setCost] = useState("");
-  const [classSize, setClassSize] = useState("");
-  const [duration, setDuration] = useState("");
-  const [lunchProvided, setLunchProvided] = useState(false);
+  const [image, setImage] = useState(null);
 
-  const [image, setImage] = useState(null); // Store image file
+  const [tiers, setTiers] = useState([
+    {
+      tierName: "",
+      cost: "",
+      classSize: "",
+      lunchProvided: false,
+      duration: "",
+    },
+  ]);
+
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const navigate = useNavigate();
@@ -26,45 +32,96 @@ const AdminCreateProgram = () => {
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      setImage(file); // Store the file object instead of a URL
+      setImage(file);
     }
   };
 
-  const handleCreateProgram = async () => {
-    const typeId = programTypeMapping[type] || null;
-
-
-    // Create FormData object
-    const formData = new FormData();
-    formData.append("ProgramName", name);
-    formData.append("ProgramDesc", description);
-    formData.append("Cost", cost);
-    formData.append("ClassSize", classSize);
-    formData.append("Duration", duration);
-    formData.append("LunchProvided", lunchProvided ? 1 : 0); // Convert boolean to integer
-    formData.append("TypeID", typeId);
-
-    // Append the image file if available
-    if (image) {
-      formData.append("file", image); // Ensure field name matches backend expectation
+  const handleAddTier = () => {
+    if (tiers.length < 3) {
+      setTiers([
+        ...tiers,
+        {
+          tierName: "",
+          cost: "",
+          classSize: "",
+          lunchProvided: false,
+          duration: "",
+        },
+      ]);
     }
+  };
 
+  const handleRemoveTier = (index) => {
+    const newTiers = tiers.filter((_, idx) => idx !== index);
+    setTiers(newTiers);
+  };
+
+  const handleTierChange = (index, field, value) => {
+    const updatedTiers = tiers.map((tier, idx) =>
+      idx === index ? { ...tier, [field]: value } : tier
+    );
+    setTiers(updatedTiers);
+  };
+
+  const handleCreateProgram = async () => {
     try {
-      const response = await fetch("http://localhost:8000/program", {
-        method: "POST",
+      // Create program details
+      const typeId = programTypeMapping[type] || null;
 
-        body: formData, // Use FormData as the request body
+      const programData = new FormData();
+      programData.append("ProgramName", name);
+      programData.append("ProgramDesc", description);
+      programData.append("TypeID", typeId);
+
+      if (image) programData.append("file", image);
+
+      // API call to create program
+      const programResponse = await fetch("http://localhost:8000/program", {
+        method: "POST",
+        body: programData,
       });
 
-      if (!response.ok) {
+      if (!programResponse.ok) {
         throw new Error("Failed to create program");
       }
 
-      console.log("Program created successfully");
-      setShowConfirmModal(false); // Close the confirmation modal
-      setShowSuccessModal(true); // Open the success modal
+      const createdProgram = await programResponse.json();
+
+      // Create tiers for the program
+      const programID = createdProgram.ProgramID;
+
+      for (const tier of tiers) {
+        const tierData = {
+          Name: tier.tierName,
+          Cost: tier.cost,
+          ClassSize: tier.classSize,
+          LunchProvided: tier.lunchProvided,
+          Duration: tier.duration,
+          DiscountedCost: tier.cost * 0.9, // Calculated discounted cost
+        };
+
+        const tierResponse = await fetch(
+          `http://localhost:8000/tier/${programID}`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(tierData),
+          }
+        );
+
+        if (!tierResponse.ok) {
+          throw new Error(`Failed to create tier: ${tier.tierName}`);
+        }
+      }
+
+      // If all API calls are successful
+      setShowConfirmModal(false);
+      setShowSuccessModal(true);
     } catch (error) {
-      console.error("Error creating program:", error);
+      console.error("Error creating program and tiers:", error);
+      alert("Error creating program. Please try again.");
     }
   };
 
@@ -98,7 +155,6 @@ const AdminCreateProgram = () => {
           {image && (
             <div className="image-preview mt-3">
               <img
-
                 src={URL.createObjectURL(image)}
                 alt="Program Preview"
                 className="img-fluid rounded"
@@ -134,64 +190,104 @@ const AdminCreateProgram = () => {
           />
         </Form.Group>
 
-        <Form.Group controlId="programCost" className="mb-3">
-          <Form.Label>Cost</Form.Label>
-          <Form.Control
-            type="text"
-            placeholder="Enter cost"
-            value={cost}
-            onChange={(e) => setCost(e.target.value)}
-          />
-        </Form.Group>
+        <h3 className="mt-4 fs-5">Cost Tiers</h3>
+        {tiers.map((tier, index) => (
+          <div
+            key={index}
+            className="tier-section mb-4 p-3 rounded"
+            style={{
+              backgroundColor: "#f9f9f9",
+              border: "1px solid #ddd",
+            }}
+          >
+            <h5 className="mb-3">Tier {index + 1}:</h5>
+            <Form.Group controlId={`tierName-${index}`} className="mb-3">
+              <Form.Label>Tier Name</Form.Label>
+              <Form.Control
+                type="text"
+                placeholder="Enter tier name"
+                value={tier.tierName}
+                onChange={(e) =>
+                  handleTierChange(index, "tierName", e.target.value)
+                }
+              />
+            </Form.Group>
+            <Form.Group controlId={`cost-${index}`} className="mb-3">
+              <Form.Label>Cost</Form.Label>
+              <Form.Control
+                type="text"
+                placeholder="Enter cost"
+                value={tier.cost}
+                onChange={(e) =>
+                  handleTierChange(index, "cost", e.target.value)
+                }
+              />
+            </Form.Group>
+            <Form.Group controlId={`classSize-${index}`} className="mb-3">
+              <Form.Label>Class Size</Form.Label>
+              <Form.Control
+                type="number"
+                placeholder="Enter class size"
+                value={tier.classSize}
+                onChange={(e) =>
+                  handleTierChange(index, "classSize", e.target.value)
+                }
+              />
+            </Form.Group>
+            <Form.Group controlId={`duration-${index}`} className="mb-3">
+              <Form.Label>Duration (in days)</Form.Label>
+              <Form.Control
+                type="number"
+                placeholder="Enter duration"
+                value={tier.duration}
+                onChange={(e) =>
+                  handleTierChange(index, "duration", e.target.value)
+                }
+              />
+            </Form.Group>
+            <Form.Group controlId={`lunchProvided-${index}`} className="mb-3">
+              <Form.Check
+                type="checkbox"
+                label="Lunch Provided"
+                checked={tier.lunchProvided}
+                onChange={(e) =>
+                  handleTierChange(index, "lunchProvided", e.target.checked)
+                }
+              />
+            </Form.Group>
+            {tiers.length > 1 && (
+              <Button
+                variant="danger"
+                className="mb-3"
+                onClick={() => handleRemoveTier(index)}
+              >
+                Remove Tier
+              </Button>
+            )}
+            <hr />
+          </div>
+        ))}
 
-        <Form.Group controlId="programClassSize" className="mt-3 mb-3">
-          <Form.Label>Class Size</Form.Label>
-          <Form.Control
-            type="number"
-            placeholder="Enter class size"
-            value={classSize}
-            onChange={(e) => setClassSize(e.target.value)}
-          />
-        </Form.Group>
-
-        <Form.Group controlId="programDuration" className="mb-3">
-          <Form.Label>Duration (in hours)</Form.Label>
-          <Form.Control
-            type="number"
-            placeholder="Enter duration"
-            value={duration}
-            onChange={(e) => setDuration(e.target.value)}
-          />
-        </Form.Group>
-
-        <Form.Group controlId="lunchProvided" className="mb-3">
-          <Form.Check
-            type="checkbox"
-            label="Lunch Provided"
-            checked={lunchProvided}
-            onChange={(e) => setLunchProvided(e.target.checked)}
-          />
-        </Form.Group>
+        {tiers.length < 3 && (
+          <Button variant="secondary" onClick={handleAddTier}>
+            Add Tier
+          </Button>
+        )}
 
         <div className="admin-create-button-group mt-4">
           <Button
             variant="warning"
-            className="admin-create-confirm-button me-3"
-            onClick={() => setShowConfirmModal(true)} // Show confirmation modal
+            className="me-3"
+            onClick={() => setShowConfirmModal(true)}
           >
             Create
           </Button>
-          <Button
-            variant="danger"
-            className="admin-create-cancel-button"
-            onClick={handleCancel}
-          >
+          <Button variant="danger" onClick={handleCancel}>
             Cancel
           </Button>
         </div>
       </Form>
 
-      {/* Confirmation Modal */}
       <Modal
         show={showConfirmModal}
         onHide={() => setShowConfirmModal(false)}
@@ -214,7 +310,6 @@ const AdminCreateProgram = () => {
         </Modal.Footer>
       </Modal>
 
-      {/* Success Modal */}
       <Modal
         show={showSuccessModal}
         onHide={() => setShowSuccessModal(false)}

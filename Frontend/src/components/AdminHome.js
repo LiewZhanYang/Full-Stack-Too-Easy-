@@ -1,9 +1,11 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Container, Row, Col, Card } from "react-bootstrap";
 import { FaShoppingCart, FaDollarSign, FaEnvelope } from "react-icons/fa";
 import { Link } from "react-router-dom";
 
 const AdminHome = () => {
+  const [pendingPaymentsCount, setPendingPaymentsCount] = useState(0);
+
   // Display current date
   const currentDate = new Date();
   const formattedDate = currentDate.toLocaleDateString("en-US", {
@@ -13,6 +15,29 @@ const AdminHome = () => {
     weekday: "long",
   });
 
+  useEffect(() => {
+    const fetchPayments = async () => {
+      try {
+        const response = await fetch("http://localhost:8000/payment");
+        if (!response.ok) {
+          throw new Error(`Error: ${response.statusText}`);
+        }
+
+        const payments = await response.json();
+
+        // Filter and count pending payments
+        const pendingPayments = payments.filter(
+          (payment) => payment.Status === "Pending"
+        );
+        setPendingPaymentsCount(pendingPayments.length);
+      } catch (error) {
+        console.error("Error fetching payments:", error);
+      }
+    };
+
+    fetchPayments();
+  }, []);
+
   return (
     <div className="d-flex">
       {/* Main Content */}
@@ -21,7 +46,9 @@ const AdminHome = () => {
         <p className="text-muted">{formattedDate}</p>
         <br></br>
         <p className="admin-status">You have...</p>
-        <h4 className="pending-invoices">3 Pending Invoice Confirmations</h4>
+        <h4 className="pending-invoices">
+          {pendingPaymentsCount} Pending Invoice Confirmations
+        </h4>
 
         <h5 className="shortcuts-title mt-4">Access:</h5>
         <Row className="mt-3">
@@ -48,13 +75,15 @@ const AdminHome = () => {
             </Link>
           </Col>
           <Col md={4} className="d-flex justify-content-center">
-          <Link to="/admin-view-announcement" className="w-100">
-            <Card className="shortcut-card text-center shadow-sm h-100">
-              <Card.Body className="d-flex flex-column align-items-center justify-content-center">
-                <FaDollarSign size={40} className="shortcut-icon mb-3" />
-                <Card.Title className="shortcut-title">Announcement</Card.Title>
-              </Card.Body>
-            </Card>
+            <Link to="/admin-view-announcement" className="w-100">
+              <Card className="shortcut-card text-center shadow-sm h-100">
+                <Card.Body className="d-flex flex-column align-items-center justify-content-center">
+                  <FaDollarSign size={40} className="shortcut-icon mb-3" />
+                  <Card.Title className="shortcut-title">
+                    Announcement
+                  </Card.Title>
+                </Card.Body>
+              </Card>
             </Link>
           </Col>
         </Row>

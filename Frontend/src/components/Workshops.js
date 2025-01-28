@@ -1,21 +1,24 @@
 import React, { useEffect, useState } from "react";
-import { Container, Row, Col, Card, Button } from "react-bootstrap";
+import { Container, Row, Col, Card, Form } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 
 const Workshops = () => {
-  const [programs, setPrograms] = useState([]);
+  const [workshops, setWorkshops] = useState([]);
+  const [filteredWorkshops, setFilteredWorkshops] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
   const navigate = useNavigate();
 
   useEffect(() => {
     const fetchWorkshops = async () => {
       try {
-        const response = await fetch("http://localhost:8000/program/type/1"); // Replace '1' with the TypeID for workshops
+        const response = await fetch("http://localhost:8000/program");
         if (!response.ok) {
           throw new Error(`Error: ${response.statusText}`);
         }
         const data = await response.json();
-        console.log("Fetched workshops:", data);
-        setPrograms(data);
+        const filteredData = data.filter((program) => program.TypeID === 1);
+        setWorkshops(filteredData);
+        setFilteredWorkshops(filteredData);
       } catch (error) {
         console.error("Error fetching workshops:", error);
       }
@@ -24,42 +27,85 @@ const Workshops = () => {
     fetchWorkshops();
   }, []);
 
-  const handleEditClick = (programId) => {
-    navigate(`/admin-edit-program/${programId}`);
+  useEffect(() => {
+    const filtered = workshops.filter((workshop) =>
+      workshop.ProgramName
+        ? workshop.ProgramName.toLowerCase().includes(searchTerm.toLowerCase())
+        : false
+    );
+    setFilteredWorkshops(filtered);
+  }, [searchTerm, workshops]);
+
+  const handleSearchChange = (e) => {
+    setSearchTerm(e.target.value);
   };
 
-  const handleViewSessionsClick = (programId) => {
-    navigate(`/admin-view-session/${programId}`);
+  const handleCardClick = (id) => {
+    navigate(`/workshops/${id}`);
   };
 
   return (
-    <Container fluid className="workshops-page p-4">
-      <h2 className="precoaching-title">All Workshops</h2>
+    <Container fluid className="admin-program-page p-4">
+      <h2 className="precoaching-title">Workshops</h2>
+      <div className="admin-program-controls d-flex align-items-center my-3">
+        <Form.Control
+          type="text"
+          placeholder="Search for workshops"
+          className="admin-program-search me-2"
+          style={{ maxWidth: "700px" }}
+          value={searchTerm}
+          onChange={handleSearchChange}
+        />
+      </div>
 
-      {/* Program Cards */}
-      <Row className="workshops-cards-row">
-        {programs.map((program) => (
+      <Row className="admin-program-cards-row">
+        {filteredWorkshops.map((workshop) => (
           <Col
             md={4}
-            key={program.ProgramID}
-            className="workshops-card-col mb-4 d-flex align-items-stretch"
+            key={workshop.ProgramID}
+            className="admin-program-card-col mb-4 d-flex align-items-stretch"
           >
-            <Card className="workshops-card shadow-sm h-100">
+            <Card
+              className="admin-program-card shadow-sm h-100"
+              onClick={() => handleCardClick(workshop.ProgramID)}
+              style={{
+                cursor: "pointer",
+                display: "flex",
+                flexDirection: "column",
+              }}
+            >
+              {/* Added wrapper for consistent styling */}
               <div className="workshops-card-image-container">
                 <Card.Img
                   variant="top"
-                  src={program.image || "/img/default.jpg"}
-                  alt={program.ProgrameName}
-                  className="workshops-card-image"
+                  src={workshop.image || "/img/default.jpg"}
+                  alt={workshop.ProgramName}
+                  className="admin-program-card-image"
+                  style={{ height: "220px", objectFit: "cover" }}
                 />
               </div>
               <Card.Body className="d-flex flex-column justify-content-between">
                 <Card.Title
                   className="workshops-card-title"
-                  style={{ textAlign: "left" }}
+                  style={{
+                    textAlign: "left",
+                    fontSize: "1.25rem",
+                    fontWeight: "bold",
+                  }}
                 >
-                  {program.ProgrameName}
+                  {workshop.ProgramName}
                 </Card.Title>
+                <Card.Text
+                  style={{
+                    textAlign: "left",
+                    fontSize: "1rem",
+                    fontWeight: "normal",
+                    color: "#6c757d",
+                    marginTop: "0",
+                  }}
+                >
+                  {workshop.ProgramDesc}
+                </Card.Text>
               </Card.Body>
             </Card>
           </Col>

@@ -8,7 +8,7 @@ import {
   Form,
   Dropdown,
 } from "react-bootstrap";
-import { FaSearch, FaEdit, FaPlus, FaList } from "react-icons/fa";
+import { FaSearch, FaEye, FaPlus, FaList } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 
 const AdminViewProgram = () => {
@@ -48,9 +48,10 @@ const AdminViewProgram = () => {
 
   useEffect(() => {
     const filtered = programs.filter((program) => {
-      const matchesSearchTerm = program.ProgrameName.toLowerCase().includes(
-        searchTerm.toLowerCase()
-      );
+      const matchesSearchTerm = program.ProgramName
+        ? program.ProgramName.toLowerCase().includes(searchTerm.toLowerCase())
+        : false;
+
       const matchesType =
         selectedType === "All" || program.TypeID === typeMapping[selectedType];
       return matchesSearchTerm && matchesType;
@@ -144,24 +145,39 @@ const AdminViewProgram = () => {
               <div className="admin-program-card-image-container">
                 <Card.Img
                   variant="top"
-                  src={program.image || "/img/default.jpg"} // Use the image URL or fallback to default
-                  alt={program.ProgrameName}
+                  src={program.image || "/img/default.jpg"}
+                  alt={program.ProgramName}
                   className="admin-program-card-image"
                 />
               </div>
               <Card.Body className="d-flex flex-column justify-content-between">
                 <Card.Title
                   className="admin-program-card-title"
-                  style={{ textAlign: "left" }}
+                  style={{
+                    textAlign: "left",
+                    fontSize: "1.25rem",
+                    fontWeight: "bold", 
+                  }}
                 >
-                  {program.ProgrameName}
+                  {program.ProgramName}
                 </Card.Title>
-                <Card.Text style={{ textAlign: "left" }}>
-                  Cost: ${program.Cost}
+                <Card.Text
+                  style={{
+                    textAlign: "left",
+                    fontSize: "1rem",
+                    fontWeight: "normal", 
+                    color: "#6c757d",
+                  }}
+                >
+                  {program.ProgramDesc}
                 </Card.Text>
                 <div className="d-flex gap-2 mt-auto">
                   <Button
-                    onClick={() => handleEditClick(program.ProgramID)}
+                    onClick={() =>
+                      navigate(
+                        `/admin-view-program-details/${program.ProgramID}`
+                      )
+                    }
                     style={{
                       backgroundColor: "#fbbf24",
                       color: "black",
@@ -169,7 +185,7 @@ const AdminViewProgram = () => {
                     variant="warning"
                     className="admin-program-edit-button d-flex align-items-center"
                   >
-                    <FaEdit className="me-1" /> <span>Edit Details</span>
+                    <FaEye className="me-1" /> <span>View Details</span>
                   </Button>
                   <Button
                     variant="warning"

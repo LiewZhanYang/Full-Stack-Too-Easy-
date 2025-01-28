@@ -3,13 +3,15 @@ const Session = require("../models/session");
 const getSessionsByTierID = async (req, res) => {
   const tierID = req.params.id;
   try {
+    console.log(`Fetching sessions for TierID: ${tierID}`);
     const sessions = await Session.getSessionsByTierID(tierID);
+    console.log(`Sessions retrieved:`, sessions);
     if (sessions.length === 0) {
-      return res.status(404).send("Sessions not found");
+      return res.status(404).send("No sessions found for this TierID");
     }
     res.json(sessions);
   } catch (error) {
-    console.error(error);
+    console.error("Error retrieving sessions:", error);
     res.status(500).send("Error retrieving sessions");
   }
 };
@@ -40,7 +42,9 @@ const updateSession = async (req, res) => {
 
   // Validate required fields
   if (StartDate === undefined) {
-    return res.status(400).json({ message: "StartDate is required and cannot be undefined." });
+    return res
+      .status(400)
+      .json({ message: "StartDate is required and cannot be undefined." });
   }
 
   const sessionDetails = {
@@ -54,7 +58,7 @@ const updateSession = async (req, res) => {
   };
 
   // Log the session details for debugging
-  console.log('Session Details:', sessionDetails);
+  console.log("Session Details:", sessionDetails);
 
   try {
     const result = await Session.updateSession(sessionID, sessionDetails);
@@ -70,17 +74,24 @@ const updateSession = async (req, res) => {
   }
 };
 
-
-
 const deleteSession = async (req, res) => {
   const SessionID = req.params.id;
   try {
-    const deletedSession = await Session.deleteSession(SessionID);
-    res.status(201).json(deletedSession);
-    console.log("Successfully deleted Session");
+    const result = await Session.deleteSession(SessionID);
+    if (!result) {
+      return res.status(404).json({ message: "Session not found" });
+    }
+    res.status(200).json({ message: "Session deleted successfully" });
   } catch (error) {
-    console.error(error);
-    res.status(403).send("Unable to delete session as it has payments for it");
+    console.error("Error deleting session:", error);
+    if (error.message.includes("Payments are associated")) {
+      return res
+        .status(403)
+        .json({
+          message: "Cannot delete session as it has associated payments.",
+        });
+    }
+    res.status(500).json({ message: "Error deleting session" });
   }
 };
 

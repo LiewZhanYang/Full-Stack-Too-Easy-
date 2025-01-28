@@ -11,10 +11,12 @@ import Sidebar from "./components/Sidebar";
 import Header from "./components/Header";
 import Dashboard from "./components/Dashboard.js";
 import Workshops from "./components/Workshops.js";
-import WorkshopPrice from "./components/WorkshopPrice.js";
-import Camps from "./components/Camps";
+import WorkshopDetails from "./components/WorkshopDetails.js";
+import Camps from "./components/Camps.js";
+import CampDetails from "./components/CampDetails.js";
 import Labs from "./components/Labs";
 import Professionals from "./components/Professionals";
+import ProfessionalDetails from "./components/ProfessionalDetails.js";
 import Webinars from "./components/Webinars";
 import WebinarDetails from "./components/WebinarDetails";
 import Profile from "./components/Profile";
@@ -25,6 +27,7 @@ import PreCoaching from "./components/PreCoaching.js";
 import Coaching from "./components/Coaching.js";
 import AdminHome from "./components/AdminHome.js";
 import AdminViewProgram from "./components/AdminViewProgram.js";
+import AdminViewProgramDetails from "./components/AdminViewProgramDetails.js";
 import AdminViewSession from "./components/AdminViewSession.js";
 import AdminEditSession from "./components/AdminEditSession.js";
 import AdminCreateSession from "./components/AdminCreateSession.js";
@@ -37,6 +40,7 @@ import AdminCoaching from "./components/AdminCoaching.js";
 import AdminCreateWebinar from "./components/AdminCreateWebinar.js";
 import AdminEditWebinar from "./components/AdminEditWebinar.js";
 import AdminViewWebinars from "./components/AdminViewWebinars.js";
+import AdminViewWebinarDetails from "./components/AdminViewWebinarDetails.js";
 import AdminViewBooking from "./components/AdminViewBooking.js";
 import AdminViewSessionDetails from "./components/AdminViewSessionDetails.js";
 import Chatbot from "./components/Chatbot.js";
@@ -92,18 +96,20 @@ function App() {
                   {/* Login route */}
                   <Route path="/login" element={<Login />} />
                   {/* Redirect root to dashboard */}
-                  <Route
-                    path="/"
-                    element={<Navigate to="/login" replace />}
-                  />
+                  <Route path="/" element={<Navigate to="/login" replace />} />
                   {/* Main routes */}
                   <Route path="/dashboard" element={<Dashboard />} />
                   <Route path="/workshops" element={<Workshops />} />
-                  <Route path="/workshopPrice" element={<WorkshopPrice />} />
+                  <Route path="/workshops/:id" element={<WorkshopDetails />} />
                   <Route path="/payment" element={<Payment />} />
                   <Route path="/camps" element={<Camps />} />
+                  <Route path="/camps/:id" element={<CampDetails />} />
                   <Route path="/labs" element={<Labs />} />
                   <Route path="/professionals" element={<Professionals />} />
+                  <Route
+                    path="/professionals/:id"
+                    element={<ProfessionalDetails />}
+                  />
                   <Route path="/webinars" element={<Webinars />} />
                   <Route path="/workshopvm" element={<Workshopvm />} />
                   <Route path="/ticketing" element={<Ticketing/>} />
@@ -130,6 +136,10 @@ function App() {
                   <Route
                     path="/admin-view-program"
                     element={<AdminViewProgram />}
+                  />
+                  <Route
+                    path="/admin-view-program-details/:id"
+                    element={<AdminViewProgramDetails />}
                   />
                   <Route
                     path="/admin-view-session/:id"
@@ -192,12 +202,16 @@ function App() {
                     element={<AdminViewWebinars />}
                   />
                   <Route
+                    path="/admin-view-webinar-details/:id"
+                    element={<AdminViewWebinarDetails />}
+                  />
+                  <Route
                     path="/admin-view-booking"
                     element={<AdminViewBooking />}
                   />
                   <Route
                     path="/admin-view-session-details/:id"
-                    element={<AdminViewSessionDetails/>}
+                    element={<AdminViewSessionDetails />}
                   />
                   {/* Logout route redirects to login */}
                   <Route

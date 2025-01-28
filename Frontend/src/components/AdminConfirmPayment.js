@@ -3,7 +3,8 @@ import { Container, Row, Col, Button, Form, Modal } from "react-bootstrap";
 import { useNavigate, useParams } from "react-router-dom";
 import { FaArrowLeft } from "react-icons/fa";
 
-const AdminConfirmPayment = () => { // 
+const AdminConfirmPayment = () => {
+  //
   const [paymentDetails, setPaymentDetails] = useState({});
   const [rejectionReason, setRejectionReason] = useState("");
   const [showConfirmModal, setShowConfirmModal] = useState(false);
@@ -212,14 +213,20 @@ const AdminConfirmPayment = () => { //
       {paymentDetails.Status === "Pending" && (
         <div className="admin-confirm-button-group mt-4">
           <Button
-            variant="warning"
+            style={{
+              backgroundColor: "#fbbf24", 
+              color: "black",
+            }}
             className="admin-confirm-confirm-button me-3"
             onClick={() => setShowConfirmModal(true)}
           >
             Confirm
           </Button>
           <Button
-            variant="danger"
+            style={{
+              backgroundColor: "#dc3545",
+              color: "white",
+            }}
             className="admin-confirm-reject-button"
             onClick={handleRejectClick}
           >

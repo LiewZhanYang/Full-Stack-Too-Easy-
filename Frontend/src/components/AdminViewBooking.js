@@ -67,48 +67,51 @@ const AdminViewBooking = () => {
     const filteredBookings = filterBookings();
 
     if (filteredBookings.length === 0) {
-      return <p className="text-muted text-center">No bookings available</p>;
+      return <p ><br></br>No bookings available.</p>;
     }
 
     return filteredBookings.map((booking) => (
       <Card
         key={booking.BookingID}
-        className="admin-booking-card mb-3 p-3"
-        style={{ textAlign: "left" }}
+        className="admin-payment-card mb-3 p-3"
+        onClick={() => handleStartCoaching(booking.BookingID)}
+        style={{
+          cursor: "pointer",
+          boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)",
+          borderRadius: "8px",
+          border: "1px solid #e5e7eb",
+        }}
       >
         <Card.Body>
-          <Card.Title className="admin-booking-id">
+          <Card.Title
+            className="admin-payment-order-id"
+            style={{
+              fontSize: "1.1rem",
+              fontWeight: "bold",
+              color: "#374151",
+              marginBottom: "10px",
+            }}
+          >
             Booking ID: {booking.BookingID}
           </Card.Title>
-          <Card.Text className="admin-booking-text">
+          <Card.Text
+            style={{
+              fontSize: "1rem",
+              color: "#6b7280",
+              marginBottom: "5px",
+            }}
+          >
             Date: {new Date(booking.Date).toLocaleDateString()}
           </Card.Text>
-          <Card.Text className="admin-booking-text">
+          <Card.Text
+            style={{
+              fontSize: "1rem",
+              color: "#6b7280",
+            }}
+          >
             Time: {formatTime(booking.StartTime)} -{" "}
             {formatTime(booking.EndTime)}
           </Card.Text>
-          {activeTab === "upcoming" && (
-            <Button
-              onClick={() => handleStartCoaching(booking.BookingID)}
-              style={{
-                backgroundColor: "#fbbf24",
-                color: "black",
-                borderRadius: "8px",
-                padding: "8px 16px",
-                fontSize: "14px",
-                fontWeight: "500",
-                textDecoration: "none",
-                transition: "background-color 0.2s ease-in-out",
-                cursor: "pointer",
-                border: "none",
-                marginTop: "20px",
-              }}
-              onMouseOver={(e) => (e.target.style.backgroundColor = "#f59e0b")}
-              onMouseOut={(e) => (e.target.style.backgroundColor = "#fbbf24")}
-            >
-              Start Coaching
-            </Button>
-          )}
         </Card.Body>
       </Card>
     ));
