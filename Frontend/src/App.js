@@ -56,6 +56,7 @@ import WorkshopForum from "./components/WorkshopForum.js";
 import ViewPost from "./components/ViewPost.js";
 import Ticketing from "./components/Ticketing.js";
 import SubmitMC from "./components/SubmitMC.js";
+import AdminConfirmMC from "./components/AdminConfirmMC.js";
 import "./StripePayment.css";
 
 // Layout component to handle conditional rendering
@@ -215,6 +216,7 @@ function App() {
                     element={<AdminViewSessionDetails />}
                   />
                   <Route path="/submitmc" element={<SubmitMC />} />
+                  <Route path="/admin-confirm-mc" element={<AdminConfirmMC />} />
                   {/* Logout route redirects to login */}
                   <Route
                     path="/logout"
