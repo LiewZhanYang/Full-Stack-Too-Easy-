@@ -12,9 +12,11 @@ import Header from "./components/Header";
 import Dashboard from "./components/Dashboard.js";
 import Workshops from "./components/Workshops.js";
 import WorkshopDetails from "./components/WorkshopDetails.js";
-import Camps from "./components/Camps";
+import Camps from "./components/Camps.js";
+import CampDetails from "./components/CampDetails.js";
 import Labs from "./components/Labs";
 import Professionals from "./components/Professionals";
+import ProfessionalDetails from "./components/ProfessionalDetails.js";
 import Webinars from "./components/Webinars";
 import WebinarDetails from "./components/WebinarDetails";
 import Profile from "./components/Profile";
@@ -96,14 +98,16 @@ function App() {
                   {/* Main routes */}
                   <Route path="/dashboard" element={<Dashboard />} />
                   <Route path="/workshops" element={<Workshops />} />
-                  <Route
-                    path="/workshops/:id"
-                    element={<WorkshopDetails />}
-                  />
+                  <Route path="/workshops/:id" element={<WorkshopDetails />} />
                   <Route path="/payment" element={<Payment />} />
                   <Route path="/camps" element={<Camps />} />
+                  <Route path="/camps/:id" element={<CampDetails />} />
                   <Route path="/labs" element={<Labs />} />
                   <Route path="/professionals" element={<Professionals />} />
+                  <Route
+                    path="/professionals/:id"
+                    element={<ProfessionalDetails />}
+                  />
                   <Route path="/webinars" element={<Webinars />} />
                   <Route path="/workshopvm" element={<Workshopvm />} />
                   <Route
