@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
+import { Button } from "react-bootstrap"; // Ensure to install and import react-bootstrap if not done already
+import { FaCalendarAlt } from "react-icons/fa";
 
 function Workshopvm() {
   const navigate = useNavigate();
@@ -9,12 +11,10 @@ function Workshopvm() {
   const [workshopDetails, setWorkshopDetails] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [deleteError, setDeleteError] = useState(null);
 
   useEffect(() => {
     const fetchWorkshopDetails = async () => {
       try {
-        // Fetch session details
         const sessionResponse = await axios.get(
           `http://localhost:8000/session/SessionID/${sessionId}`
         );
@@ -25,7 +25,6 @@ function Workshopvm() {
           return;
         }
 
-        // Fetch tier details
         let tierDetails = null;
         if (sessionData.TierID) {
           const tierResponse = await axios.get(
@@ -63,10 +62,15 @@ function Workshopvm() {
 
   const { session, tier } = workshopDetails;
 
+  const handleArrangeMakeupSession = () => {
+    console.log("Arrange makeup session clicked!");
+    navigate("/makeup-session", { state: { sessionId } });
+  };
+
   return (
     <div className="p-6">
       <button
-        onClick={() => navigate(-1)} // Navigate back to the previous page
+        onClick={() => navigate(-1)}
         style={{
           padding: "8px 16px",
           backgroundColor: "#fbbf24",
@@ -83,6 +87,7 @@ function Workshopvm() {
           borderRadius: "12px",
           padding: "16px",
           boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+          position: "relative", // Ensures the button is positioned relative to this box
         }}
       >
         <h1 style={{ fontSize: "24px", fontWeight: "bold", marginBottom: "8px" }}>
@@ -101,6 +106,21 @@ function Workshopvm() {
         <p style={{ marginTop: "16px", color: "#333" }}>
           {session?.Description || "No additional details provided."}
         </p>
+        <Button
+          variant="warning"
+          className="d-flex align-items-center"
+          style={{
+            position: "absolute",
+            bottom: "16px",
+            right: "16px",
+            padding: "10px 20px",
+            borderRadius: "8px",
+          }}
+          onClick={handleArrangeMakeupSession}
+        >
+          <FaCalendarAlt className="me-2" />
+          Arrange Makeup Session
+        </Button>
       </div>
     </div>
   );
