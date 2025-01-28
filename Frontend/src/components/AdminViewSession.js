@@ -12,57 +12,49 @@ const AdminViewSession = () => {
   const navigate = useNavigate();
   const { id: programID } = useParams();
 
-  // Fetch program details
   useEffect(() => {
-    const fetchProgramDetails = async () => {
+    const fetchProgramAndTiers = async () => {
       try {
-        const response = await fetch(
+        // Fetch program details
+        const programResponse = await fetch(
           `http://localhost:8000/program/${programID}`
         );
-        if (!response.ok) {
+        if (!programResponse.ok) {
           throw new Error("Failed to fetch program details");
         }
-        const programData = await response.json();
+        const programData = await programResponse.json();
         setProgramName(programData.ProgramName);
-      } catch (error) {
-        console.error("Error fetching program details:", error);
-      }
-    };
 
-    fetchProgramDetails();
-  }, [programID]);
-
-  // Fetch tiers and their sessions
-  useEffect(() => {
-    const fetchTiersAndSessions = async () => {
-      try {
+        // Fetch tiers
         const tierResponse = await fetch(
-          `http://localhost:8000/tier/${programID}`
+          `http://localhost:8000/tier/program/${programID}`
         );
         if (!tierResponse.ok) {
           throw new Error("Failed to fetch tiers");
         }
         const tierData = await tierResponse.json();
 
+        // Fetch sessions for each tier
         const tiersWithSessions = await Promise.all(
-          tierData.map(async (tier, index) => {
+          tierData.map(async (tier) => {
             const sessionResponse = await fetch(
               `http://localhost:8000/session/${tier.TierID}`
             );
             const sessions = sessionResponse.ok
               ? await sessionResponse.json()
               : [];
-            return { ...tier, sessions, tierNumber: index + 1 };
+            return { ...tier, sessions };
           })
         );
 
         setTiers(tiersWithSessions);
       } catch (error) {
-        console.error("Error fetching tiers and sessions:", error);
+        console.error("Error fetching program or tiers:", error);
+        alert("Failed to fetch program details. Please try again.");
       }
     };
 
-    fetchTiersAndSessions();
+    fetchProgramAndTiers();
   }, [programID]);
 
   const formatDate = (dateString) => {
@@ -146,9 +138,7 @@ const AdminViewSession = () => {
           >
             <Row className="align-items-center mb-3">
               <Col>
-                <h4>
-                  Tier {tier.tierNumber}: {tier.Name}
-                </h4>
+                <h4>{tier.Name}</h4>
               </Col>
               <Col className="text-end">
                 <Button
