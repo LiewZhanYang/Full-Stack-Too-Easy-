@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useContext } from "react";
 import { AppContext } from "../AppContext";
 import axios from "axios";
@@ -9,53 +9,73 @@ function WorkshopDetails() {
   const { sessionName, setSessionName } = useContext(AppContext);
   const [activeTab, setActiveTab] = useState("About");
   const navigate = useNavigate();
+  const { id } = useParams();
+
+  const [programDetails, setProgramDetails] = useState({});
   const [isMemberActive, setIsMemberActive] = useState(false);
-  const [reviews, setReviews] = useState({});
-  const [tiers, setTiers] = useState([]); // State to hold fetched tiers
+  const [reviews, setReviews] = useState([]);
+  const [tiers, setTiers] = useState([]);
+  const [selectedTier, setSelectedTier] = useState(null);
 
   useEffect(() => {
-    setSessionName("Public Speaking Workshop");
-
-    const userId = localStorage.getItem("userId");
-    const fetchMembershipStatus = async () => {
+    const fetchData = async () => {
       try {
-        const response = await axios.get(
-          `http://localhost:8000/customer/id/${userId}`
+        const programResponse = await axios.get(
+          `http://localhost:8000/program/${id}`
         );
-        if (response.data && response.data.length > 0) {
-          setIsMemberActive(response.data[0].MemberStatus === 1);
+        const programData = programResponse.data;
+        setProgramDetails(programData);
+        setSessionName(programData.ProgramName);
+
+        const userId = localStorage.getItem("userId");
+        if (userId) {
+          const membershipResponse = await axios.get(
+            `http://localhost:8000/customer/id/${userId}`
+          );
+          const membershipData = membershipResponse.data;
+          if (membershipData && membershipData.length > 0) {
+            setIsMemberActive(membershipData[0].MemberStatus === 1);
+          }
         }
+
+        const reviewsResponse = await axios.get(
+          `http://localhost:8000/review/${id}`
+        );
+        setReviews(reviewsResponse.data);
+
+        const tiersResponse = await axios.get(
+          `http://localhost:8000/tier/program/${id}`
+        );
+        const tierData = tiersResponse.data;
+
+        const tiersWithSessions = await Promise.all(
+          tierData.map(async (tier) => {
+            try {
+              const sessionResponse = await axios.get(
+                `http://localhost:8000/session/${tier.TierID}`
+              );
+              return {
+                ...tier,
+                sessions: sessionResponse.data || [],
+              };
+            } catch (error) {
+              console.error(
+                `Error fetching sessions for tier ${tier.TierID}:`,
+                error
+              );
+              return { ...tier, sessions: [] };
+            }
+          })
+        );
+
+        setTiers(tiersWithSessions);
       } catch (error) {
-        console.error("Error fetching membership status:", error);
+        console.error("Error fetching data:", error);
       }
     };
 
-    // Fetch reviews for ProgramID 1
-    const fetchReviewsForProgram1 = async () => {
-      try {
-        const response = await axios.get(`http://localhost:8000/review/1`);
-        setReviews(response.data);
-      } catch (error) {
-        console.error("Error fetching reviews:", error);
-      }
-    };
-
-    fetchMembershipStatus();
-    fetchReviewsForProgram1();
-  }, [setSessionName]);
-
-  useEffect(() => {
-    const fetchTiers = async () => {
-      try {
-        const response = await axios.get(`http://localhost:8000/tier/1`); // Adjust URL to your backend
-        setTiers(response.data); // Update the state with the fetched tiers
-      } catch (error) {
-        console.error("Error fetching tiers:", error);
-      }
-    };
-
-    fetchTiers(); // Fetch tiers when the component mounts
-  }, []);
+    fetchData();
+  }, [id, setSessionName]);
 
   const handleGetStarted = (tier) => {
     const discountedPrice = isMemberActive
@@ -71,6 +91,14 @@ function WorkshopDetails() {
         duration: tier.Duration,
       },
     });
+  };
+
+  const openTierModal = (tier) => {
+    setSelectedTier(tier);
+  };
+
+  const closeTierModal = () => {
+    setSelectedTier(null);
   };
 
   const skillDevelopmentData = [
@@ -98,10 +126,9 @@ function WorkshopDetails() {
   return (
     <div className="workshop-container">
       <div className="hero-section position-relative">
-        {/* Hero Section */}
         <img
           src={"img/workshops.jpg"}
-          alt="Public Speaking"
+          alt={programDetails.ProgramName || "Public Speaking"}
           className="w-100"
           style={{ minHeight: "600px", objectFit: "cover" }}
         />
@@ -118,7 +145,6 @@ function WorkshopDetails() {
             left: "20px",
             textAlign: "left",
             width: "auto",
-            padding: 0,
           }}
         >
           <h1
@@ -127,11 +153,9 @@ function WorkshopDetails() {
               fontSize: "2.5rem",
               fontWeight: "bold",
               textShadow: "2px 2px 4px rgba(0,0,0,0.5)",
-              marginLeft: 10,
-              transform: "translateY(20px)",
             }}
           >
-            {sessionName}
+            {programDetails.ProgramName || sessionName}
           </h1>
         </div>
 
@@ -142,10 +166,6 @@ function WorkshopDetails() {
                 key={index}
                 className="skibidi-box bg-white p-3 flex-grow-1"
                 style={{
-                  borderRight:
-                    index !== skillDevelopmentData.length - 1
-                      ? "1px solid #eee"
-                      : "none",
                   ...(index === 0 && {
                     borderTopLeftRadius: "8px",
                     borderBottomLeftRadius: "8px",
@@ -156,27 +176,61 @@ function WorkshopDetails() {
                   }),
                 }}
               >
-                <h6 className="mb-2" style={{ color: "#333" }}>
+                <h6
+                  className="mb-2"
+                  style={{
+                    color: "#333",
+                    fontSize: "1.1rem",
+                  }}
+                >
                   {skill.title}
                 </h6>
-                <p className="mb-0 small text-muted">{skill.description}</p>
+                <p
+                  className="mb-0 text-muted"
+                  style={{
+                    fontSize: "1rem",
+                    lineHeight: "1.5",
+                  }}
+                >
+                  {skill.description}
+                </p>
               </div>
             ))}
           </div>
         </div>
       </div>
 
+      {/* Tabs Section */}
       <div className="tabs-section mt-4">
         <div className="d-flex">
           <div
             className={`tab-item ${activeTab === "About" ? "active" : ""}`}
             onClick={() => setActiveTab("About")}
+            style={{
+              color: activeTab === "About" ? "#fbbf24" : "#000",
+              borderBottom:
+                activeTab === "About" ? "2px solid #fbbf24" : "none",
+              backgroundColor: "transparent",
+              padding: "10px 20px",
+              marginRight: "10px",
+              cursor: "pointer",
+              fontWeight: "bold",
+            }}
           >
             About
           </div>
           <div
             className={`tab-item ${activeTab === "Reviews" ? "active" : ""}`}
             onClick={() => setActiveTab("Reviews")}
+            style={{
+              color: activeTab === "Reviews" ? "#fbbf24" : "#000",
+              borderBottom:
+                activeTab === "Reviews" ? "2px solid #fbbf24" : "none",
+              backgroundColor: "transparent",
+              padding: "10px 20px",
+              cursor: "pointer",
+              fontWeight: "bold",
+            }}
           >
             Reviews
           </div>
@@ -184,25 +238,17 @@ function WorkshopDetails() {
         <hr className="mt-0" />
       </div>
 
+      {/* Content Sections */}
       {activeTab === "About" && (
         <div className="details-section mt-4">
-          <p
-            style={{
-              padding: "0 15px",
-              fontSize: "1rem",
-              lineHeight: "1.5",
-              color: "#333",
-            }}
-          >
-            This workshop spans 3.5 days and is available in Beginner,
-            Intermediate, and Advanced levels. Class sizes range from 5 to 20
-            participants, ensuring personalized attention.
-          </p>
+          {/* Tiers Section */}
           <div className="price-tiers-section mt-4">
             <div
               className="row g-4"
               style={{
-                justifyContent: tiers.length === 1 ? "center" : "flex-start",
+                display: "grid",
+                gridTemplateColumns: "repeat(auto-fit, minmax(350px, 1fr))",
+                gap: "1.5rem",
               }}
             >
               {tiers.map((tier, index) => {
@@ -212,51 +258,107 @@ function WorkshopDetails() {
                 return (
                   <div
                     key={index}
-                    className={`col-md-${
-                      tiers.length === 1 ? "6" : "4"
-                    } d-flex justify-content-center`}
+                    className="tier-card d-flex justify-content-center p-4 shadow-sm rounded"
+                    style={{
+                      backgroundColor: "#ffffff",
+                      border: "2px solid #ddd",
+                      transition: "transform 0.3s ease, box-shadow 0.3s ease",
+                    }}
                   >
-                    <div
-                      className="rounded-4 p-4 h-100 text-center shadow-sm"
-                      style={{ backgroundColor: "#e0f7fa" }}
-                    >
-                      <h5>{tier.Name}</h5>
-                      <div className="price-amount my-3">
-                        {isMemberActive && (
-                          <span
-                            style={{
-                              textDecoration: "line-through",
-                              color: "red",
-                              marginRight: "10px",
-                            }}
-                          >
-                            ${tier.Cost}
-                          </span>
-                        )}
-                        <span>${discountedPrice.toFixed(2)}</span>
-                      </div>
-                      <div className="tier-details mt-4 text-start">
-                        <div className="d-flex align-items-center mb-2">
-                          <i className="bi bi-people-fill me-2"></i>
-                          <span>Class size: {tier.ClassSize}</span>
-                        </div>
-                        <div className="d-flex align-items-center mb-2">
-                          <i className="bi bi-clock-fill me-2"></i>
-                          <span>Duration: {tier.Duration} days</span>
-                        </div>
-                        <div className="d-flex align-items-center">
-                          <i className="bi bi-check2-circle me-2"></i>
-                          <span>
-                            {tier.LunchProvided ? "Lunch Provided" : "No Lunch"}
-                          </span>
-                        </div>
-                      </div>
-                      <button
-                        className="btn btn-outline-primary rounded-pill w-100 mt-3"
-                        onClick={() => handleGetStarted(tier)}
+                    <div style={{ width: "100%" }}>
+                      <h5
+                        className="text-dark mb-3"
+                        style={{
+                          color: "#2F455B",
+                          fontWeight: "bold",
+                          fontSize: "1.25rem",
+                        }}
                       >
-                        Get Started
-                      </button>
+                        {tier.Name}
+                      </h5>
+                      <div className="d-flex align-items-center mb-3">
+                        <div className="me-3">
+                          <span className="text-danger text-decoration-line-through">
+                            {isMemberActive ? `$${tier.Cost}` : ""}
+                          </span>{" "}
+                          <span className="fw-bold text-dark">
+                            ${tier.DiscountedCost}
+                          </span>
+                        </div>
+                      </div>
+                      <div className="d-flex flex-column mb-3">
+                        <div>
+                          <i className="bi bi-people me-2"></i>
+                          Class Size: {tier.ClassSize}
+                        </div>
+                        <div>
+                          <i className="bi bi-clock me-2"></i>
+                          Duration: {tier.Duration} days
+                        </div>
+                        <div>
+                          <i className="bi bi-box-seam me-2"></i>
+                          {tier.LunchProvided ? "Lunch Provided" : "No Lunch"}
+                        </div>
+                      </div>
+                      <div className="sessions mb-3">
+                        <h6 className="fw-bold text-dark">
+                          Session dates available:
+                        </h6>
+                        {tier.sessions.length > 0 ? (
+                          <ul style={{ listStyleType: "none", paddingLeft: 0 }}>
+                            {tier.sessions.map((session, i) => (
+                              <li
+                                key={i}
+                                style={{
+                                  backgroundColor: "#F9FAFB",
+                                  padding: "0.75rem",
+                                  borderRadius: "8px",
+                                  marginBottom: "0.5rem",
+                                  boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
+                                }}
+                              >
+                                <p style={{ margin: 0, fontSize: "0.9rem" }}>
+                                  <strong>Date:</strong>{" "}
+                                  {new Date(
+                                    session.StartDate
+                                  ).toLocaleDateString()}
+                                </p>
+                                <p style={{ margin: 0, fontSize: "0.9rem" }}>
+                                  <strong>Time:</strong> {session.Time}
+                                </p>
+                                <p style={{ margin: 0, fontSize: "0.9rem" }}>
+                                  <strong>Location:</strong> {session.Location}
+                                </p>
+                                <p style={{ margin: 0, fontSize: "0.9rem" }}>
+                                  <strong>Vacancy:</strong> {session.Vacancy}
+                                </p>
+                              </li>
+                            ))}
+                          </ul>
+                        ) : (
+                          <p>
+                            No sessions available currently, please check back
+                            again!
+                          </p>
+                        )}
+                      </div>
+                      {tier.sessions.length > 0 && (
+                        <button
+                          className="btn btn-warning fw-bold w-100 mt-auto"
+                          style={{
+                            padding: "0.75rem",
+                            borderRadius: "8px",
+                            fontSize: "1rem",
+                            backgroundColor: "#2F455B",
+                            color: "#ffffff",
+                            border: "none",
+                            boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+                          }}
+                          onClick={() => handleGetStarted(tier)}
+                        >
+                          Get Started
+                        </button>
+                      )}
                     </div>
                   </div>
                 );
@@ -278,15 +380,16 @@ function WorkshopDetails() {
           }}
         >
           <h5
-            className="text-primary mb-4"
+            className="mb-4"
             style={{
               fontSize: "1.5rem",
               fontWeight: "bold",
-              color: "#007bff",
               marginBottom: "1.5rem",
+              color: "#000000",
             }}
           >
-            What Participants Say About Public Speaking Workshop
+            What Participants Say About{" "}
+            {programDetails.ProgramName || "This Workshop"}
           </h5>
           {reviews.length > 0 ? (
             <div
@@ -336,7 +439,7 @@ function WorkshopDetails() {
                     <div
                       className="review-rating"
                       style={{
-                        color: "#f39c12", // Gold star color
+                        color: "#f39c12",
                         fontWeight: "bold",
                       }}
                     >
@@ -353,7 +456,7 @@ function WorkshopDetails() {
                 color: "#666",
               }}
             >
-              Loading reviews...
+              No reviews yet.
             </p>
           )}
         </div>
