@@ -173,6 +173,27 @@ CREATE TABLE Comments (
     FOREIGN KEY (TicketID) REFERENCES Ticketing(TicketID) ON DELETE CASCADE
 );
 
+CREATE TABLE Forum (
+	ForumID INT PRIMARY KEY AUTO_INCREMENT,
+    Topic VARCHAR(100) NOT NULL 
+);
+
+CREATE TABLE Thread (
+    ThreadID INT PRIMARY KEY AUTO_INCREMENT,
+    Title VARCHAR(100) NULL,
+    Body VARCHAR(500) NOT NULL,
+    CreatedOn DATE NOT NULL,
+    Likes INT NOT NULL DEFAULT 0,
+    SentimentValue FLOAT NOT NULL,
+    PostedBy INT NOT NULL,
+    Topic INT NOT NULL,
+    ReplyTo INT NULL,
+    
+    FOREIGN KEY (PostedBy) REFERENCES Customer(AccountID),
+    FOREIGN KEY (Topic) REFERENCES Forum(ForumID),
+    FOREIGN KEY (ReplyTo) REFERENCES Thread(ThreadID)
+);
+
 
 -- Data Insertion
 USE TooEasyDB;
@@ -306,6 +327,19 @@ VALUES
 (5, 3, 3, FALSE, 'Can someone assist me with this?', '2025-01-18 12:05:00'),
 (6, 3, 2, TRUE, 'The program schedule is available in your dashboard.', '2025-01-18 12:10:00');
 
+
+INSERT INTO Forum (Topic) VALUES 
+('Workshop'), 
+('Camp'), 
+('Lab');
+
+INSERT INTO Thread (Title, Body, CreatedOn, Likes, SentimentValue, PostedBy, Topic, ReplyTo) 
+VALUES
+    ('Workshop on Machine Learning', 'Hi all, what do those who have attended this workshop feel about it? Please comment under this thread and share with me thanks!', '2024-01-01', 10, 0.8, 1, 1, NULL),
+    (NULL, 'I think this workshop is wonderful and you will not regret signing up for it!', '2024-01-05', 5, 0.9, 2, 1, 1),
+    ('Enquiry on Public Speaking workshop', 'Im interested in the public speaking workshops. Could someone please share with me the how the experience was like?', '2024-01-10', 3, 0.7, 3, 1, NULL),
+    (NULL, 'I found the public speaking workshops to be incredibly helpful. I learned valuable techniques for structuring presentations, engaging the audience, and managing my nerves. The practical exercises and constructive feedback from the instructor were invaluable. Im already applying what I learned in my professional and personal life.', '2024-01-15', 8, 0.95, 4, 1, 3),
+    (NULL, 'The workshops significantly boosted my confidence in public speaking. I used to dread presenting, but now I feel much more comfortable and prepared. The supportive environment and encouraging feedback from the instructor and fellow participants made a huge difference. I highly recommend these workshops to anyone looking to improve their public speaking skills.', '2024-01-20', 7, 0.85, 5, 1, 3);
 
 Trigger
 
@@ -467,4 +501,3 @@ BEGIN
 END //
 
 DELIMITER ;
-

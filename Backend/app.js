@@ -34,6 +34,7 @@ const tierRoutes = require("./routes/tierRoutes");
 const sentimentRoutes = require("./routes/sentimentRoutes");
 const ticketingRoutes = require("./routes/ticketingRoutes");
 const commentsRoutes = require("./routes/commentsRoutes");
+const threadRoutes = require("./routes/threadRoutes");
 
 app.use("/customer", customerRoutes);
 app.use("/admin", adminRoutes);
@@ -55,6 +56,7 @@ app.use("/tier", tierRoutes);
 app.use("/sentiment", sentimentRoutes);
 app.use("/ticketing", ticketingRoutes);
 app.use("/comments", commentsRoutes);
+app.use("/thread", threadRoutes);
 
 //const testController = require('./controllers/testController');
 
