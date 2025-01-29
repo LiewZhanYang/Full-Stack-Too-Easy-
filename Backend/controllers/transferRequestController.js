@@ -1,12 +1,22 @@
 const TransferRequest = require("../models/transferRequest");
 const dbConfig = require("../dbConfig");
 const mysql = require("mysql2/promise");
+const { uploadDocument } = require("./uploadController");
 
 // Create a new transfer request (ensures the 3-day rule)
 exports.createTransferRequest = async (req, res) => {
   try {
-    const { signUpID, newSessionID, reason, mcPath } = req.body;
-
+    const { signUpID, newSessionID, reason, MCpath } = req.body;
+    // Handle document upload if a file is provided
+    if (req.file) {
+      try {
+        const uploadResult = await uploadDocument(req.file, id); // Use uploadController for file upload
+        MCpath = uploadResult.data.Location || null; // Ensure mcPath is set to null if no URL is returned
+      } catch (uploadError) {
+        console.error("Error uploading document:", uploadError);
+        return res.status(500).json({ message: "Error uploading document" });
+      }
+    }
     if (!signUpID || !newSessionID || !reason) {
       return res
         .status(400)
@@ -46,7 +56,7 @@ exports.createTransferRequest = async (req, res) => {
       signUpID,
       newSessionID,
       reason,
-      mcPath
+      MCpath
     );
     res
       .status(201)

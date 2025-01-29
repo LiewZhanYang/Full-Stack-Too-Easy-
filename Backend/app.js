@@ -33,7 +33,9 @@ const reviewRoutes = require("./routes/reviewRoutes");
 const tierRoutes = require("./routes/tierRoutes");
 const sentimentRoutes = require("./routes/sentimentRoutes");
 const customerinsightsRoutes = require("./routes/customerInsightsRoutes");
+const transferRequestRoutes = require("./routes/transferRequestRoutes");
 
+app.use("/transfer-requests", transferRequestRoutes);
 app.use("/customer", customerRoutes);
 app.use("/admin", adminRoutes);
 app.use("/children", childRoutes);
