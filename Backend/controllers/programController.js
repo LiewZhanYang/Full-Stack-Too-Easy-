@@ -141,21 +141,23 @@ const deleteProgram = async (req, res) => {
     console.error(error);
     res.status(403).send("Cannot delete Programs, there are sessions");
   }
-}
+};
 
 const getProgramsByProgramType = async (req, res) => {
   const { typeID } = req.params;
   try {
     const programs = await Program.getProgramsByType(typeID);
     if (!programs || programs.length === 0) {
-      return res.status(404).json({ message: "No programs found for this type" });
+      return res
+        .status(404)
+        .json({ message: "No programs found for this type" });
     }
     res.json(programs);
   } catch (error) {
     console.error("Error retrieving programs by type:", error);
     res.status(500).json({ message: "Error retrieving programs by type" });
   }
-}
+};
 
 const getProgramByTierID = async (req, res) => {
   const { tierID } = req.params;
@@ -163,12 +165,31 @@ const getProgramByTierID = async (req, res) => {
   try {
     const programs = await Program.getProgramByTierID(tierID);
     if (!programs || programs.length === 0) {
-      return res.status(404).json({ message: "No programs found for this TierID" });
+      return res
+        .status(404)
+        .json({ message: "No programs found for this TierID" });
     }
     res.json(programs);
   } catch (error) {
     console.error("Error retrieving programs by TierID:", error);
     res.status(500).json({ message: "Error retrieving programs by TierID" });
+  }
+};
+
+const getProgramBySessionID = async (req, res) => {
+  const { sessionID } = req.params;
+
+  try {
+    const programs = await Program.getProgramBySessionID(sessionID);
+    if (!programs || programs.length === 0) {
+      return res
+        .status(404)
+        .json({ message: "No programs found for this SessionID" });
+    }
+    res.json(programs);
+  } catch (error) {
+    console.error("Error retrieving programs by SessionID:", error);
+    res.status(500).json({ message: "Error retrieving programs by SessionID" });
   }
 };
 
@@ -181,4 +202,5 @@ module.exports = {
   deleteProgram,
   getProgramsByProgramType,
   getProgramByTierID,
+  getProgramBySessionID,
 };

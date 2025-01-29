@@ -207,6 +207,39 @@ class Program {
       throw error;
     }
   }
+
+  static async getProgramBySessionID(SessionID) {
+    const connection = await mysql.createConnection(dbConfig);
+    const sqlQuery = `
+        SELECT p.ProgramID, p.ProgramName, p.ProgramDesc, p.TypeID 
+        FROM Program p
+        JOIN ProgramTier pt ON p.ProgramID = pt.ProgramID
+        JOIN Session s ON pt.TierID = s.TierID
+        WHERE s.SessionID = ?;
+    `;
+
+    try {
+      const [rows] = await connection.execute(sqlQuery, [SessionID]);
+      connection.end();
+
+      if (rows.length === 0) {
+        return null; // No program found for the given SessionID
+      }
+
+      return rows.map(
+        (row) =>
+          new Program(
+            row.ProgramID,
+            row.ProgramName,
+            row.ProgramDesc,
+            row.TypeID
+          )
+      );
+    } catch (error) {
+      console.error("Database query error in getProgramBySessionID:", error);
+      throw error;
+    }
+  }
 }
 
 module.exports = Program;

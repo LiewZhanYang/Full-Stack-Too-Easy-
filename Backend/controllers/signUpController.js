@@ -28,15 +28,15 @@ const getSignUpById = async (req, res) => {
   }
 };
 
-
-
 const createSignUp = async (req, res) => {
   try {
     const { AccountID, SessionID, LunchOptionID, ChildID } = req.body;
 
     // Validate required fields
     if (!AccountID || !SessionID || !LunchOptionID || !ChildID) {
-      return res.status(400).json({ error: "Missing required fields in request body." });
+      return res
+        .status(400)
+        .json({ error: "Missing required fields in request body." });
     }
 
     const signUpDetails = { AccountID, SessionID, LunchOptionID, ChildID };
@@ -56,13 +56,14 @@ const createSignUp = async (req, res) => {
         error: "Invalid foreign key reference. Please check the provided IDs.",
       });
     } else if (error.code === "ER_DUP_ENTRY") {
-      res.status(400).json({ error: "Duplicate signup entry. Entry already exists." });
+      res
+        .status(400)
+        .json({ error: "Duplicate signup entry. Entry already exists." });
     } else {
       res.status(500).json({ error: "Failed to create signup" });
     }
   }
 };
-
 
 const updateSignUp = async (req, res) => {
   try {
@@ -100,6 +101,7 @@ const deleteSignUp = async (req, res) => {
     res.status(500).json({ error: "Failed to delete signup" });
   }
 };
+
 
 module.exports = {
   getAllSignUps,

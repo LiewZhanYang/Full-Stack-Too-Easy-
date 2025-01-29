@@ -215,7 +215,7 @@ function App() {
                     path="/admin-view-session-details/:id"
                     element={<AdminViewSessionDetails />}
                   />
-                  <Route path="/submitmc" element={<SubmitMC />} />
+                  <Route path="/submitmc/:sessionid" element={<SubmitMC />} />
                   <Route path="/admin-confirm-mc" element={<AdminConfirmMC />} />
                   {/* Logout route redirects to login */}
                   <Route

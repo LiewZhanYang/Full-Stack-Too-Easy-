@@ -37,17 +37,14 @@ function Workshopvm() {
           );
           console.log("Tier response:", tierResponse.data);
           tierDetails = tierResponse.data;
-
-          console.log(
-            "Fetching program details for TierID:",
-            sessionData.TierID
-          );
-          const programResponse = await axios.get(
-            `http://localhost:8000/program/tier/${sessionData.TierID}`
-          );
-          console.log("Program response:", programResponse.data);
-          programDetails = programResponse.data[0]; // Get first program found
         }
+
+        console.log("Fetching program details for SessionID:", sessionId);
+        const programResponse = await axios.get(
+          `http://localhost:8000/program/session/${sessionId}`
+        );
+        console.log("Program response:", programResponse.data);
+        programDetails = programResponse.data[0];
 
         setWorkshopDetails({
           session: sessionData,
@@ -80,7 +77,15 @@ function Workshopvm() {
   const { session, tier, program } = workshopDetails;
 
   const handleArrangeMakeupSession = () => {
-    navigate("/makeup-session", { state: { sessionId } });
+    console.log("Navigating to SubmitMc with state:", {
+      session,
+      program,
+      tier: tier?.[0] || {}, 
+    });
+
+    navigate(`/submitmc/${session.SessionID}`, {
+      state: { session, program, tier: tier?.[0] || {} },
+    });
   };
 
   return (
