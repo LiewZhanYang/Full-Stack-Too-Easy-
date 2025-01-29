@@ -29,6 +29,8 @@ CREATE TABLE Child (
     DOB DATE NOT NULL,
     Age INT NOT NULL DEFAULT 0,
     AccountID INT NOT NULL,
+    SpecialLearningNeeds VARCHAR(255) DEFAULT NULL,
+    DietaryRestrictions VARCHAR(255) DEFAULT NULL,
 
     FOREIGN KEY (AccountID) REFERENCES Customer(AccountID)
 );
@@ -151,6 +153,17 @@ CREATE TABLE Review (
     
     FOREIGN KEY (AccountID) REFERENCES Customer(AccountID),
     FOREIGN KEY (ProgramID) REFERENCES Program(ProgramID)
+);
+CREATE TABLE TransferRequest (
+    TransferID INT PRIMARY KEY AUTO_INCREMENT,
+    SignUpID INT NOT NULL,
+    NewSessionID INT NOT NULL,
+    Reason VARCHAR(255) NOT NULL,
+    MCPath VARCHAR(255) NULL,
+    RequestedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+    FOREIGN KEY (SignUpID) REFERENCES SignUp(SignUpID),
+    FOREIGN KEY (NewSessionID) REFERENCES Session(SessionID)
 );
 
 CREATE TABLE Ticketing (
