@@ -34,6 +34,9 @@ const tierRoutes = require("./routes/tierRoutes");
 const sentimentRoutes = require("./routes/sentimentRoutes");
 const customerinsightsRoutes = require("./routes/customerInsightsRoutes");
 const transferRequestRoutes = require("./routes/transferRequestRoutes");
+const ticketingRoutes = require("./routes/ticketingRoutes");
+const commentsRoutes = require("./routes/commentsRoutes");
+const threadRoutes = require("./routes/threadRoutes");
 
 app.use("/transfer-requests", transferRequestRoutes);
 app.use("/customer", customerRoutes);
@@ -55,6 +58,10 @@ app.use("/review", reviewRoutes);
 app.use("/tier", tierRoutes);
 app.use("/sentiment", sentimentRoutes);
 app.use("/insight", customerinsightsRoutes);
+app.use("/ticketing", ticketingRoutes);
+app.use("/comments", commentsRoutes);
+app.use("/thread", threadRoutes);
+
 //const testController = require('./controllers/testController');
 
 // Test Routes (Not Final Routes)

@@ -2,14 +2,9 @@ const dbConfig = require("../dbConfig");
 const mysql = require("mysql2/promise");
 
 class Program {
-  constructor(
-    ProgramID,
-    ProgrameName,
-    ProgramDesc,
-    TypeID
-  ) {
+  constructor(ProgramID, ProgramName, ProgramDesc, TypeID) {
     this.ProgramID = ProgramID;
-    this.ProgrameName = ProgrameName;
+    this.ProgramName = ProgramName;
     this.ProgramDesc = ProgramDesc;
     this.TypeID = TypeID;
   }
@@ -35,29 +30,29 @@ class Program {
     );
   }
 
-  // static async getProgramBySignUp(AccountID) {
-  //   const connection = await mysql.createConnection(dbConfig);
-  //   const sqlQuery = `
-  //       SELECT * FROM Program WHERE ProgramID IN (
-  //       SELECT ProgramID FROM Session 
-  //       WHERE SessionID IN (SELECT SessionID FROM SignUp WHERE AccountID = ?));
-  //   `;
-  //   const [rows] = await connection.execute(sqlQuery, [AccountID]);
-  //   connection.end();
+  static async getProgramBySignUp(AccountID) {
+    const connection = await mysql.createConnection(dbConfig);
+    const sqlQuery = `
+        SELECT * FROM Program WHERE ProgramID IN (
+        SELECT ProgramID FROM Session 
+        WHERE SessionID IN (SELECT SessionID FROM SignUp WHERE AccountID = ?));
+    `;
+    const [rows] = await connection.execute(sqlQuery, [AccountID]);
+    connection.end();
 
-  //   if (rows.length === 0) {
-  //     return null; // Return null if no program found with the given ID
-  //   }
+    if (rows.length === 0) {
+      return null; // Return null if no program found with the given ID
+    }
 
-  //   return rows.map((row) => {
-  //     return new Program(
-  //       row.ProgramID,
-  //       row.ProgramName,
-  //       row.ProgramDesc,
-  //       row.TypeID
-  //     );
-  //   });
-  // }
+    return rows.map((row) => {
+      return new Program(
+        row.ProgramID,
+        row.ProgramName,
+        row.ProgramDesc,
+        row.TypeID
+      );
+    });
+  }
 
   static async getAllPrograms() {
     const connection = await mysql.createConnection(dbConfig);

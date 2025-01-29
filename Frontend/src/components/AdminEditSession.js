@@ -18,6 +18,7 @@ const AdminEditSession = () => {
   const [vacancy, setVacancy] = useState("");
   const [showSaveModal, setShowSaveModal] = useState(false); // State for save confirmation modal
   const [showSuccessModal, setShowSuccessModal] = useState(false); // State for success confirmation modal
+  const [showCancelModal, setShowCancelModal] = useState(false);
   const navigate = useNavigate();
   const { id: sessionID } = useParams();
 
@@ -82,6 +83,50 @@ const AdminEditSession = () => {
 
   const handleCancel = () => {
     navigate("/admin-view-program");
+  };
+
+  const handleCancelSession = async () => {
+    try {
+      console.log("Initiating session cancellation...");
+
+      // Assuming you have access to the current session details
+      const currentSessionDetails = {
+        StartDate: startDate,
+        EndDate: endDate,
+        Time: time,
+        Location: location,
+        Vacancy: vacancy,
+        Status: "Cancelled", // Set status to 'Cancelled'
+      };
+
+      const response = await fetch(
+        `http://localhost:8000/session/${sessionID}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(currentSessionDetails),
+        }
+      );
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error(
+          "Failed to cancel session. Response status:",
+          response.status,
+          "Response text:",
+          errorText
+        );
+        throw new Error("Failed to cancel session");
+      }
+
+      console.log("Session canceled successfully");
+      setShowCancelModal(false); // Close the cancel confirmation modal
+      navigate("/admin-view-program"); // Redirect to the program view page
+    } catch (error) {
+      console.error("Error canceling session:", error);
+    }
   };
 
   return (
@@ -153,15 +198,36 @@ const AdminEditSession = () => {
             Save
           </Button>
           <Button
-            variant="secondary"
-            className="cancel-button ms-2"
-            onClick={handleCancel}
+            variant="danger"
+            className="cancel-session-button ms-2"
+            onClick={() => setShowCancelModal(true)}
           >
             Cancel
           </Button>
         </div>
       </Form>
-
+      {/* Cancel Session Confirmation Modal */}
+      <Modal
+        show={showCancelModal}
+        onHide={() => setShowCancelModal(false)}
+        centered
+      >
+        <Modal.Header closeButton>
+          <Modal.Title>Cancel Session</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          Are you sure you want to stop editing this session? This action cannot
+          be undone.
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="danger" onClick={handleCancelSession}>
+            Confirm Cancel
+          </Button>
+          <Button variant="secondary" onClick={() => setShowCancelModal(false)}>
+            Back
+          </Button>
+        </Modal.Footer>
+      </Modal>
       {/* Save Confirmation Modal */}
       <Modal
         show={showSaveModal}

@@ -33,30 +33,53 @@ const AdminViewSingleAnnouncement = () => {
 
     fetchAnnouncement();
   }, [id]);
-
-  const handleBack = () => {
-    navigate("/admin-view-announcement");
+  
+  const handleBack= () => {
+    navigate(-1);
   };
 
+
   return (
-    <Container
-      fluid
-      className="admin-view-single-announcement-page p-4"
-      style={{ maxWidth: "600px" }}
-    >
-      <h2 className="admin-view-title">View Announcement</h2>
-      <hr className="admin-view-divider mb-4" />
+    <Container fluid className="admin-view-single-announcement-page p-4">
+      <h2 className="admin-create-title">View Announcement</h2>
+      <hr className="admin-create-divider mb-4" />
+
       <Form>
         <Form.Group controlId="announcementTitle" className="mb-3">
           <Form.Label>Title</Form.Label>
-          <Form.Control type="text" value={title} readOnly />
+          <Form.Control
+            type="text"
+            value={title}
+            readOnly
+            style={{
+              backgroundColor: "#f8f9fa",
+              border: "1px solid #ced4da",
+              fontSize: "1rem",
+              padding: "0.75rem",
+            }}
+          />
         </Form.Group>
         <Form.Group controlId="announcementDescription" className="mb-3">
           <Form.Label>Description</Form.Label>
-          <Form.Control as="textarea" rows={6} value={description} readOnly />
+          <Form.Control
+            as="textarea"
+            rows={6}
+            value={description}
+            readOnly
+            style={{
+              backgroundColor: "#f8f9fa",
+              border: "1px solid #ced4da",
+              fontSize: "1rem",
+              padding: "0.75rem",
+            }}
+          />
         </Form.Group>
-        <div className="d-flex justify-content-center mt-4">
-          <Button variant="warning" onClick={handleBack}>
+        <div className="admin-create-button-group mt-4">
+          <Button
+            variant="warning"
+            className="admin-create-confirm-button"
+            onClick={handleBack}
+          >
             Back
           </Button>
         </div>

@@ -105,7 +105,7 @@ function Sidebar() {
                 {expandedMenu === "programmes" && (
                   <div className="ps-4">
                     <Link
-                      to="/workshopPrice"
+                      to="/workshops"
                       className="d-block py-1 text-dark text-decoration-none"
                       style={{ fontSize: "0.95rem" }}
                     >
@@ -131,6 +131,47 @@ function Sidebar() {
                       style={{ fontSize: "0.95rem" }}
                     >
                       Professionals
+                    </Link>
+                  </div>
+                )}
+              </div>
+
+              {/* Forum Dropdown */}
+              <div className="mt-3">
+                <button
+                  onClick={() => toggleMenu("forum")}
+                  className="btn d-flex align-items-center w-100 text-dark fw-bold px-3 py-2 border-0 bg-transparent"
+                >
+                  <i className="bi bi-chat-dots me-2"></i>
+                  Forum
+                  <i
+                    className={`bi ${
+                      expandedMenu === "forum" ? "bi-chevron-up" : "bi-chevron-down"
+                    } ms-auto`}
+                  ></i>
+                </button>
+                {expandedMenu === "forum" && (
+                  <div className="ps-4">
+                    <Link
+                      to="/forum/workshop"
+                      className="d-block py-1 text-dark text-decoration-none"
+                      style={{ fontSize: "0.95rem" }}
+                    >
+                      Workshop
+                    </Link>
+                    <Link
+                      to="/workshopforum"
+                      className="d-block py-1 text-dark text-decoration-none"
+                      style={{ fontSize: "0.95rem" }}
+                    >
+                      Camp
+                    </Link>
+                    <Link
+                      to="/forum/lab"
+                      className="d-block py-1 text-dark text-decoration-none"
+                      style={{ fontSize: "0.95rem" }}
+                    >
+                      Lab
                     </Link>
                   </div>
                 )}

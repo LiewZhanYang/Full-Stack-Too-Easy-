@@ -21,8 +21,10 @@ const AdminCreateSession = () => {
       Time: time,
       Location: location,
       Vacancy: vacancy,
-      ProgramID: programID,
+      TierID: programID, 
     };
+
+    console.log("Session Details:", sessionDetails); // Debug log
 
     try {
       const response = await fetch("http://localhost:8000/session", {
