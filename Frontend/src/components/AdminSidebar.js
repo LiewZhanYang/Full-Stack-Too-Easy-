@@ -227,6 +227,34 @@ function Sidebar() {
                     </div>
                   )}
                 </div>
+                {/* MC Submission Dropdown */}
+                <div className="mt-3">
+                  <button
+                    onClick={() => toggleMenu("mcSubmission")}
+                    className="btn d-flex align-items-center w-100 text-dark fw-bold px-3 py-2 border-0 bg-transparent"
+                  >
+                    <i className="bi bi-file-earmark-text me-2"></i>
+                    MC Submission
+                    <i
+                      className={`bi ${
+                        expandedMenu === "mcSubmission"
+                          ? "bi-chevron-up"
+                          : "bi-chevron-down"
+                      } ms-auto`}
+                    ></i>
+                  </button>
+                  {expandedMenu === "mcSubmission" && (
+                    <div className="ps-4">
+                      <Link
+                        to="/admin-confirm-mc"
+                        className="d-block py-1 text-dark text-decoration-none"
+                        style={{ fontSize: "0.95rem" }}
+                      >
+                        Confirm Submissions
+                      </Link>
+                    </div>
+                  )}
+                </div>
               </div>
             </nav>
           </div>
