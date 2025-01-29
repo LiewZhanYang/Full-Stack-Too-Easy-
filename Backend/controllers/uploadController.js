@@ -243,3 +243,31 @@ exports.getdocumentByTransferID = async (TransferID) => {
     throw new Error("Error retrieving document from S3.");
   }
 };
+
+exports.getWebPicByCategory = async (req, res) => {
+  try {
+    const { category } = req.params;
+    console.log(`📢 API hit: GET /web-pics/${category}`);
+
+    if (!category) {
+      console.error("❌ Error: Category parameter is missing.");
+      return res.status(400).json({ error: "Category is required." });
+    }
+
+    console.log(`🔄 Fetching image for category: ${category}`);
+
+    // Fetch image from the model
+    const image = await require("../models/upload").getWebPicByCategory(
+      category
+    );
+    console.log(`✅ Image found and returned: ${JSON.stringify(image)}`);
+
+    res.status(200).json(image);
+  } catch (error) {
+    console.error(
+      `🚨 Error in API response for category ${req.params.category}:`,
+      error
+    );
+    res.status(500).json({ error: error.message || "Internal server error." });
+  }
+};
