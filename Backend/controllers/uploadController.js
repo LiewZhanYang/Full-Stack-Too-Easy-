@@ -104,6 +104,27 @@ exports.uploadWebinar = async (file, WebinarID) => {
     throw new Error("Error processing file upload.");
   }
 };
+exports.uploadDocument = async (file, TransferID) => {
+  if (!file) {
+    throw new Error("No document provided for upload.");
+  }
+
+  if (!AccountID) {
+    throw new Error("TransferID is required for upload.");
+  }
+
+  try {
+    const data = await uploadFileToS3(file, `Transfer-Request/${TransferID}`);
+    console.log("document uploaded successfully:", data);
+    return {
+      message: "document uploaded successfully!",
+      data,
+    };
+  } catch (error) {
+    console.error("Error during document upload:", error);
+    throw new Error("Error uploading document to S3.");
+  }
+};
 exports.getFileByWebinarID = async (WebinarID) => {
   if (!WebinarID) {
     throw new Error("WebinarID is required.");
@@ -194,5 +215,31 @@ exports.getProgramPicByProgramID = async (programID) => {
       error
     );
     throw new Error("Error retrieving program picture from S3.");
+  }
+};
+
+exports.getdocumentByTransferID = async (TransferID) => {
+  if (!TransferID) {
+    throw new Error("TransferID is required.");
+  }
+
+  const foldername = `Transfer-Request/${TransferID}`;
+  try {
+    const files = await listObjectsByPrefix(foldername);
+    if (files.length === 0) {
+      // Return a default image URL or null if no files are found
+      console.warn(`No document found for TransferID: ${TransferID}`);
+      return { url: "/img/default.jpg" }; // Adjust this to your needs
+    }
+
+    // Generate the signed URL for the first file
+    const url = await getSignedUrlFromS3(foldername, files[0].split("/").pop());
+    return { url };
+  } catch (error) {
+    console.error(
+      `Error retrieving document for TransferID ${TransferID}:`,
+      error
+    );
+    throw new Error("Error retrieving document from S3.");
   }
 };
