@@ -14,7 +14,7 @@ const s3 = new S3Client({
     secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
   },
 });
-
+/*
 // Function to upload files to S3
 exports.uploadFileToS3 = async (file, foldername) => {
   const filename = `${file.originalname}`; // Generate unique filename using timestamp
@@ -37,6 +37,7 @@ exports.uploadFileToS3 = async (file, foldername) => {
     throw new Error("Error uploading file to S3");
   }
 };
+*/
 exports.uploadFileToS3 = async (file, foldername) => {
   // Define a consistent filename, e.g., 'profile-picture' or 'main-image'
   // This ensures that only one file is present per folder and replaces previous uploads.
