@@ -42,4 +42,12 @@ router.get(
   uploadController.getProgramPicByProgramID
 );
 
+router.get(
+  "/:category",
+  (req, res, next) => {
+    console.log(`📡 Incoming GET request: /web-pics/${req.params.category}`);
+    next();
+  },
+  uploadController.getWebPicByCategory
+);
 module.exports = router;
