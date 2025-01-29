@@ -155,6 +155,21 @@ const getProgramsByProgramType = async (req, res) => {
     console.error("Error retrieving programs by type:", error);
     res.status(500).json({ message: "Error retrieving programs by type" });
   }
+}
+
+const getProgramByTierID = async (req, res) => {
+  const { tierID } = req.params;
+
+  try {
+    const programs = await Program.getProgramByTierID(tierID);
+    if (!programs || programs.length === 0) {
+      return res.status(404).json({ message: "No programs found for this TierID" });
+    }
+    res.json(programs);
+  } catch (error) {
+    console.error("Error retrieving programs by TierID:", error);
+    res.status(500).json({ message: "Error retrieving programs by TierID" });
+  }
 };
 
 module.exports = {
@@ -164,5 +179,6 @@ module.exports = {
   getProgramById,
   getProgramBySignUp,
   deleteProgram,
-  getProgramsByProgramType
+  getProgramsByProgramType,
+  getProgramByTierID,
 };

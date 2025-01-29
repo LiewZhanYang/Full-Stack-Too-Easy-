@@ -175,6 +175,38 @@ class Program {
     const [result] = await connection.execute(sqlQuery, [ProgramID]);
     connection.end();
   }
+
+  static async getProgramByTierID(TierID) {
+    const connection = await mysql.createConnection(dbConfig);
+    const sqlQuery = `
+        SELECT p.ProgramID, p.ProgramName, p.ProgramDesc, p.TypeID 
+        FROM Program p
+        JOIN ProgramTier pt ON p.ProgramID = pt.ProgramID
+        WHERE pt.TierID = ?;
+    `;
+
+    try {
+      const [rows] = await connection.execute(sqlQuery, [TierID]);
+      connection.end();
+
+      if (rows.length === 0) {
+        return null; // No program found for the given TierID
+      }
+
+      return rows.map(
+        (row) =>
+          new Program(
+            row.ProgramID,
+            row.ProgramName,
+            row.ProgramDesc,
+            row.TypeID
+          )
+      );
+    } catch (error) {
+      console.error("Database query error in getProgramByTierID:", error);
+      throw error;
+    }
+  }
 }
 
 module.exports = Program;
