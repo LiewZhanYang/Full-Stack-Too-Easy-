@@ -51,7 +51,7 @@ class Ticketing {
 
   static async getTickets() {
     const connection = await mysql.createConnection(dbConfig);
-    const sqlQuery = `SELECT * FROM Ticketing`;
+    const sqlQuery = `SELECT * FROM Ticketing WHERE Status = 'Open' OR Status = 'In Progress'`;
     const [result] = await connection.execute(sqlQuery);
     connection.end();
     return result;
