@@ -41,7 +41,7 @@ router.get(
   "/program-pic/:programID",
   uploadController.getProgramPicByProgramID
 );
-
+/*
 router.get(
   "/:category",
   (req, res, next) => {
@@ -50,4 +50,5 @@ router.get(
   },
   uploadController.getWebPicByCategory
 );
+*/
 module.exports = router;

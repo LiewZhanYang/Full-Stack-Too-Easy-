@@ -191,30 +191,52 @@ exports.getProfilePicByAccountID = async (accountID) => {
     throw new Error("Error retrieving profile picture from S3.");
   }
 };
-// Updated getProgramPicByProgramID function
-exports.getProgramPicByProgramID = async (programID) => {
+exports.getProgramPicByProgramID = async (req, res) => {
+  const { programID } = req.params;
+
   if (!programID) {
-    throw new Error("ProgramID is required.");
+    return res.status(400).json({ error: "ProgramID is required." });
   }
 
   const foldername = `program-pics/${programID}`;
+
   try {
+    console.log(`📂 Fetching images from: ${foldername}`);
+
     const files = await listObjectsByPrefix(foldername);
-    if (files.length === 0) {
-      // Return a default image URL or null if no files are found
-      console.warn(`No images found for ProgramID: ${programID}`);
-      return { url: "/img/default.jpg" }; // Adjust this to your needs
+
+    console.log(`📝 Files found: ${files.length}`, files);
+
+    // ✅ Filter out folders and keep only images
+    const validExtensions = [".jpg", ".jpeg", ".png", ".gif", ".webp"];
+    const imageFiles = files.filter(
+      (file) =>
+        !file.endsWith("/") &&
+        validExtensions.some((ext) => file.toLowerCase().endsWith(ext))
+    );
+
+    if (imageFiles.length === 0) {
+      console.warn(`⚠️ No images found for Program ID: ${programID}`);
+      return res.json({ url: "/img/default.jpg" });
     }
 
-    // Generate the signed URL for the first file
-    const url = await getSignedUrlFromS3(foldername, files[0].split("/").pop());
-    return { url };
+    // ✅ Pick the first valid image file
+    const selectedFile = imageFiles[0].split("/").pop(); // Extract filename
+    console.log(`🔗 Selected image file: ${selectedFile}`);
+
+    const signedUrl = await getSignedUrlFromS3(foldername, selectedFile);
+
+    console.log(`✅ Signed URL generated: ${signedUrl}`);
+
+    res.json({ url: signedUrl });
   } catch (error) {
     console.error(
-      `Error retrieving program picture for ProgramID ${programID}:`,
+      `❌ Error retrieving image for ProgramID ${programID}:`,
       error
     );
-    throw new Error("Error retrieving program picture from S3.");
+    res
+      .status(500)
+      .json({ error: "Error retrieving program picture from S3." });
   }
 };
 
@@ -243,7 +265,7 @@ exports.getdocumentByTransferID = async (TransferID) => {
     throw new Error("Error retrieving document from S3.");
   }
 };
-
+/*
 exports.getWebPicByCategory = async (req, res) => {
   try {
     const { category } = req.params;
@@ -271,3 +293,4 @@ exports.getWebPicByCategory = async (req, res) => {
     res.status(500).json({ error: error.message || "Internal server error." });
   }
 };
+*/
