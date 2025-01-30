@@ -58,9 +58,43 @@ const getTicketById = async (req, res) => {
   }
 };
 
+const addComment = async (req, res) => {
+  const { ticketID } = req.params;
+  const { Content, CommenterID, IsAdmin = 0 } = req.body;
+
+  try {
+    const comment = await Ticketing.addComment(ticketID, Content, CommenterID, IsAdmin);
+    console.log("Comment Response Sent to Frontend:", comment); // Log the response
+    res.status(201).json(comment);
+  } catch (error) {
+    console.error("Error in controller while adding comment:", error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+const getComments = async (req, res) => {
+  const { ticketID } = req.params;
+
+  try {
+    const comments = await Ticketing.getComments(ticketID);
+
+    // If no comments are found, return an empty array
+    if (!comments.length) {
+      return res.status(200).json([]); // Respond with an empty array
+    }
+
+    res.status(200).json(comments);
+  } catch (error) {
+    console.error("Error fetching comments:", error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
 module.exports = {
   postTicket,
   getTickets,
   updateTicketStatus,
   getTicketById,
+  addComment,
+  getComments,
 };
