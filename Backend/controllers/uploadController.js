@@ -125,25 +125,51 @@ exports.uploadDocument = async (file, TransferID) => {
     throw new Error("Error uploading document to S3.");
   }
 };
-exports.getFileByWebinarID = async (WebinarID) => {
-  if (!WebinarID) {
-    throw new Error("WebinarID is required.");
+exports.getWebinarPicByWebinarID = async (req, res) => {
+  const { webinarID } = req.params;
+
+  if (!webinarID) {
+    return res.status(400).json({ error: "WebinarID is required." });
   }
 
-  const foldername = `webinar-pics/${WebinarID}`;
+  const foldername = `webinar-pics/${webinarID}`;
+
   try {
-    // List objects in the specified folder in S3
+    console.log(`📂 Fetching images from: ${foldername}`);
+
     const files = await listObjectsByPrefix(foldername);
-    if (files.length === 0) {
-      throw new Error("No files found for this WebinarID.");
+
+    console.log(`📝 Files found: ${files.length}`, files);
+
+    // ✅ Filter only valid image formats
+    const validExtensions = [".jpg", ".jpeg", ".png", ".gif", ".webp"];
+    const imageFiles = files.filter(
+      (file) =>
+        !file.endsWith("/") &&
+        validExtensions.some((ext) => file.toLowerCase().endsWith(ext))
+    );
+
+    if (imageFiles.length === 0) {
+      console.warn(`⚠️ No images found for Webinar ID: ${webinarID}`);
+      return res.json({ url: "/img/default.jpg" });
     }
 
-    // Generate a signed URL for the first file
-    const url = await getSignedUrlFromS3(foldername, files[0].split("/").pop());
-    return { url };
+    // ✅ Select the first image file
+    const selectedFile = imageFiles[0].split("/").pop();
+    console.log(`🔗 Selected image file: ${selectedFile}`);
+
+    const signedUrl = await getSignedUrlFromS3(foldername, selectedFile);
+    console.log(`✅ Signed URL generated: ${signedUrl}`);
+
+    res.json({ url: signedUrl });
   } catch (error) {
-    console.error("Error retrieving file:", error);
-    throw new Error("Error retrieving file from S3.");
+    console.error(
+      `❌ Error retrieving image for WebinarID ${webinarID}:`,
+      error
+    );
+    res
+      .status(500)
+      .json({ error: "Error retrieving webinar picture from S3." });
   }
 };
 // Retrieve a file by OrderID
@@ -155,15 +181,30 @@ exports.getFileByOrderID = async (orderID) => {
   const foldername = `PaymentInvoice/${orderID}`;
   try {
     const files = await listObjectsByPrefix(foldername);
-    if (files.length === 0) {
+
+    if (!files || files.length === 0) {
       throw new Error("No files found for this OrderID.");
     }
 
-    // Generate the signed URL for the first file
-    const url = await getSignedUrlFromS3(foldername, files[0].split("/").pop());
+    // ✅ Filter out folders and keep only actual files
+    const validExtensions = [".jpg", ".jpeg", ".png", ".pdf", ".docx"]; // Allowed file types
+    const fileList = files.filter((file) =>
+      validExtensions.some((ext) => file.toLowerCase().endsWith(ext))
+    );
+
+    if (fileList.length === 0) {
+      throw new Error("No valid files found for this OrderID.");
+    }
+
+    // ✅ Select the first valid file
+    const selectedFile = fileList[0].split("/").pop(); // Extract filename
+    console.log(`🔗 Selected file for signed URL: ${selectedFile}`);
+
+    // ✅ Generate the signed URL
+    const url = await getSignedUrlFromS3(foldername, selectedFile);
     return { url };
   } catch (error) {
-    console.error("Error retrieving file:", error);
+    console.error("❌ Error retrieving file:", error);
     throw new Error("Error retrieving file from S3.");
   }
 };
