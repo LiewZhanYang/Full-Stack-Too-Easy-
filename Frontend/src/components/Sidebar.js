@@ -153,7 +153,7 @@ function Sidebar() {
                 {expandedMenu === "forum" && (
                   <div className="ps-4">
                     <Link
-                      to="/forum/workshop"
+                      to="/workshopforum"
                       className="d-block py-1 text-dark text-decoration-none"
                       style={{ fontSize: "0.95rem" }}
                     >
