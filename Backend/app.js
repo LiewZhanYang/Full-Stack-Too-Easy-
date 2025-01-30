@@ -38,6 +38,7 @@ const ticketingRoutes = require("./routes/ticketingRoutes");
 const commentsRoutes = require("./routes/commentsRoutes");
 const threadRoutes = require("./routes/threadRoutes");
 
+app.use("/", uploadRoutes);
 app.use("/transfer-requests", transferRequestRoutes);
 app.use("/customer", customerRoutes);
 app.use("/admin", adminRoutes);

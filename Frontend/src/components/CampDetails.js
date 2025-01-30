@@ -16,6 +16,7 @@ function CampDetails() {
   const [reviews, setReviews] = useState([]);
   const [tiers, setTiers] = useState([]);
   const [selectedTier, setSelectedTier] = useState(null);
+  const [imageUrl, setImageUrl] = useState("");
 
   useEffect(() => {
     const fetchData = async () => {
@@ -73,7 +74,22 @@ function CampDetails() {
         console.error("Error fetching data:", error);
       }
     };
+    // Fetch program image
+    const fetchImage = async () => {
+      try {
+        const imageResponse = await axios.get(
+          `http://localhost:8000/program-pic/${id}`
+        );
+        if (imageResponse.data.url) {
+          setImageUrl(imageResponse.data.url);
+        }
+      } catch (error) {
+        console.error(`Error fetching image for ProgramID ${id}:`, error);
+        setImageUrl("/img/default.jpg");
+      }
+    };
 
+    fetchImage();
     fetchData();
   }, [id, setSessionName]);
 
@@ -92,7 +108,6 @@ function CampDetails() {
       },
     });
   };
-
 
   const skillDevelopmentData = [
     {
@@ -120,7 +135,7 @@ function CampDetails() {
     <div className="workshop-container">
       <div className="hero-section position-relative">
         <img
-          src={"img/workshops.jpg"}
+          src={imageUrl || "img/workshops.jpg"}
           alt={programDetails.ProgramName || "Public Speaking"}
           className="w-100"
           style={{ minHeight: "600px", objectFit: "cover" }}

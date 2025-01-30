@@ -61,6 +61,7 @@ exports.uploadFileToS3 = async (file, foldername) => {
     throw new Error("Error uploading file to S3");
   }
 };
+/*
 exports.getWebPicByCategory = async (category) => {
   console.log(`📥 Received request to get web pic for category: ${category}`);
 
@@ -111,7 +112,8 @@ exports.getWebPicByCategory = async (category) => {
     throw new Error(`Error retrieving image from S3: ${error.message}`);
   }
 };
-
+*/
+/*
 // Function to generate signed URL specifically for web images
 exports.getWebPicSignedUrl = async (foldername, filename, expiresIn = 900) => {
   if (!foldername || !filename) {
@@ -144,6 +146,7 @@ exports.getWebPicSignedUrl = async (foldername, filename, expiresIn = 900) => {
     throw new Error("Error generating web image signed URL from S3.");
   }
 };
+*/
 // Function to generate a signed URL for accessing a file in S3
 exports.getSignedUrlFromS3 = async (foldername, filename, expiresIn = 900) => {
   const params = {
