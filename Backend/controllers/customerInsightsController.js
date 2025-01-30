@@ -51,3 +51,21 @@ exports.getAverageRatingByWorkshop= async (req, res) => {
     res.status(500).json({ error: "Internal server error." });
   }
 }
+
+exports.getTotalForumEngagementToday= async (req, res) => {
+  const { id } = req.params;
+  try {
+    const engagement = await Workshop.getTotalForumEngagementToday(id);
+
+    if (!engagement) {
+      return res
+        .status(404)
+        .json({ message: "No engagement" });
+    }
+
+    res.status(200).json(engagement);
+  } catch (error) {
+    console.error("Error fetching engagement:", error);
+    res.status(500).json({ error: "Internal server error." });
+  }
+}

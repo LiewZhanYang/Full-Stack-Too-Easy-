@@ -6,5 +6,6 @@ const customerInsightsController = require("../controllers/customerInsightsContr
 router.get("/", customerInsightsController.getTopPayingCustomers);
 router.get("/most-popular", customerInsightsController.getMostPopularWorkshop);
 router.get("/get-rating/:id", customerInsightsController.getAverageRatingByWorkshop);
+router.get("/engagement/:id", customerInsightsController.getTotalForumEngagementToday);
 
 module.exports = router;

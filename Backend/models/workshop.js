@@ -39,6 +39,17 @@ class Workshop {
         const [result] = await connection.execute(sqlQuery, [id]);
         return result[0] || null; // Return the most popular workshop or null if none found
     }
+
+    static async getTotalForumEngagementToday(id) {
+        const connection = await mysql.createConnection(dbConfig);
+        const sqlQuery = `
+            SELECT COUNT(*) AS 'Engagement' FROM Thread
+            WHERE CreatedOn = CURDATE() AND Topic = ?;
+        `;
+
+        const [result] = await connection.execute(sqlQuery, [id]);
+        return result[0] || null; // Return the most popular workshop or null if none found
+    }
 }
 
 module.exports = Workshop;
