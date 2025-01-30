@@ -160,7 +160,7 @@ function Sidebar() {
                       Workshop
                     </Link>
                     <Link
-                      to="/workshopforum"
+                      to="/forum/camp"
                       className="d-block py-1 text-dark text-decoration-none"
                       style={{ fontSize: "0.95rem" }}
                     >
@@ -176,6 +176,15 @@ function Sidebar() {
                   </div>
                 )}
               </div>
+
+              {/* Ticketing Section */}
+              <Link
+                to="/ticketing"
+                className="btn d-flex align-items-center w-100 text-dark fw-bold px-3 py-2 border-0 bg-transparent mt-3"
+              >
+                <i className="bi bi-ticket me-2"></i>
+                Ticketing
+              </Link>
 
               {/* Events Dropdown (Only for Members) */}
               {isMemberActive && (
