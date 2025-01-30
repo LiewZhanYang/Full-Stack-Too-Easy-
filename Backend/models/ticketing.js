@@ -76,6 +76,71 @@ class Ticketing {
       throw error;
     }
   }
+
+  static async addComment(ticketID, content, commenterID, isAdmin = 0) {
+    let connection;
+  
+    try {
+      // Establish a database connection
+      connection = await mysql.createConnection(dbConfig);
+  
+      // Insert the comment into the database
+      const sqlQuery = `
+        INSERT INTO Comments (TicketID, Content, CommenterID, IsAdmin, CommentDate) 
+        VALUES (?, ?, ?, ?, NOW())
+      `;
+      const [result] = await connection.execute(sqlQuery, [
+        ticketID,
+        content,       // Pass the content properly
+        commenterID,   // Pass the commenter ID properly
+        isAdmin,       // Pass the admin flag properly
+      ]);
+  
+      // Return the inserted comment
+      return {
+        CommentID: result.insertId,
+        TicketID: parseInt(ticketID),
+        Content: content,
+        CommenterID: commenterID,
+        IsAdmin: isAdmin,
+        CommentDate: new Date().toISOString(),
+      };
+    } catch (error) {
+      console.error("Error adding comment in model:", error);
+      throw error; // Rethrow the error for the controller to handle
+    } finally {
+      if (connection) {
+        await connection.end();
+      }
+    }
+  }
+  
+  static async getComments(ticketID) {
+    let connection;
+
+    try {
+      // Establish a database connection
+      connection = await mysql.createConnection(dbConfig);
+
+      // SQL query to fetch comments by ticket ID
+      const sqlQuery = `
+        SELECT CommentID, TicketID, Content, CommenterID, IsAdmin, CommentDate
+        FROM Comments
+        WHERE TicketID = ?
+        ORDER BY CommentDate ASC
+      `;
+      const [comments] = await connection.execute(sqlQuery, [ticketID]);
+
+      return comments; // Return the list of comments
+    } catch (error) {
+      console.error("Error fetching comments in model:", error);
+      throw error; // Rethrow error for the controller to handle
+    } finally {
+      if (connection) {
+        await connection.end(); // Ensure the connection is closed
+      }
+    }
+  }
   
 }
 
