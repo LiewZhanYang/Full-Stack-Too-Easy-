@@ -33,3 +33,21 @@ exports.getMostPopularWorkshop = async (req, res) => {
     res.status(500).json({ error: "Internal server error." });
   }
 };
+
+exports.getAverageRatingByWorkshop= async (req, res) => {
+  const { id } = req.params;
+  try {
+    const averageRating = await Workshop.getAverageRatingByWorkshop(id);
+
+    if (!averageRating) {
+      return res
+        .status(404)
+        .json({ message: "No rating was given for this workshop." });
+    }
+
+    res.status(200).json(averageRating);
+  } catch (error) {
+    console.error("Error fetching rating:", error);
+    res.status(500).json({ error: "Internal server error." });
+  }
+}
