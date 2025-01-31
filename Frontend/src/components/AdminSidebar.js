@@ -246,7 +246,7 @@ function Sidebar() {
                   {expandedMenu === "ticket" && (
                     <div className="ps-4">
                       <Link
-                        to="/admin-view-tickets"
+                        to="/admin-view-ticket"
                         className="d-block py-1 text-dark text-decoration-none"
                         style={{ fontSize: "0.95rem" }}
                       >
