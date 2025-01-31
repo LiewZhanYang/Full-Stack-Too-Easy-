@@ -17,6 +17,7 @@ const AdminViewProgram = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedType, setSelectedType] = useState("All");
   const navigate = useNavigate();
+  const [imageUrls, setImageUrls] = useState({});
 
   const typeMapping = {
     All: null,
@@ -45,6 +46,46 @@ const AdminViewProgram = () => {
 
     fetchPrograms();
   }, []);
+  useEffect(() => {
+    if (programs.length === 0) return; // Only run when programs exist
+
+    const fetchProgramImages = async () => {
+      try {
+        const imagePromises = programs.map(async (program) => {
+          try {
+            const response = await fetch(
+              `http://localhost:8000/program-pic/${program.ProgramID}`
+            );
+            if (!response.ok) {
+              throw new Error(
+                `Error fetching image for ProgramID ${program.ProgramID}`
+              );
+            }
+            const data = await response.json();
+            return { id: program.ProgramID, url: data.url };
+          } catch (error) {
+            console.error(
+              `Error fetching image for ProgramID ${program.ProgramID}:`,
+              error
+            );
+            return { id: program.ProgramID, url: "/img/default.jpg" }; // Default image on error
+          }
+        });
+
+        const imageResults = await Promise.all(imagePromises);
+        const imageMap = imageResults.reduce((acc, { id, url }) => {
+          acc[id] = url;
+          return acc;
+        }, {});
+
+        setImageUrls(imageMap);
+      } catch (error) {
+        console.error("Error fetching program images:", error);
+      }
+    };
+
+    fetchProgramImages();
+  }, [programs]); // Depend on `programs` to run only when it's updated
 
   useEffect(() => {
     const filtered = programs.filter((program) => {
@@ -145,7 +186,7 @@ const AdminViewProgram = () => {
               <div className="admin-program-card-image-container">
                 <Card.Img
                   variant="top"
-                  src={program.image || "/img/default.jpg"}
+                  src={imageUrls[program.ProgramID] || "/img/default.jpg"}
                   alt={program.ProgramName}
                   className="admin-program-card-image"
                 />
@@ -156,7 +197,7 @@ const AdminViewProgram = () => {
                   style={{
                     textAlign: "left",
                     fontSize: "1.25rem",
-                    fontWeight: "bold", 
+                    fontWeight: "bold",
                   }}
                 >
                   {program.ProgramName}
@@ -165,7 +206,7 @@ const AdminViewProgram = () => {
                   style={{
                     textAlign: "left",
                     fontSize: "1rem",
-                    fontWeight: "normal", 
+                    fontWeight: "normal",
                     color: "#6c757d",
                   }}
                 >

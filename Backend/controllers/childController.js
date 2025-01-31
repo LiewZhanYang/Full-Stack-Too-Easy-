@@ -58,6 +58,19 @@ const updateChild = async (req, res) => {
   }
 };
 
+const updateChildNotes = async (req, res) => {
+  const id = req.params.id;
+  const notes = req.body;
+  try {
+    const updatedChild = await Child.updateChildNotes(id, notes);
+    res.status(201).json(updatedChild);
+    console.log("Successfully updated Child");
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Error updating Child");
+  }
+};
+
 const getChildBySessionID = async (req, res) => {
   const SessionID = req.params.id;
   try {
@@ -84,4 +97,4 @@ const getCustomerByChildID = async (req, res) => {
 };
 
 
-module.exports = { getChildByAccountID, postChild, deleteChild, updateChild, getChildBySessionID, getCustomerByChildID };
+module.exports = { getChildByAccountID, postChild, deleteChild, updateChild, getChildBySessionID, getCustomerByChildID , updateChildNotes};

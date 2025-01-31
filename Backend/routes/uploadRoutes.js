@@ -5,8 +5,27 @@ const uploadController = require("../controllers/uploadController");
 
 const router = express.Router();
 
-// Configure multer for file parsing
-const upload = multer({ storage: multer.memoryStorage() });
+const storage = multer.memoryStorage();
+
+const fileFilter = (req, file, cb) => {
+  const allowedTypes = [
+    "image/jpeg",
+    "image/png",
+    "image/webp",
+    "image/gif",
+    "application/pdf",
+    "application/msword", // DOC
+    "application/vnd.openxmlformats-officedocument.wordprocessingml.document", // DOCX
+  ];
+
+  if (allowedTypes.includes(file.mimetype)) {
+    cb(null, true); // ✅ Accept file
+  } else {
+    cb(new Error("Invalid file type. Allowed: Images, PDFs, DOCX"), false); // ❌ Reject file
+  }
+};
+
+const upload = multer({ storage, fileFilter });
 
 // Endpoint for uploading a single file
 router.post(
@@ -41,7 +60,11 @@ router.get(
   "/program-pic/:programID",
   uploadController.getProgramPicByProgramID
 );
-
+router.get(
+  "/webinar-pic/:webinarID",
+  uploadController.getWebinarPicByWebinarID
+);
+/*
 router.get(
   "/:category",
   (req, res, next) => {
@@ -50,4 +73,5 @@ router.get(
   },
   uploadController.getWebPicByCategory
 );
+*/
 module.exports = router;
