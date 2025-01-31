@@ -57,6 +57,7 @@ import ViewPost from "./components/ViewPost.js";
 import Ticketing from "./components/Ticketing.js";
 import ViewTicket from "./components/ViewTicket.js";
 import AdminViewTicket from "./components/AdminViewTicket.js";
+import AdminResolveTicket from "./components/AdminResolveTicket.js";
 import "./StripePayment.css";
 
 // Layout component to handle conditional rendering
@@ -220,6 +221,7 @@ function App() {
                     path="/admin-view-ticket"
                     element={<AdminViewTicket />}
                   />
+                  <Route path="/admin-resolve-ticket/:id" element={<AdminResolveTicket />} />
                   {/* Logout route redirects to login */}
                   <Route
                     path="/logout"

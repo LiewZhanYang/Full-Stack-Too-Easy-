@@ -41,8 +41,8 @@ const AdminViewTicket = () => {
     setActiveTab(selectedTab);
   };
 
-  const handleCardClick = (ticketID) => {
-    navigate(`/admin-view-ticket/${ticketID}`);
+  const handleCardClick = (ticket) => {
+    navigate(`/admin-resolve-ticket/${ticket.TicketID}`);
   };
 
   const renderTickets = (tickets) => {
@@ -50,7 +50,7 @@ const AdminViewTicket = () => {
       <Card
         key={ticket.TicketID}
         className="admin-payment-card mb-3 p-3"
-        onClick={() => handleCardClick(ticket.TicketID)}
+        onClick={() => handleCardClick(ticket)}
         style={{ cursor: "pointer" }}
       >
         <Card.Body>
