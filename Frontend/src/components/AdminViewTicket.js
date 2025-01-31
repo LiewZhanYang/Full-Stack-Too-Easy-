@@ -1,19 +1,41 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Container, Row, Col, Nav, Card } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 
 const AdminViewTicket = () => {
-  const [activeTab, setActiveTab] = useState("pending");
+  const [activeTab, setActiveTab] = useState("open");
+  const [openTickets, setOpenTickets] = useState([]);
+  const [inProgressTickets, setInProgressTickets] = useState([]);
+  const [resolvedTickets, setResolvedTickets] = useState([]);
   const navigate = useNavigate();
 
-  const pendingTickets = [
-    { TicketID: 1, AccountID: "A123", Issue: "Payment not processed" },
-    { TicketID: 2, AccountID: "B456", Issue: "Unable to access course materials" },
-  ];
+  useEffect(() => {
+    const fetchTickets = async () => {
+      try {
+        const response = await fetch("http://localhost:8000/ticketing");
+        if (!response.ok) {
+          throw new Error("Failed to fetch tickets");
+        }
+        const tickets = await response.json();
 
-  const resolvedTickets = [
-    { TicketID: 3, AccountID: "C789", Issue: "Login issue resolved" },
-  ];
+        const open = tickets.filter((ticket) => ticket.Status === "Open");
+        const inProgress = tickets.filter(
+          (ticket) => ticket.Status === "In Progress"
+        );
+        const resolved = tickets.filter(
+          (ticket) => ticket.Status === "Resolved"
+        );
+
+        setOpenTickets(open);
+        setInProgressTickets(inProgress);
+        setResolvedTickets(resolved);
+      } catch (error) {
+        console.error("Error fetching tickets:", error);
+      }
+    };
+
+    fetchTickets();
+  }, []);
 
   const handleSelect = (selectedTab) => {
     setActiveTab(selectedTab);
@@ -36,7 +58,10 @@ const AdminViewTicket = () => {
             Account ID: {ticket.AccountID}
           </Card.Title>
           <Card.Text className="admin-payment-text">
-            Issue: {ticket.Issue}
+            Issue: {ticket.Category} - {ticket.Content}
+          </Card.Text>
+          <Card.Text className="admin-payment-text">
+            Status: {ticket.Status}
           </Card.Text>
         </Card.Body>
       </Card>
@@ -61,33 +86,44 @@ const AdminViewTicket = () => {
       >
         <Nav.Item>
           <Nav.Link
-            eventKey="pending"
-            className="admin-bookings-tab"
+            eventKey="open"
             style={{
-              color: activeTab === "pending" ? "#f59e0b" : "#6b7280",
-              fontWeight: activeTab === "pending" ? "bold" : "normal",
-              padding: "10px 20px",
-              textAlign: "center",
-              borderBottom: activeTab === "pending" ? "2px solid #f59e0b" : "2px solid transparent",
-              cursor: "pointer",
-              transition: "color 0.3s ease, border-bottom-color 0.3s ease",
-              marginLeft: "10px",
+              color: activeTab === "open" ? "#DCAF27" : "#6b7280",
+              fontWeight: activeTab === "open" ? "bold" : "normal",
+              borderBottom:
+                activeTab === "open"
+                  ? "2px solid #DCAF27"
+                  : "2px solid transparent",
             }}
           >
-            Pending
+            Open
+          </Nav.Link>
+        </Nav.Item>
+        <Nav.Item>
+          <Nav.Link
+            eventKey="in-progress"
+            style={{
+              color: activeTab === "in-progress" ? "#DCAF27" : "#6b7280",
+              fontWeight: activeTab === "in-progress" ? "bold" : "normal",
+              borderBottom:
+                activeTab === "in-progress"
+                  ? "2px solid #DCAF27"
+                  : "2px solid transparent",
+            }}
+          >
+            In Progress
           </Nav.Link>
         </Nav.Item>
         <Nav.Item>
           <Nav.Link
             eventKey="resolved"
             style={{
-              color: activeTab === "resolved" ? "#f59e0b" : "#6b7280",
+              color: activeTab === "resolved" ? "#DCAF27" : "#6b7280",
               fontWeight: activeTab === "resolved" ? "bold" : "normal",
-              padding: "10px 20px",
-              textAlign: "center",
-              borderBottom: activeTab === "resolved" ? "2px solid #f59e0b" : "2px solid transparent",
-              cursor: "pointer",
-              transition: "color 0.3s ease, border-bottom-color 0.3s ease",
+              borderBottom:
+                activeTab === "resolved"
+                  ? "2px solid #DCAF27"
+                  : "2px solid transparent",
             }}
           >
             Resolved
@@ -97,7 +133,9 @@ const AdminViewTicket = () => {
 
       <Row>
         <Col>
-          {activeTab === "pending" ? renderTickets(pendingTickets) : renderTickets(resolvedTickets)}
+          {activeTab === "open" && renderTickets(openTickets)}
+          {activeTab === "in-progress" && renderTickets(inProgressTickets)}
+          {activeTab === "resolved" && renderTickets(resolvedTickets)}
         </Col>
       </Row>
     </Container>
