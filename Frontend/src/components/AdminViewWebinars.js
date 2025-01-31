@@ -18,6 +18,7 @@ const AdminViewWebinars = () => {
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [webinarToDelete, setWebinarToDelete] = useState(null);
   const navigate = useNavigate();
+  const [imageUrls, setImageUrls] = useState({});
 
   useEffect(() => {
     const fetchWebinars = async () => {
@@ -33,9 +34,56 @@ const AdminViewWebinars = () => {
         console.error("Error fetching webinars:", error);
       }
     };
-
     fetchWebinars();
   }, []);
+  useEffect(() => {
+    if (webinars.length > 0) {
+      const fetchWebinarImages = async () => {
+        try {
+          const imagePromises = webinars.map(async (webinar) => {
+            try {
+              const response = await fetch(
+                `http://localhost:8000/webinar-pic/${webinar.WebinarID}`
+              );
+              if (!response.ok) {
+                throw new Error(
+                  `Error fetching image for WebinarID ${webinar.WebinarID}`
+                );
+              }
+              const data = await response.json();
+
+              console.log(
+                `✅ Webinar ${webinar.WebinarID} Image URL:`,
+                data.url
+              ); // Debugging
+
+              return { id: webinar.WebinarID, url: data.url };
+            } catch (error) {
+              console.error(
+                `❌ Error fetching image for WebinarID ${webinar.WebinarID}:`,
+                error
+              );
+              return { id: webinar.WebinarID, url: "/img/default.jpg" };
+            }
+          });
+
+          const imageResults = await Promise.all(imagePromises);
+          console.log("Final Image URLs in React State:", imageResults); // Debugging
+
+          const imageMap = imageResults.reduce((acc, { id, url }) => {
+            acc[id] = url;
+            return acc;
+          }, {});
+
+          setImageUrls(imageMap);
+        } catch (error) {
+          console.error("❌ Error fetching webinar images:", error);
+        }
+      };
+
+      fetchWebinarImages();
+    }
+  }, [webinars]);
 
   useEffect(() => {
     const filtered = webinars.filter((webinar) =>
@@ -114,7 +162,9 @@ const AdminViewWebinars = () => {
 
       {/* Webinar Cards */}
       {filteredWebinars.length === 0 ? (
-        <p><br></br>No webinars currently.</p>
+        <p>
+          <br></br>No webinars currently.
+        </p>
       ) : (
         <Row className="admin-program-cards-row">
           {filteredWebinars.map((webinar) => (
@@ -127,9 +177,18 @@ const AdminViewWebinars = () => {
                 <div className="admin-program-card-image-container">
                   <Card.Img
                     variant="top"
-                    src={webinar.imageUrl || "/img/default.jpg"}
+                    src={imageUrls[webinar.WebinarID] || "/img/default.jpg"}
                     alt={webinar.WebinarName}
                     className="admin-program-card-image"
+                    onLoad={() =>
+                      console.log(
+                        `✅ Image Loaded: ${imageUrls[webinar.WebinarID]}`
+                      )
+                    }
+                    onError={(e) => {
+                      console.error(`❌ Image Load Failed: ${e.target.src}`);
+                      e.target.src = "/img/default.jpg";
+                    }}
                   />
                 </div>
                 <Card.Body className="d-flex flex-column justify-content-between">

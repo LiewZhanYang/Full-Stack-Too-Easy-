@@ -55,6 +55,7 @@ import CompletePage from "./components/CompletePage.js";
 import WorkshopForum from "./components/WorkshopForum.js";
 import ViewPost from "./components/ViewPost.js";
 import Ticketing from "./components/Ticketing.js";
+import ViewTicket from "./components/ViewTicket.js";
 import SubmitMC from "./components/SubmitMC.js";
 import AdminConfirmMC from "./components/AdminConfirmMC.js";
 import "./StripePayment.css";
@@ -115,6 +116,7 @@ function App() {
                   <Route path="/webinars" element={<Webinars />} />
                   <Route path="/workshopvm" element={<Workshopvm />} />
                   <Route path="/ticketing" element={<Ticketing />} />
+                  <Route path="/ticket/:id" element={<ViewTicket />} />
                   <Route
                     path="/webinar-details/:id"
                     element={<WebinarDetails />}

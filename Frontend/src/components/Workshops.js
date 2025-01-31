@@ -7,6 +7,7 @@ const Workshops = () => {
   const [filteredWorkshops, setFilteredWorkshops] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const navigate = useNavigate();
+  const [imageUrls, setImageUrls] = useState({});
 
   useEffect(() => {
     const fetchWorkshops = async () => {
@@ -17,10 +18,48 @@ const Workshops = () => {
         }
         const data = await response.json();
         const filteredData = data.filter((program) => program.TypeID === 1);
+
         setWorkshops(filteredData);
         setFilteredWorkshops(filteredData);
+
+        fetchProgramImages(filteredData);
       } catch (error) {
         console.error("Error fetching workshops:", error);
+      }
+    };
+
+    const fetchProgramImages = async (programs) => {
+      try {
+        const imagePromises = programs.map(async (program) => {
+          try {
+            const response = await fetch(
+              `http://localhost:8000/program-pic/${program.ProgramID}`
+            );
+            if (!response.ok) {
+              throw new Error(
+                `Error fetching image for ProgramID ${program.ProgramID}`
+              );
+            }
+            const data = await response.json();
+            return { id: program.ProgramID, url: data.url };
+          } catch (error) {
+            console.error(
+              `Error fetching image for ProgramID ${program.ProgramID}:`,
+              error
+            );
+            return { id: program.ProgramID, url: "/img/default.jpg" }; // Default image on error
+          }
+        });
+
+        const imageResults = await Promise.all(imagePromises);
+        const imageMap = imageResults.reduce((acc, { id, url }) => {
+          acc[id] = url;
+          return acc;
+        }, {});
+
+        setImageUrls(imageMap);
+      } catch (error) {
+        console.error("Error fetching program images:", error);
       }
     };
 
@@ -78,7 +117,7 @@ const Workshops = () => {
               <div className="workshops-card-image-container">
                 <Card.Img
                   variant="top"
-                  src={workshop.image || "/img/default.jpg"}
+                  src={imageUrls[workshop.ProgramID] || "/img/default.jpg"}
                   alt={workshop.ProgramName}
                   className="admin-program-card-image"
                   style={{ height: "220px", objectFit: "cover" }}

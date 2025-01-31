@@ -51,32 +51,29 @@ const getAllWebinar = async (req, res) => {
     // Fetch all webinars from the database
     const webinars = await Webinar.getAllWebinar();
 
-    // Loop through webinars to fetch image URLs
+    // ✅ Fetch only ONE image per webinar
     const webinarsWithImages = await Promise.all(
       webinars.map(async (webinar) => {
         try {
-          // Fetch the image URL using the uploadController function
           const { url } = await uploadController.getFileByWebinarID(
             webinar.WebinarID
           );
           return { ...webinar, imageUrl: url };
         } catch (error) {
-          // If there's an error fetching the image, log it and return the webinar without imageUrl
           console.error(
-            `Error fetching image for WebinarID ${webinar.WebinarID}:`,
+            `⚠️ Error fetching image for WebinarID ${webinar.WebinarID}:`,
             error
           );
-          return { ...webinar, imageUrl: null };
+          return { ...webinar, imageUrl: "/img/default.jpg" }; // Default if error
         }
       })
     );
 
-    // Return webinars with their image URLs
     res.status(200).json(webinarsWithImages);
-    console.log("Successfully retrieved all webinars with images");
+    console.log("✅ Successfully retrieved all webinars with images");
   } catch (error) {
-    console.error("Error getting Webinar:", error);
-    res.status(500).send("Error getting Webinar");
+    console.error("❌ Error getting Webinars:", error);
+    res.status(500).send("Error getting Webinars");
   }
 };
 
@@ -87,6 +84,18 @@ const getAllWebinarByID = async (req, res) => {
     if (webinar.length === 0) {
       return res.status(404).send("Webinar not found");
     }
+
+    try {
+      const { url } = await uploadController.getFileByWebinarID(WebinarID);
+      webinar.imageUrl = url; // ✅ Attach Image URL
+    } catch (error) {
+      console.error(
+        `⚠️ Error fetching image for WebinarID ${WebinarID}:`,
+        error
+      );
+      webinar.imageUrl = "/img/default.jpg";
+    }
+
     res.json(webinar);
   } catch (error) {
     console.error("Error retrieving webinar:", error);
