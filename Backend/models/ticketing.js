@@ -11,7 +11,6 @@ class Ticketing {
     this.Status = Status;
   }
 
-
   static async getTicketById(ticketID) {
     const connection = await mysql.createConnection(dbConfig);
     const sqlQuery = `SELECT * FROM Ticketing WHERE TicketID = ?`;
@@ -28,7 +27,10 @@ class Ticketing {
     `;
 
     // Convert StartDate to MySQL DATETIME format
-    const formattedDate = new Date(ticketDetails.StartDate).toISOString().slice(0, 19).replace('T', ' ');
+    const formattedDate = new Date(ticketDetails.StartDate)
+      .toISOString()
+      .slice(0, 19)
+      .replace("T", " ");
 
     const values = [
       ticketDetails.AccountID,
@@ -41,7 +43,11 @@ class Ticketing {
     try {
       const [result] = await connection.execute(sqlQuery, values);
       connection.end();
-      return { TicketID: result.insertId, ...ticketDetails, StartDate: formattedDate };
+      return {
+        TicketID: result.insertId,
+        ...ticketDetails,
+        StartDate: formattedDate,
+      };
     } catch (error) {
       console.error("Error inserting ticket:", error);
       connection.end();
@@ -51,7 +57,7 @@ class Ticketing {
 
   static async getTickets() {
     const connection = await mysql.createConnection(dbConfig);
-    const sqlQuery = `SELECT * FROM Ticketing WHERE Status = 'Open' OR Status = 'In Progress'`;
+    const sqlQuery = `SELECT * FROM Ticketing WHERE Status IN ('Open', 'In Progress', 'Resolved')`;
     const [result] = await connection.execute(sqlQuery);
     connection.end();
     return result;
@@ -63,9 +69,9 @@ class Ticketing {
       UPDATE Ticketing
       SET Status = ?
       WHERE TicketID = ?`;
-  
+
     const values = [newStatus, ticketID];
-  
+
     try {
       const [result] = await connection.execute(sqlQuery, values);
       connection.end();
@@ -79,11 +85,11 @@ class Ticketing {
 
   static async addComment(ticketID, content, commenterID, isAdmin = 0) {
     let connection;
-  
+
     try {
       // Establish a database connection
       connection = await mysql.createConnection(dbConfig);
-  
+
       // Insert the comment into the database
       const sqlQuery = `
         INSERT INTO Comments (TicketID, Content, CommenterID, IsAdmin, CommentDate) 
@@ -91,11 +97,11 @@ class Ticketing {
       `;
       const [result] = await connection.execute(sqlQuery, [
         ticketID,
-        content,       // Pass the content properly
-        commenterID,   // Pass the commenter ID properly
-        isAdmin,       // Pass the admin flag properly
+        content, // Pass the content properly
+        commenterID, // Pass the commenter ID properly
+        isAdmin, // Pass the admin flag properly
       ]);
-  
+
       // Return the inserted comment
       return {
         CommentID: result.insertId,
@@ -114,7 +120,7 @@ class Ticketing {
       }
     }
   }
-  
+
   static async getComments(ticketID) {
     let connection;
 
@@ -141,7 +147,6 @@ class Ticketing {
       }
     }
   }
-  
 }
 
 module.exports = Ticketing;
