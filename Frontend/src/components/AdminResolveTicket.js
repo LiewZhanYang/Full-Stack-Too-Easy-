@@ -76,6 +76,13 @@ const AdminResolveTicket = () => {
 
       setComments((prev) => [...prev, response.data]);
       setNewComment("");
+      // If ticket is open, update status to "In Progress"
+      if (ticket.Status === "Open") {
+        await axios.put(`http://localhost:8000/ticketing/${id}/status`, {
+          Status: "In Progress",
+        });
+        setTicket((prev) => ({ ...prev, Status: "In Progress" }));
+      }
     } catch (error) {
       console.error("Error adding comment:", error);
       alert("Failed to add comment. Please try again.");
