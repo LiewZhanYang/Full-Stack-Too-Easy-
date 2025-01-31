@@ -58,6 +58,7 @@ import Ticketing from "./components/Ticketing.js";
 import ViewTicket from "./components/ViewTicket.js";
 import SubmitMC from "./components/SubmitMC.js";
 import AdminConfirmMC from "./components/AdminConfirmMC.js";
+import AdminViewTransferRequest from "./components/AdminViewTransferRequest.js";
 import "./StripePayment.css";
 
 // Layout component to handle conditional rendering
@@ -219,6 +220,7 @@ function App() {
                   />
                   <Route path="/submitmc/:sessionid" element={<SubmitMC />} />
                   <Route path="/admin-confirm-mc" element={<AdminConfirmMC />} />
+                  <Route path="/admin-view-transfer-request" element={<AdminViewTransferRequest />} />
                   {/* Logout route redirects to login */}
                   <Route
                     path="/logout"

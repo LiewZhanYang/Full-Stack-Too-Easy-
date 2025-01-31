@@ -246,11 +246,11 @@ function Sidebar() {
                   {expandedMenu === "mcSubmission" && (
                     <div className="ps-4">
                       <Link
-                        to="/admin-confirm-mc"
+                        to="/admin-view-transfer-request"
                         className="d-block py-1 text-dark text-decoration-none"
                         style={{ fontSize: "0.95rem" }}
                       >
-                        Confirm Submissions
+                        Transfer Requests
                       </Link>
                     </div>
                   )}

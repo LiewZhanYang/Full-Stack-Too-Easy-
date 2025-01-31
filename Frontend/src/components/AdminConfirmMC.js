@@ -1,161 +1,122 @@
-import React, { useState, useEffect } from "react";
-import { Container, Button, Form } from "react-bootstrap";
-import axios from "axios";
+import React, { useState } from "react";
+import { Container, Row, Col, Card, Button } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 
-const SubmitMc = () => {
-  const [name, setName] = useState("");
-  const [children, setChildren] = useState([]);
-  const [sessions, setSessions] = useState([]);
-  const [selectedChild, setSelectedChild] = useState("");
-  const [selectedSession, setSelectedSession] = useState("");
-  const [file, setFile] = useState(null);
+const AdminConfirmTransfer = () => {
   const navigate = useNavigate();
-
-  useEffect(() => {
-    const fetchChildren = async () => {
-      const userId = localStorage.getItem("userId");
-      if (!userId) return;
-
-      try {
-        const response = await axios.get(`http://localhost:8000/children/${userId}`);
-        setChildren(response.data);
-      } catch (error) {
-        console.error("Error fetching children:", error);
-      }
-    };
-
-    const fetchSessions = async () => {
-      try {
-        const response = await axios.get("http://localhost:8000/sessions");
-        setSessions(response.data);
-      } catch (error) {
-        console.error("Error fetching sessions:", error);
-      }
-    };
-
-    fetchChildren();
-    fetchSessions();
-  }, []);
-
-  const handleFileChange = (e) => {
-    setFile(e.target.files[0]);
+  const transferDetails = {
+    TransferID: 1,
+    AccountID: "A123",
+    ProgramName: "Coding Bootcamp",
+    CurrentSession: {
+      Date: "1/4/2025",
+      Time: "10:00:00",
+      Location: "Auditorium A",
+    },
+    NewSession: {
+      Date: "31/3/2025",
+      Time: "10:00:00",
+      Location: "Auditorium A",
+    },
+    Reason: "Fever",
   };
 
-  const handleSubmit = async () => {
-    if (!name || !selectedChild || !selectedSession || !file) {
-      alert("Please fill in all fields and upload a file.");
-      return;
-    }
-
-    try {
-      const formData = new FormData();
-      formData.append("name", name);
-      formData.append("childId", selectedChild);
-      formData.append("sessionId", selectedSession);
-      formData.append("file", file);
-
-      const response = await axios.post("http://localhost:8000/submit-mc", formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      });
-
-      if (response.data.success) {
-        alert("Medical certificate submitted successfully.");
-        navigate(-1); // Navigate back to the previous page
-      } else {
-        alert("Failed to submit medical certificate.");
-      }
-    } catch (error) {
-      console.error("Error submitting medical certificate:", error);
-      alert("An error occurred while submitting the medical certificate.");
-    }
+  const handleBackClick = () => {
+    navigate(-1);
   };
 
-  const handleCancel = () => {
-    navigate(-1); // Navigate back to the previous page
+  const handleConfirmClick = () => {
+    alert("Transfer Approved");
+    navigate(-1);
+  };
+
+  const handleRejectClick = () => {
+    alert("Transfer Rejected");
+    navigate(-1);
   };
 
   return (
-    <Container fluid className="submit-mc-page p-4">
-      <h2 className="precoaching-title">Submit Medical Certificate</h2>
-
-      <Form>
-        <Form.Group controlId="mcName" className="mb-3">
-          <Form.Label>Name</Form.Label>
-          <Form.Control
-            type="text"
-            placeholder="Enter your name"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-          />
-        </Form.Group>
-
-        <Form.Group controlId="selectChild" className="mb-3">
-          <Form.Label>Select Child</Form.Label>
-          <Form.Control
-            as="select"
-            value={selectedChild}
-            onChange={(e) => setSelectedChild(e.target.value)}
+    <Container fluid className="admin-confirm-payment-page p-4">
+      <Row className="mb-3">
+        <Col>
+          <h2 className="admin-confirm-title">Confirm Transfer Request</h2>
+        </Col>
+        <Col className="text-end">
+          <Button
+            variant="link"
+            className="admin-confirm-back-button"
+            onClick={handleBackClick}
           >
-            <option value="">Select a child</option>
-            {children.map((child) => (
-              <option key={child.ChildID} value={child.ChildID}>
-                {child.Name}
-              </option>
-            ))}
-          </Form.Control>
-        </Form.Group>
+            Back
+          </Button>
+        </Col>
+      </Row>
+      <hr className="admin-confirm-divider mb-4" />
 
-        <Form.Group controlId="selectSession" className="mb-3">
-          <Form.Label>Select Session</Form.Label>
-          <Form.Control
-            as="select"
-            value={selectedSession}
-            onChange={(e) => setSelectedSession(e.target.value)}
-          >
-            <option value="">Select a session</option>
-            {sessions.map((session) => (
-              <option key={session.SessionID} value={session.SessionID}>
-                {session.Name} ({new Date(session.StartDate).toLocaleDateString()} - {new Date(session.EndDate).toLocaleDateString()})
-              </option>
-            ))}
-          </Form.Control>
-        </Form.Group>
-
-        <Form.Group controlId="uploadFile" className="mb-3">
-          <Form.Label>Upload Medical Certificate</Form.Label>
-          <Form.Control
-            type="file"
-            accept="image/*,application/pdf"
-            onChange={handleFileChange}
-          />
-          {file && (
-            <div className="mt-3">
-              <p className="small text-muted mb-1">{file.name}</p>
-              <Button
-                variant="link"
-                className="text-danger p-0"
-                onClick={() => setFile(null)}
-              >
-                Remove
-              </Button>
+      <Row>
+        <Col md={6}>
+          <div className="admin-confirm-details">
+            <p>
+              <strong>Account ID</strong>
+              <br />
+              {transferDetails.AccountID}
+            </p>
+            <p>
+              <strong>Current Program</strong>
+              <br />
+              {transferDetails.ProgramName}
+            </p>
+            <p>
+              <strong>Current Session</strong>
+              <br />
+              Date: {transferDetails.CurrentSession.Date} <br />
+              Time: {transferDetails.CurrentSession.Time} <br />
+              Location: {transferDetails.CurrentSession.Location}
+            </p>
+            <p>
+              <strong>New Session</strong>
+              <br />
+              Date: {transferDetails.NewSession.Date} <br />
+              Time: {transferDetails.NewSession.Time} <br />
+              Location: {transferDetails.NewSession.Location}
+            </p>
+            <p>
+              <strong>Reason for Transfer</strong>
+              <br />
+              {transferDetails.Reason}
+            </p>
+          </div>
+        </Col>
+        <Col md={6}>
+          <div className="admin-confirm-screenshot-preview">
+            <p>
+              <strong>Medical Certificate:</strong>
+            </p>
+            <div className="admin-confirm-screenshot-placeholder">
+              <p>No document available</p>
             </div>
-          )}
-        </Form.Group>
+          </div>
+        </Col>
+      </Row>
 
-        <div className="submit-mc-button-group mt-4">
-          <Button variant="warning" className="me-3" onClick={handleSubmit}>
-            Submit
-          </Button>
-          <Button variant="danger" onClick={handleCancel}>
-            Cancel
-          </Button>
-        </div>
-      </Form>
+      <div className="admin-confirm-button-group mt-4">
+        <Button
+          style={{ backgroundColor: "#fbbf24", color: "black" }}
+          className="admin-confirm-confirm-button me-3"
+          onClick={handleConfirmClick}
+        >
+          Approve
+        </Button>
+        <Button
+          style={{ backgroundColor: "#dc3545", color: "white" }}
+          className="admin-confirm-reject-button"
+          onClick={handleRejectClick}
+        >
+          Reject
+        </Button>
+      </div>
     </Container>
   );
 };
 
-export default SubmitMc;
+export default AdminConfirmTransfer;
