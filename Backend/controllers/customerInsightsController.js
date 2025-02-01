@@ -1,6 +1,7 @@
 const Customer = require("../models/customer");
 const Workshop = require("../models/workshop");
 const Program = require("../models/program");
+const Thread = require("../models/thread");
 
 exports.getTopPayingCustomers = async (req, res) => {
   try {
@@ -256,6 +257,27 @@ exports.getTotalAmountSpent = async (req, res) => {
     res.status(200).json(totalSpentData);
   } catch (error) {
     console.error("Error fetching total amount spent:", error);
+    res.status(500).json({ error: "Internal server error." });
+  }
+};
+
+exports.getTopSentimentThreads = async (req, res) => {
+  try {
+    const { forumID } = req.params;
+
+    if (!forumID) {
+      return res.status(400).json({ message: "Forum ID is required." });
+    }
+
+    const topThreads = await Thread.topSentimentThreadsByForumID(forumID);
+
+    if (!topThreads.length) {
+      return res.status(404).json({ message: "No threads found." });
+    }
+
+    res.status(200).json(topThreads);
+  } catch (error) {
+    console.error("Error fetching top sentiment threads:", error);
     res.status(500).json({ error: "Internal server error." });
   }
 };

@@ -259,6 +259,13 @@ function Sidebar() {
                       >
                         Insights Dashboard
                       </Link>
+                      <Link
+                        to="/forum-dashboard"
+                        className="d-block py-1 text-dark text-decoration-none"
+                        style={{ fontSize: "0.95rem" }}
+                      >
+                        Forum Dashboard
+                      </Link>
                     </div>
                   )}
                 </div>
