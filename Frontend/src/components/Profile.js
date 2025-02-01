@@ -88,6 +88,8 @@ function Profile() {
               fullName: child.Name,
               dateOfBirth: child.DOB.split("T")[0],
               strengths: child.Strength,
+              specialLearningNeeds: child.SpecialLearningNeeds,
+              dietaryRestrictions: child.DietaryRestrictions
             }))
           );
         }
@@ -155,6 +157,8 @@ function Profile() {
       DOB: child.dateOfBirth,
       Age: calculateAge(child.dateOfBirth),
       AccountID: userId,
+      DietaryRestrictions: child.dietaryRestrictions,
+      SpecialLearningNeeds: child.specialLearningNeeds
     };
 
     try {
@@ -431,6 +435,36 @@ function Profile() {
                   }
                   rows={4}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Special Learning Needs:
+                </label>
+                <textarea
+                  placeholder="Tell us more about your child"
+                  value={child.specialLearningNeeds || ""}
+                  onChange={(e) =>
+                    handleChildInputChange(index, "specialLearningNeeds", e.target.value)
+                  }
+                  rows={4}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Dietary Restrictions:
+                </label>
+                <textarea
+                  placeholder="Tell us more about your child"
+                  value={child.dietaryRestrictions || ""}
+                  onChange={(e) =>
+                    handleChildInputChange(index, "dietaryRestrictions", e.target.value)
+                  }
+                  rows={4}
+                  className="w-full px-3 py-1 border border-gray-300 rounded-md"
                 />
               </div>
 
