@@ -142,8 +142,8 @@ function AnalyticsDashboard() {
         <div className="card">
           <h5>Average Ratings</h5>
           <select
-            className="dropdown"
             value={selectedRatingType}
+            className="forum-dropdown"
             onChange={(e) => setSelectedRatingType(e.target.value)}
           >
             <option value="program-types">By Program Type</option>

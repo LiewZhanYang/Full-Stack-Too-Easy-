@@ -1103,18 +1103,106 @@ code {
   gap: 20px;
 }
 
-.dropdown {
-  width: 100%;
-  padding: 8px;
-  margin-bottom: 10px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  background-color: #fff;
-}
-
 .grid-income {
   display: grid;
   grid-template-columns: 300px 1fr;
-  align-items: start; 
-  gap: 20px
+  align-items: start;
+  gap: 20px;
+}
+
+/* Forum Dashboard */
+.forum-dashboard-container {
+  padding: 20px;
+}
+
+.forum-dashboard-title {
+  font-size: 1.8rem;
+  font-weight: bold;
+  margin-bottom: 20px;
+  text-align: center;
+  color: #333;
+}
+
+.forum-dashboard-top-section {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 50vh;
+  gap: 20px;
+  padding-bottom: 20px;
+}
+
+.forum-dashboard-sentiment-card,
+.forum-dashboard-engagement-card,
+.forum-dashboard-threads-card {
+  background: #fff;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  height: 100%;
+}
+
+.forum-sentiment-chart-container {
+  height: calc(100% - 60px);
+}
+
+.forum-dropdown {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  margin-bottom: 15px;
+}
+
+.forum-engagement-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 15px;
+}
+
+.forum-engagement-table th,
+.forum-engagement-table td {
+  padding: 10px;
+  border: 1px solid #ddd;
+  text-align: center;
+  font-size: 14px;
+}
+
+.forum-rank-column {
+  width: 5%;
+}
+
+.forum-customer-name-column {
+  width: 25%;
+}
+
+.forum-threads-created-column,
+.forum-replies-column,
+.forum-total-engagement-column {
+  width: 15%;
+}
+
+.forum-threads-table .forum-thread-body-column {
+  width: 50%;
+  text-align: left;
+}
+
+.forum-threads-table .forum-sentiment-value-column,
+.forum-threads-table .forum-posted-by-column {
+  width: 15%;
+}
+
+.forum-threads-table .forum-created-on-column {
+  width: 20%;
+}
+
+.forum-scroll-box {
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+@media (max-width: 768px) {
+  .forum-dashboard-top-section {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto;
+  }
 }

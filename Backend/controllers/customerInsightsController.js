@@ -281,3 +281,53 @@ exports.getTopSentimentThreads = async (req, res) => {
     res.status(500).json({ error: "Internal server error." });
   }
 };
+
+exports.getForumTypes = async (req, res) => {
+  try {
+    const forumTypes = await Thread.getAllForumTypes();
+
+    if (forumTypes.length === 0) {
+      return res.status(404).json({ message: "No forum types found." });
+    }
+
+    res.status(200).json(forumTypes);
+  } catch (error) {
+    console.error("Error fetching forum types:", error);
+    res.status(500).json({ message: "Internal server error." });
+  }
+};
+
+exports.getTopForumEngagement = async (req, res) => {
+  try {
+    const topEngagedCustomers = await Workshop.getTotalForumEngagement();
+
+    if (!topEngagedCustomers.length) {
+      return res.status(404).json({ message: "No forum engagement found." });
+    }
+
+    res.status(200).json(topEngagedCustomers);
+  } catch (error) {
+    console.error(
+      "Error fetching top forum engagement by customers:",
+      error.message
+    );
+    res.status(500).json({ error: "Failed to fetch top forum engagement." });
+  }
+};
+
+exports.getThreadBodiesBySentiment = async (req, res) => {
+  try {
+    const order = req.query.order || "desc"; 
+    const threads = await Thread.getAllThreadBodiesSorted(order);
+
+    if (!threads.length) {
+      return res.status(404).json({ message: "No thread bodies found." });
+    }
+
+    res.status(200).json(threads);
+  } catch (error) {
+    console.error("Error fetching thread bodies:", error);
+    res.status(500).json({ error: "Internal server error." });
+  }
+};
+

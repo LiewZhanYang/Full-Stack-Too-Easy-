@@ -58,5 +58,7 @@ router.get(
   "/top-threads/:forumID",
   customerInsightsController.getTopSentimentThreads
 );
-
+router.get("/types", customerInsightsController.getForumTypes);
+router.get("/top-engagement", customerInsightsController.getTopForumEngagement);
+router.get("/comments", customerInsightsController.getThreadBodiesBySentiment);
 module.exports = router;

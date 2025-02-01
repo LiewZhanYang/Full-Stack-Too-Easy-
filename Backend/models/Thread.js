@@ -218,8 +218,7 @@ class Thread {
     const sqlQuery = `
             SELECT * FROM Thread
             WHERE Topic = ?
-            ORDER BY SentimentValue DESC
-            LIMIT 5;
+            ORDER BY SentimentValue DESC;
         `;
 
     try {
@@ -246,6 +245,45 @@ class Thread {
       throw error;
     }
   }
+  static async getAllForumTypes() {
+    const connection = await mysql.createConnection(dbConfig);
+
+    try {
+      const [rows] = await connection.execute(
+        "SELECT ForumID, Topic FROM Forum"
+      );
+      return rows;
+    } catch (error) {
+      console.error("Error fetching forum types:", error);
+      throw error;
+    } finally {
+      connection.end();
+    }
+  }
+
+  static async getAllThreadBodiesSorted(order) {
+    try {
+      const connection = await mysql.createConnection(dbConfig);
+
+      const query = `
+        SELECT t.Body, t.SentimentValue, 
+               c.Name AS PostedBy, t.CreatedOn
+        FROM Thread t
+        JOIN Customer c ON t.PostedBy = c.AccountID
+        ORDER BY t.SentimentValue ${order === "asc" ? "ASC" : "DESC"}
+      `;
+
+      const [rows] = await connection.execute(query);
+      connection.end();
+
+      return rows;
+    } catch (error) {
+      console.error("Error fetching thread bodies:", error);
+      throw error;
+    }
+  }
 }
 
 module.exports = Thread;
+
+
