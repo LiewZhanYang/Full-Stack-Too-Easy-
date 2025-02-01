@@ -499,6 +499,8 @@ function Payment() {
                       totalPrice={totalPrice}
                       programId={programId}
                       selectedChildren={selectedChildren}
+                      SessionID={selectedSession?.SessionID}
+                      UserID={localStorage.getItem("userId")}
                     />
                   )}
                   <button

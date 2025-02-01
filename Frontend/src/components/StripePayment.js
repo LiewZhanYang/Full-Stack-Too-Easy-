@@ -17,7 +17,7 @@ const stripePromise = loadStripe("pk_test_51QRx0kG1MaTqtP83A1bjOVMHB8mwcVhkQXB78
 
 export default function StripePayment(props) {
 
-    const { totalPrice } = props; // Destructure props
+    const { totalPrice, programId, selectedChildren, SessionID, UserID } = props; // Destructure props
     const [clientSecret, setClientSecret] = useState("");
 
     useEffect(() => {
@@ -35,7 +35,13 @@ export default function StripePayment(props) {
         <>
             {stripePromise && clientSecret && (
                 <Elements stripe={stripePromise} options={ {clientSecret} }>
-                    <CheckoutForm />
+                    <CheckoutForm 
+                        programId={programId}
+                        selectedChildren={selectedChildren}
+                        SessionID={SessionID}
+                        userId={UserID}
+                        totalPrice={totalPrice}
+                    />
                 </Elements>
             )}
         </>
