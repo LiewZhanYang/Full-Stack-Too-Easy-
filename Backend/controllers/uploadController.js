@@ -109,7 +109,7 @@ exports.uploadDocument = async (file, TransferID) => {
     throw new Error("No document provided for upload.");
   }
 
-  if (!AccountID) {
+  if (!TransferID) {
     throw new Error("TransferID is required for upload.");
   }
 

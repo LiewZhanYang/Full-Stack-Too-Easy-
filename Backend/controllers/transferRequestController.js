@@ -6,10 +6,11 @@ const { uploadDocument } = require("./uploadController");
 // Create a new transfer request (ensures the 3-day rule)
 exports.createTransferRequest = async (req, res) => {
   try {
-    const { signUpID, newSessionID, reason, MCpath } = req.body;
+    let { signUpID, newSessionID, reason, MCpath } = req.body;
     // Handle document upload if a file is provided
     if (req.file) {
       try {
+        const id = 1;
         const uploadResult = await uploadDocument(req.file, id); // Use uploadController for file upload
         MCpath = uploadResult.data.Location || null; // Ensure mcPath is set to null if no URL is returned
       } catch (uploadError) {
