@@ -202,43 +202,82 @@ const WorkshopForum = () => {
 
       {/* Threads List */}
       {threads.map((thread) => (
-        <div key={thread.ThreadID} className="card mb-4 shadow-sm">
-          <div className="card-body">
-            <div className="d-flex align-items-start mb-3">
-              {/* Replace profile picture with user icon */}
-              <i className="bi bi-person-circle" style={{ fontSize: "40px", color: "#6c757d" }}></i>
-              <div>
-                <h5 className="card-title">{thread.Title}</h5>
-                <p className="text-muted mb-2 small">
-                  Posted by: {thread.PostedByName || "Anonymous"} on{" "}
-                  {thread.CreatedAt
-                    ? new Date(thread.CreatedAt).toLocaleDateString()
-                    : "Date unavailable"}
-                </p>
-                <p className="card-text">{thread.Body}</p>
-              </div>
-            </div>
+        <div
+        key={thread.ThreadID}
+        style={{
+          backgroundColor: "#f7fafc",
+          border: "none",
+          borderRadius: "10px",
+          boxShadow: "0 4px 10px rgba(0, 0, 0, 0.1)",
+          marginBottom: "20px",
+        }}
+      >
+      
+      <div style={{ padding: "20px" }}>
 
-            <div className="d-flex align-items-center gap-3">
-              <button
-                onClick={() => handleLikeThread(thread.ThreadID)}
-                className="btn btn-warning text-white border-0 d-flex align-items-center gap-2"
-              >
-                <i className="bi bi-hand-thumbs-up"></i> {thread.Likes || 0}
-              </button>
-              <button
-                onClick={() => toggleComments(thread.ThreadID)}
-                className="btn btn-outline-secondary border-0 d-flex align-items-center gap-2"
-              >
-                <i className="bi bi-chat"></i> {thread.comments.length || 0}
-              </button>
-              <Link
-                to={`/viewpost/${thread.ThreadID}`}
-                className="btn btn-primary"
-              >
-                View Post
-              </Link>
-            </div>
+    <div className="d-flex align-items-start mb-3">
+      {/* User Icon */}
+      <i
+        className="bi bi-person-circle me-3"
+        style={{
+          fontSize: "40px",
+          color: "#6c757d",
+          flexShrink: 0,
+        }}
+      ></i>
+
+      {/* Thread Details */}
+      <div style={{ flex: 1 }}>
+        <h5
+          className="card-title mb-1"
+          style={{ fontSize: "18px", fontWeight: "bold" }}
+        >
+          {thread.Title}
+        </h5>
+        <p
+          className="text-muted mb-2"
+          style={{
+            fontSize: "14px",
+          }}
+        >
+          Posted by: <strong>{thread.PostedByName || "Anonymous"}</strong> on{" "}
+          {thread.CreatedAt
+            ? new Date(thread.CreatedAt).toLocaleDateString()
+            : "Date unavailable"}
+        </p>
+        <p
+          className="card-text"
+          style={{
+            fontSize: "16px",
+            marginBottom: "0",
+            color: "#495057",
+          }}
+        >
+          {thread.Body}
+        </p>
+      </div>
+    </div>
+
+    {/* Buttons Section */}
+    <div className="d-flex align-items-center justify-content-between mt-3">
+      <div className="d-flex align-items-center gap-3">
+        <button
+          onClick={() => handleLikeThread(thread.ThreadID)}
+          className="btn btn-warning text-white border-0 d-flex align-items-center gap-2"
+        >
+          <i className="bi bi-hand-thumbs-up"></i> {thread.Likes || 0}
+        </button>
+        <button
+          onClick={() => toggleComments(thread.ThreadID)}
+          className="btn btn-outline-secondary border-0 d-flex align-items-center gap-2"
+        >
+          <i className="bi bi-chat"></i> {thread.comments.length || 0}
+        </button>
+      </div>
+      <Link to={`/viewpost/${thread.ThreadID}`} className="btn btn-primary">
+        View Post
+      </Link>
+    </div>
 
             {/* Comments Section */}
 {/* Comments Section */}
