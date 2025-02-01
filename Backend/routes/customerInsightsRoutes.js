@@ -41,4 +41,6 @@ router.get(
   customerInsightsController.getAverageRatingForAllPrograms
 );
 
+router.get("/new-signups", customerInsightsController.getNewSignUpsToday);
+
 module.exports = router;

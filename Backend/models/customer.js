@@ -239,6 +239,18 @@ class Customer {
       throw error;
     }
   }
+
+  static async getNewSignUpsToday() {
+    const connection = await mysql.createConnection(dbConfig);
+    const sqlQuery = `
+      SELECT COUNT(*) AS newSignUps
+      FROM Customer
+      WHERE DATE(DateJoined) = CURDATE();
+    `;
+    const [result] = await connection.execute(sqlQuery);
+    connection.end();
+    return result[0].newSignUps; 
+  }
 }
 
 module.exports = Customer;

@@ -101,22 +101,22 @@ exports.getTopProgramByType = async (req, res) => {
   }
 };
 
-exports.getAverageRatingByProgram = async (req, res) => {
-  try {
-    const ratings = await Program.getAverageRatingByProgram();
+// exports.getAverageRatingByProgram = async (req, res) => {
+//   try {
+//     const ratings = await Program.getAverageRatingByProgram();
 
-    if (!ratings.length) {
-      return res
-        .status(404)
-        .json({ message: "No ratings found for programs." });
-    }
+//     if (!ratings.length) {
+//       return res
+//         .status(404)
+//         .json({ message: "No ratings found for programs." });
+//     }
 
-    res.status(200).json(ratings);
-  } catch (error) {
-    console.error("Error fetching average ratings by program:", error);
-    res.status(500).json({ error: "Internal server error." });
-  }
-};
+//     res.status(200).json(ratings);
+//   } catch (error) {
+//     console.error("Error fetching average ratings by program:", error);
+//     res.status(500).json({ error: "Internal server error." });
+//   }
+// };
 
 exports.getAverageRatingByProgramType = async (req, res) => {
   try {
@@ -179,6 +179,21 @@ exports.getAverageRatingForAllPrograms = async (req, res) => {
     res.status(200).json(programs);
   } catch (error) {
     console.error("Error fetching average ratings for all programs:", error);
+    res.status(500).json({ error: "Internal server error." });
+  }
+};
+
+exports.getNewSignUpsToday = async (req, res) => {
+  try {
+    const newSignUps = await Customer.getNewSignUpsToday();
+
+    if (newSignUps === 0) {
+      return res.status(404).json({ message: "No new sign-ups today." });
+    }
+
+    res.status(200).json({ newSignUps });
+  } catch (error) {
+    console.error("Error fetching new sign-ups:", error);
     res.status(500).json({ error: "Internal server error." });
   }
 };

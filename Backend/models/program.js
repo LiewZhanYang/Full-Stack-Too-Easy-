@@ -228,23 +228,18 @@ class Program {
     return result;
   }
 
-  static async getAverageRatingByProgram() {
-    const connection = await mysql.createConnection(dbConfig);
-    const sqlQuery = `
-        SELECT 
-            p.ProgramName,
-            ROUND(AVG(r.Star), 1) AS AverageRating
-        FROM 
-            Review r
-        JOIN 
-            Program p ON r.ProgramID = p.ProgramID
-        GROUP BY 
-            p.ProgramID, p.ProgramName;
-    `;
+  // static async getAverageRatingByProgram() {
+  //   const connection = await mysql.createConnection(dbConfig);
+  //   const sqlQuery = `
+  //     SELECT ROUND(AVG(Star), 1) AS AverageRating
+  //     FROM Review;
+  //   `;
 
-    const [result] = await connection.execute(sqlQuery);
-    return result;
-  }
+  //   const [result] = await connection.execute(sqlQuery);
+  //   connection.end();
+
+  //   return result[0]?.AverageRating || null;
+  // }
 
   static async getAverageRatingByProgramType() {
     const connection = await mysql.createConnection(dbConfig);
