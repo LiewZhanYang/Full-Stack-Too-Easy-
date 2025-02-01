@@ -31,6 +31,7 @@ CREATE TABLE Child (
     AccountID INT NOT NULL,
     SpecialLearningNeeds VARCHAR(255) DEFAULT NULL,
     DietaryRestrictions VARCHAR(255) DEFAULT NULL,
+    Notes VARCHAR(255) DEFAULT NULL,
 
     FOREIGN KEY (AccountID) REFERENCES Customer(AccountID)
 );

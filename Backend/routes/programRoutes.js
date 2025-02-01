@@ -20,6 +20,6 @@ router.post("/", upload.single("file"), programController.postProgram);
 // Route to update a program by ID (with optional image upload)
 router.put("/id/:id", upload.single("file"), programController.updateProgram);
 
-router.delete("/:id", programController.deleteProgram)
+router.delete("/:id", programController.deleteProgram);
 
 module.exports = router;

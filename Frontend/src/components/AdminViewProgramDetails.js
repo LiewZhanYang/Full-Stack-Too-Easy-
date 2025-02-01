@@ -49,8 +49,7 @@ const AdminViewProgramDetails = () => {
 
   return (
     <Container fluid className="admin-view-program-page p-4">
-      <h2 className="admin-create-title">View Program Details</h2>
-      <hr className="admin-create-divider mb-4" />
+      <h2 className="precoaching-title">View Program Details</h2>
 
       <Form>
         <Row>

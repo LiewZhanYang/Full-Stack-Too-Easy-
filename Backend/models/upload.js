@@ -2,6 +2,7 @@ const {
   S3Client,
   PutObjectCommand,
   GetObjectCommand,
+  DeleteObjectCommand,
   ListObjectsV2Command,
 } = require("@aws-sdk/client-s3");
 const { getSignedUrl } = require("@aws-sdk/s3-request-presigner");
@@ -39,26 +40,90 @@ exports.uploadFileToS3 = async (file, foldername) => {
 };
 */
 exports.uploadFileToS3 = async (file, foldername) => {
-  // Define a consistent filename, e.g., 'profile-picture' or 'main-image'
-  // This ensures that only one file is present per folder and replaces previous uploads.
-  const filename = "only-you"; // Fixed name or set a meaningful name for each context
+  if (!file) {
+    throw new Error("No file provided for upload.");
+  }
 
-  const params = {
-    Bucket: process.env.AWS_BUCKET_NAME,
-    Key: `${foldername}/${filename}`, // S3 path including folder and filename
-    Body: file.buffer,
-    ContentType: file.mimetype,
-  };
+  // Extract file extension
+  const fileExtension = file.originalname.split(".").pop().toLowerCase();
+  const allowedExtensions = [
+    "jpg",
+    "jpeg",
+    "png",
+    "gif",
+    "webp",
+    "pdf",
+    "doc",
+    "docx",
+  ];
+
+  if (!allowedExtensions.includes(fileExtension)) {
+    throw new Error(
+      "Invalid file type. Allowed types: JPG, PNG, GIF, WEBP, PDF, DOC, DOCX."
+    );
+  }
+
+  const filename = `only-you.${fileExtension}`;
+  const filePath = `${foldername}/${filename}`;
 
   try {
-    console.log("Uploading file to S3 with params:", params);
+    // Step 1: Delete Existing Files in the Folder
+    const existingFiles = await listObjectsByPrefix(foldername);
+    await Promise.all(
+      existingFiles.map(async (existingFile) => {
+        console.log(`🗑 Deleting old file: ${existingFile}`);
+        await deleteFileFromS3(existingFile);
+      })
+    );
+
+    // Step 2: Upload the New File
+    const params = {
+      Bucket: process.env.AWS_BUCKET_NAME,
+      Key: filePath,
+      Body: file.buffer,
+      ContentType: file.mimetype,
+    };
+
+    console.log("Uploading new file to S3:", params);
     const command = new PutObjectCommand(params);
     const result = await s3.send(command);
-    console.log("File uploaded successfully to S3:", result);
+
+    console.log("✅ File uploaded successfully:", result);
     return { filename, s3Result: result };
   } catch (error) {
-    console.error("Error uploading file to S3:", error);
+    console.error("❌ Error uploading file to S3:", error);
     throw new Error("Error uploading file to S3");
+  }
+};
+
+// Helper function to list existing files in a folder
+const listObjectsByPrefix = async (prefix) => {
+  try {
+    const command = new ListObjectsV2Command({
+      Bucket: process.env.AWS_BUCKET_NAME,
+      Prefix: prefix,
+    });
+
+    const data = await s3.send(command);
+    return data.Contents ? data.Contents.map((content) => content.Key) : [];
+  } catch (error) {
+    console.error("❌ Error listing objects from S3:", error);
+    return [];
+  }
+};
+
+// Helper function to delete a file from S3
+const deleteFileFromS3 = async (filePath) => {
+  try {
+    const command = new DeleteObjectCommand({
+      Bucket: process.env.AWS_BUCKET_NAME,
+      Key: filePath,
+    });
+
+    await s3.send(command);
+    console.log(`🗑 Deleted file: ${filePath}`);
+  } catch (error) {
+    console.error(`❌ Error deleting file ${filePath} from S3:`, error);
   }
 };
 exports.getWebPicByCategory = async (category) => {

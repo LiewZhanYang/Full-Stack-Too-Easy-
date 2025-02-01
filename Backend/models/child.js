@@ -10,7 +10,8 @@ class Child {
     Age,
     AccountID,
     SpecialLearningNeeds,
-    DietaryRestrictions
+    DietaryRestrictions,
+    Notes
   ) {
     this.ChildID = ChildID;
     this.Name = Name;
@@ -20,6 +21,7 @@ class Child {
     this.AccountID = AccountID;
     this.SpecialLearningNeeds = SpecialLearningNeeds;
     this.DietaryRestrictions = DietaryRestrictions;
+    this.Notes = Notes;
   }
 
   static async getChildByAccountID(AccountID) {
@@ -40,7 +42,8 @@ class Child {
         row.Age,
         row.AccountID,
         row.SpecialLearningNeeds,
-        row.DietaryRestrictions
+        row.DietaryRestrictions,
+        row.Notes
       );
     });
   }
@@ -122,6 +125,22 @@ class Child {
     connection.end();
   }
 
+  static async updateChildNotes(id, notes) {
+    const connection = await mysql.createConnection(dbConfig);
+    const sqlQuery = `
+        UPDATE child
+        SET Notes = ?
+        WHERE childID = ?`;
+
+    const values = [
+      notes.notes,
+      id
+    ];
+
+    const [result] = await connection.execute(sqlQuery, values);
+    connection.end();
+  }
+
   static async getChildBySessionID(id) {
     const connection = await mysql.createConnection(dbConfig);
 
@@ -141,7 +160,8 @@ class Child {
         row.Age,
         row.AccountID,
         row.DietaryRestrictions,
-        row.SpecialLearningNeeds
+        row.SpecialLearningNeeds,
+        row.Notes
       );
     });
   }

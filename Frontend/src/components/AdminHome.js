@@ -5,6 +5,9 @@ import { Link } from "react-router-dom";
 
 const AdminHome = () => {
   const [pendingPaymentsCount, setPendingPaymentsCount] = useState(0);
+  const [openTicketsCount, setOpenTicketsCount] = useState(0);
+  const [inProgressTicketsCount, setInProgressTicketsCount] = useState(0);
+  const [upcomingBookingsCount, setUpcomingBookingsCount] = useState(0);
 
   // Display current date
   const currentDate = new Date();
@@ -35,7 +38,49 @@ const AdminHome = () => {
       }
     };
 
+    const fetchTickets = async () => {
+      try {
+        const response = await fetch("http://localhost:8000/ticketing");
+        if (!response.ok) {
+          throw new Error("Failed to fetch tickets");
+        }
+        const tickets = await response.json();
+
+        const openTickets = tickets.filter(
+          (ticket) => ticket.Status === "Open"
+        );
+        const inProgressTickets = tickets.filter(
+          (ticket) => ticket.Status === "In Progress"
+        );
+
+        setOpenTicketsCount(openTickets.length);
+        setInProgressTicketsCount(inProgressTickets.length);
+      } catch (error) {
+        console.error("Error fetching tickets:", error);
+      }
+    };
+
+    const fetchBookings = async () => {
+      try {
+        const response = await fetch("http://localhost:8000/booking");
+        if (!response.ok) {
+          throw new Error("Failed to fetch bookings");
+        }
+        const bookings = await response.json();
+
+        const currentDate = new Date();
+        const upcomingBookings = bookings.filter(
+          (booking) => new Date(booking.Date) >= currentDate
+        );
+        setUpcomingBookingsCount(upcomingBookings.length);
+      } catch (error) {
+        console.error("Error fetching bookings:", error);
+      }
+    };
+
     fetchPayments();
+    fetchTickets();
+    fetchBookings();
   }, []);
 
   return (
@@ -48,6 +93,13 @@ const AdminHome = () => {
         <p className="admin-status">You have...</p>
         <h4 className="pending-invoices">
           {pendingPaymentsCount} Pending Invoice Confirmations
+        </h4>
+        <h4 className="pending-invoices">{openTicketsCount} Open Tickets</h4>
+        <h4 className="pending-invoices">
+          {inProgressTicketsCount} Tickets In Progress
+        </h4>
+        <h4 className="pending-invoices">
+          {upcomingBookingsCount} Upcoming Bookings
         </h4>
 
         <h5 className="shortcuts-title mt-4">Access:</h5>
