@@ -46,6 +46,9 @@ const AdminViewTicket = () => {
   };
 
   const renderTickets = (tickets) => {
+    if (tickets.length === 0) {
+      return <p><br></br>No tickets available.</p>;
+    }
     return tickets.map((ticket) => (
       <Card
         key={ticket.TicketID}
