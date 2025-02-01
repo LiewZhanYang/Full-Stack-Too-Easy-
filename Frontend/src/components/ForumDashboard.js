@@ -88,7 +88,7 @@ const ForumDashboard = () => {
 
   return (
     <div className="forum-dashboard-container">
-      <h2 className="forum-dashboard-title">Forum Dashboard</h2>
+      <h2 className="precoaching-title">Forum Dashboard</h2>
 
       {/* Top Section: Chart and First Table */}
       <div className="forum-dashboard-top-section">
