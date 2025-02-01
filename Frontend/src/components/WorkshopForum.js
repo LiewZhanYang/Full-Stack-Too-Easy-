@@ -38,17 +38,23 @@ const WorkshopForum = () => {
         const response = await axios.get("http://localhost:8000/thread", {
           params: { topic: 1 },
         });
-
+  
         const threadsWithNames = await Promise.all(
           response.data.map(async (thread) => {
             const customerResponse = await axios.get(
               `http://localhost:8000/customer/id/${thread.PostedBy}`
             );
+  
+            // Fetch comments for each thread to calculate the comment count
+            const commentsResponse = await axios.get(
+              `http://localhost:8000/thread/${thread.ThreadID}/comment`
+            );
+  
             return {
               ...thread,
               PostedByName: customerResponse.data[0]?.Name || "Unknown",
               CreatedAt: thread.CreatedOn || null,
-              comments: thread.comments || [],
+              comments: commentsResponse.data || [], // Attach comments directly
             };
           })
         );
@@ -57,9 +63,10 @@ const WorkshopForum = () => {
         console.error("Error fetching threads:", error);
       }
     };
-
+  
     fetchThreads();
   }, []);
+  
 
   const handleNewThreadChange = (e) => {
     const { name, value } = e.target;
@@ -199,7 +206,7 @@ const WorkshopForum = () => {
           <div className="card-body">
             <div className="d-flex align-items-start mb-3">
               {/* Replace profile picture with user icon */}
-              <i className="bi bi-person-circle fs-2 me-3"></i>
+              <i className="bi bi-person-circle" style={{ fontSize: "40px", color: "#6c757d" }}></i>
               <div>
                 <h5 className="card-title">{thread.Title}</h5>
                 <p className="text-muted mb-2 small">
@@ -245,7 +252,7 @@ const WorkshopForum = () => {
                     className="d-flex align-items-start mb-3 border p-2 rounded"
                 >
                     {/* User icon instead of profile picture */}
-                    <i className="bi bi-person-circle fs-4 me-2"></i>
+                    <i className="bi bi-person-circle" style={{ fontSize: "40px", color: "#6c757d" }}></i>
                     <div>
                         <p className="mb-1">
                             <strong>{comment.PostedByName || "Anonymous"}</strong> on{" "}
