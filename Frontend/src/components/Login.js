@@ -34,15 +34,18 @@ function Login() {
         });
 
         const { token, user } = response.data;
-        localStorage.setItem("userId", user.id);
+        //localStorage.setItem("userId", user.id);
         // Store the token in localStorage or sessionStorage
         localStorage.setItem("token", token);
+        //localStorage.setItem("adminId", user.id);
 
         // Store either adminId or userId based on the user type
         if (user.userType === "admin") {
           navigate("/AdminHome");
+          localStorage.setItem("adminId", user.id);
         } else {
           navigate("/dashboard");
+          localStorage.setItem("userId", user.id);
         }
       } catch (error) {
         console.error("Login error:", error);
