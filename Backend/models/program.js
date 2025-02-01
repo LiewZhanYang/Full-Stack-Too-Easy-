@@ -30,6 +30,24 @@ class Program {
     );
   }
 
+  static async getProgramByTier(tierID) {
+    const connection = await mysql.createConnection(dbConfig);
+    
+    const sqlQuery = `
+        SELECT ProgramID FROM ProgramTier 
+        WHERE TierID = ?;
+    `;
+
+    const [rows] = await connection.execute(sqlQuery, [tierID]);
+    connection.end();
+
+    if (rows.length === 0) {
+      return null; // Return null if no program found for this TierID
+    }
+
+    return rows.map((row) => row.ProgramID); // Return list of ProgramIDs
+  }
+
   static async getProgramBySignUp(AccountID) {
     const connection = await mysql.createConnection(dbConfig);
     const sqlQuery = `
@@ -175,6 +193,9 @@ class Program {
     const [result] = await connection.execute(sqlQuery, [ProgramID]);
     connection.end();
   }
+
+
+  
 }
 
 module.exports = Program;
