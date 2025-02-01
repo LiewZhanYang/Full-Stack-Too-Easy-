@@ -78,7 +78,9 @@ const AdminViewAnnouncement = () => {
 
     if (activeTab === "active" && filteredAnnouncements.length === 0) {
       return (
-        <p ><br></br>No upcoming announcements.</p>
+        <p>
+          <br></br>No upcoming announcements.
+        </p>
       );
     }
 
@@ -197,16 +199,14 @@ const AdminViewAnnouncement = () => {
             eventKey="active"
             className="admin-payments-tab"
             style={{
-              color: activeTab === "active" ? "#f59e0b" : "#6b7280",
+              color: activeTab === "active" ? "#DCAF27" : "#6b7280",
               fontWeight: activeTab === "active" ? "bold" : "normal",
               padding: "10px 20px",
               textAlign: "center",
               borderBottom:
                 activeTab === "active"
-                  ? "2px solid #f59e0b"
+                  ? "2px solid #DCAF27"
                   : "2px solid transparent",
-              cursor: "pointer",
-              transition: "color 0.3s ease, border-bottom-color 0.3s ease",
             }}
           >
             Active
@@ -217,16 +217,14 @@ const AdminViewAnnouncement = () => {
             eventKey="past"
             className="admin-payments-tab"
             style={{
-              color: activeTab === "past" ? "#f59e0b" : "#6b7280",
+              color: activeTab === "past" ? "#DCAF27" : "#6b7280",
               fontWeight: activeTab === "past" ? "bold" : "normal",
               padding: "10px 20px",
               textAlign: "center",
               borderBottom:
                 activeTab === "past"
-                  ? "2px solid #f59e0b"
+                  ? "2px solid #DCAF27"
                   : "2px solid transparent",
-              cursor: "pointer",
-              transition: "color 0.3s ease, border-bottom-color 0.3s ease",
             }}
           >
             Past
