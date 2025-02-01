@@ -21,7 +21,7 @@ class Workshop {
             t.TierID, t.Name, t.Duration
         ORDER BY 
             TotalSignups DESC
-        LIMIT 1;
+        LIMIT 3;
         `;
 
         const [result] = await connection.execute(sqlQuery);

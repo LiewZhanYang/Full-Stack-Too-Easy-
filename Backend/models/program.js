@@ -175,6 +175,31 @@ class Program {
     const [result] = await connection.execute(sqlQuery, [ProgramID]);
     connection.end();
   }
+
+  static async getTopPrograms() {
+    const connection = await mysql.createConnection(dbConfig);
+    const sqlQuery = `
+        SELECT 
+            p.ProgramName,
+            COUNT(su.SignUpID) AS TotalSignups
+        FROM 
+            SignUp su
+        JOIN 
+            Session s ON su.SessionID = s.SessionID
+        JOIN 
+            ProgramTier pt ON s.TierID = pt.TierID
+        JOIN 
+            Program p ON pt.ProgramID = p.ProgramID
+        GROUP BY 
+            p.ProgramID, p.ProgramName
+        ORDER BY 
+            TotalSignups DESC
+        LIMIT 3;
+    `;
+
+    const [result] = await connection.execute(sqlQuery);
+    return result; // Returns the top 3 programs
+  }
 }
 
 module.exports = Program;

@@ -58,6 +58,7 @@ import Ticketing from "./components/Ticketing.js";
 import ViewTicket from "./components/ViewTicket.js";
 import AdminViewTicket from "./components/AdminViewTicket.js";
 import AdminResolveTicket from "./components/AdminResolveTicket.js";
+import AnalyticsDashboard from "./components/AnalyticsDashboard.js";
 import "./StripePayment.css";
 
 // Layout component to handle conditional rendering
@@ -222,6 +223,7 @@ function App() {
                     element={<AdminViewTicket />}
                   />
                   <Route path="/admin-resolve-ticket/:id" element={<AdminResolveTicket />} />
+                  <Route path="/analytics" element={<AnalyticsDashboard />} />
                   {/* Logout route redirects to login */}
                   <Route
                     path="/logout"
