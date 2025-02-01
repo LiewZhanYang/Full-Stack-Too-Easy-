@@ -288,6 +288,7 @@ class Customer {
 
     const sqlQuery = `
       SELECT 
+          c.AccountID,
           c.Name AS CustomerName,
           COALESCE(SUM(p.Amount), 0) AS PurchaseTotal,
           COALESCE((SELECT COUNT(*) FROM Thread t WHERE t.PostedBy = c.AccountID), 0) AS ForumEngagement,

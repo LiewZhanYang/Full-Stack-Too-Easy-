@@ -46,6 +46,3 @@ router.get("/highest-paying-customers", customerInsightsController.getHighestPay
 router.get("/customer-data-table", customerInsightsController.getCustomerDataTable);
 
 module.exports = router;
-
-
-module.exports = router;
