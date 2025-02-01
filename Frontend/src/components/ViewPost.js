@@ -115,12 +115,8 @@ const ViewPost = () => {
       <div className="mb-4">
         <div className="d-flex align-items-center mb-3">
           <div className="me-3">
-            <img
-              src="/api/placeholder/40/40"
-              className="rounded-circle"
-              alt="User avatar"
-              style={{ width: "40px", height: "40px", backgroundColor: "#E9ECEF" }}
-            />
+            {/* Replaced User Profile Picture with a User Icon */}
+            <i className="bi bi-person-circle" style={{ fontSize: "40px", color: "#6c757d" }}></i>
           </div>
           <div>
             <h6 className="mb-0">{post.PostedByName}</h6>
@@ -154,16 +150,8 @@ const ViewPost = () => {
             <div key={index} className="mb-4">
               <div className="d-flex align-items-center mb-2">
                 <div className="me-3">
-                  <img
-                    src="/api/placeholder/40/40"
-                    className="rounded-circle"
-                    alt="Commenter avatar"
-                    style={{
-                      width: "40px",
-                      height: "40px",
-                      backgroundColor: "#E9ECEF",
-                    }}
-                  />
+                  {/*  Replaced Commenter Profile Picture with a User Icon */}
+                  <i className="bi bi-person-circle" style={{ fontSize: "40px", color: "#6c757d" }}></i>
                 </div>
                 <div>
                   <h6 className="mb-0">{comment.PostedByName}</h6>

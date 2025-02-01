@@ -250,6 +250,8 @@ function Payment() {
         }
 
         alert("Payment submitted and signups created successfully!");
+
+        navigate('/dashboard');
       } else {
         throw new Error("Order ID was not returned in the response data.");
       }
@@ -493,12 +495,14 @@ function Payment() {
                     Pay with Stripe
                   </button>
                   {showStripePayment && (
-            <StripePayment
-              totalPrice={totalPrice}
-              programId={programId}
-              selectedChildren={selectedChildren}
-            />
-          )}
+                    <StripePayment
+                      totalPrice={totalPrice}
+                      programId={programId}
+                      selectedChildren={selectedChildren}
+                      SessionID={selectedSession?.SessionID}
+                      UserID={localStorage.getItem("userId")}
+                    />
+                  )}
                   <button
                     onClick={() => setShowPaynow(true)}
                     className="btn btn-outline-secondary w-100 mt-3"

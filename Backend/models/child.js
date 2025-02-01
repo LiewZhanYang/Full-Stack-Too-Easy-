@@ -55,7 +55,7 @@ class Child {
     const formattedDOB = new Date(childDetails.DOB).toISOString().slice(0, 10); // Extracts YYYY-MM-DD
 
     const sqlQuery = `
-            INSERT INTO child (Name, Strength, DOB, Age, AccountID, DietaryRestrictions)
+            INSERT INTO child (Name, Strength, DOB, Age, AccountID, DietaryRestrictions, SpecialLearningNeeds)
             VALUES (?, ?, ?, ?, ?,?)`;
 
     const values = [
@@ -65,6 +65,7 @@ class Child {
       childDetails.Age,
       childDetails.AccountID,
       childDetails.DietaryRestrictions,
+      childDetails.SpecialLearningNeeds
     ];
 
     try {
