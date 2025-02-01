@@ -82,120 +82,164 @@ function Dashboard() {
   useEffect(() => {
     const fetchProgramsAndSessions = async () => {
       try {
-        const signUpResponse = await axios.get(
-          `http://localhost:8000/signup/${userAccountID}`
-        );
-        const signUps = Array.isArray(signUpResponse.data)
-          ? signUpResponse.data
-          : [signUpResponse.data];
+          console.log(" Fetching signed-up programs for AccountID:", userAccountID);
   
-        const signUpsWithDetails = await Promise.all(
-          signUps.map(async (signup) => {
-            if (signup.SessionID) {
-              const sessionResponse = await axios.get(
-                `http://localhost:8000/session/SessionID/${signup.SessionID}`
-              );
-              const tierResponse = await axios.get(
-                `http://localhost:8000/tier/${sessionResponse.data.TierID}`
-              );
+          const signUpResponse = await axios.get(`http://localhost:8000/signup/${userAccountID}`);
+          const signUps = Array.isArray(signUpResponse.data) ? signUpResponse.data : [signUpResponse.data];
   
-              return {
-                ...signup,
-                session: sessionResponse.data,
-                tier: tierResponse.data,
-              };
-            }
-            return { ...signup, session: null, tier: null };
-          })
-        );
+          console.log(" Raw sign-up data:", signUps);
   
-        console.log("Sign-ups with details:", signUpsWithDetails);
+          const signUpsWithDetails = await Promise.all(
+              signUps.map(async (signup) => {
+                  if (signup.SessionID) {
+                      console.log(" Fetching session details for SessionID:", signup.SessionID);
   
-        const endedPrograms = signUpsWithDetails.find((program) => {
-          if (program.session && program.session.EndDate) {
-            const endDate = new Date(program.session.EndDate);
-            console.log(
-              "Checking program:",
-              program,
-              "End Date:",
-              endDate,
-              "Current Date:",
-              currentDate,
-              "Comparison Result:",
-              endDate < currentDate
-            );
-            return endDate < currentDate; // Compare dates
+                      const sessionResponse = await axios.get(
+                          `http://localhost:8000/session/SessionID/${signup.SessionID}`
+                      );
+  
+                      console.log(" Session API Response:", sessionResponse.data);
+  
+                      console.log(" Fetching tier details for TierID:", sessionResponse.data.TierID);
+                      const tierResponse = await axios.get(
+                          `http://localhost:8000/tier/${sessionResponse.data.TierID}`
+                      );
+  
+                      console.log(" Tier API Response:", tierResponse.data);
+  
+                      console.log(" Fetching ProgramID for TierID:", sessionResponse.data.TierID);
+                      const programResponse = await axios.get(
+                          `http://localhost:8000/program/tier/${sessionResponse.data.TierID}`
+                      );
+  
+                      console.log(" Program API Response:", programResponse.data);
+  
+                      //  Ensure ProgramID is correctly assigned inside `session`
+                      return {
+                          ...signup,
+                          session: {
+                              ...sessionResponse.data,
+                              ProgramID: programResponse.data.ProgramIDs ? programResponse.data.ProgramIDs[0] : null,
+                          },
+                          tier: tierResponse.data,
+                      };
+                  }
+                  return { ...signup, session: null, tier: null };
+              })
+          );
+  
+          console.log("🔍 Sign-ups with session & program details:", signUpsWithDetails);
+  
+          //  Find an ended program
+          const endedPrograms = signUpsWithDetails.find((program) => {
+              if (program.session && program.session.EndDate) {
+                  const endDate = new Date(program.session.EndDate);
+                  console.log(" Checking program end date:", endDate, "(Now:", new Date(), ")");
+                  return endDate < new Date(); // Compare dates
+              }
+              return false;
+          });
+  
+          if (endedPrograms) {
+              console.log(" Ended program for review:", endedPrograms);
+              if (endedPrograms.session?.ProgramID) {
+                  setReviewPrompt(endedPrograms);
+              } else {
+                  console.error(" Error: `ProgramID` is missing in endedPrograms.session", endedPrograms.session);
+              }
           }
-          return false;
-        });
-        
-        console.log("Ended Programs Result:", endedPrograms);
-        
   
-        console.log("Ended Programs:", endedPrograms);
-  
-        if (endedPrograms) {
-          setReviewPrompt(endedPrograms);
-        }
-  
-        setPrograms(signUpsWithDetails);
+          setPrograms(signUpsWithDetails);
       } catch (err) {
-        setError("You have not signed up for any programmes.");
-        console.error(err);
+          console.error(" Error in fetchProgramsAndSessions:", err);
+          setError("You have not signed up for any programs.");
       } finally {
-        setLoading(false);
+          setLoading(false);
+          console.log(" Finished fetching programs.");
       }
-    };
-  
-    fetchProgramsAndSessions();
-  }, [userAccountID]);
-  
-  
-
-  const handleReviewSubmit = async () => {
-    if (!reviewContent.trim()) {
-      alert("Please write a review before submitting.");
-      return;
-    }
-  
-    // Ensure ProgramID is valid
-    const programID = reviewPrompt?.session?.ProgramID;
-    if (!programID) {
-      alert("Program ID is missing. Unable to submit review.");
-      return;
-    }
-  
-    const payload = {
-      Content: reviewContent,
-      Star: reviewRating,
-      AccountID: userAccountID, // User submitting the review
-      Date: new Date().toISOString(), // Current date and time
-    };
-  
-    console.log(`Submitting review for ProgramID: ${programID}`, payload);
-  
-    try {
-      const response = await axios.post(`http://localhost:8000/review/${programID}`, payload);
-  
-      // Log success response
-      console.log("Review submission successful:", response.data);
-  
-      alert("Thank you for your review!");
-      setReviewPrompt(null); // Close the review prompt
-      setReviewContent("");
-      setReviewRating(5); // Reset review form
-    } catch (error) {
-      console.error("Error submitting review:", error);
-  
-      if (error.response) {
-        console.error("Server responded with:", error.response.data);
-        alert(`Failed to submit review: ${error.response.data.message || "Unknown error"}`);
-      } else {
-        alert("Failed to submit review. Please check your network connection.");
-      }
-    }
   };
   
+  
+  fetchProgramsAndSessions();
+  
+
+    fetchProgramsAndSessions();
+}, [userAccountID]);
+
+  
+
+const handleReviewSubmit = async () => {
+  if (!reviewContent.trim()) {
+      alert("Please write a review before submitting.");
+      return;
+  }
+
+  console.log("🔍 Review Prompt Data:", reviewPrompt);
+
+  if (!reviewPrompt || !reviewPrompt.session) {
+      console.error(" Error: `session` object is missing in reviewPrompt.");
+      alert("Session data is missing. Unable to submit review.");
+      return;
+  }
+
+  //  Fetch ProgramID directly from reviewPrompt.session
+  const programID = reviewPrompt.session.ProgramID;
+  const signUpID = reviewPrompt.SignUpID; // Get the SignUpID for deletion
+
+  console.log(" ProgramID from `reviewPrompt.session`:", programID);
+  console.log(" SignUpID for deletion:", signUpID);
+
+  if (!programID || !signUpID) {
+      console.error(" Error: `ProgramID` or `SignUpID` is missing in session data.");
+      alert("Required IDs are missing. Unable to submit review.");
+      return;
+  }
+
+  const payload = {
+      Content: reviewContent,
+      Star: reviewRating,
+      AccountID: userAccountID,
+      Date: new Date().toISOString(),
+      ProgramID: programID, //  Now ProgramID is guaranteed
+  };
+
+  console.log(" Submitting review:", payload);
+
+  try {
+      //  Submit the review
+      const reviewResponse = await axios.post(`http://localhost:8000/review/`, payload);
+      console.log("Review submission successful:", reviewResponse.data);
+
+      // Delete the SignUp entry to remove the program from the database
+      console.log(`Deleting SignUp entry with SignUpID: ${signUpID}`);
+      await axios.delete(`http://localhost:8000/signup/${signUpID}`);
+      console.log("Successfully removed ended program from database.");
+
+      alert("Thank you for your review!");
+
+      // Remove the reviewed program from the UI
+      setPrograms((prevPrograms) => prevPrograms.filter(
+          (program) => program.SignUpID !== signUpID
+      ));
+
+      // Close the review prompt and reset form
+      setReviewPrompt(null);
+      setReviewContent("");
+      setReviewRating(5); // Reset review form
+
+  } catch (error) {
+      console.error(" Error submitting review or removing program:", error);
+
+      if (error.response) {
+          console.error(" Server responded with:", error.response.data);
+          alert(`Failed to submit review: ${error.response.data.message || "Unknown error"}`);
+      } else {
+          alert("Failed to submit review. Please check your network connection.");
+      }
+  }
+};
+
+
   
   
   const renderProgramCard = (data) => (

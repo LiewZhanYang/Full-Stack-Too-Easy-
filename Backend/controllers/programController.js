@@ -157,6 +157,25 @@ const getProgramsByProgramType = async (req, res) => {
   }
 };
 
+const getProgramByTier = async (req, res) => {
+  try {
+    const { tierID } = req.params;
+    console.log(" Fetching ProgramID for TierID:", tierID);
+
+    const programIDs = await Program.getProgramByTier(tierID);
+
+    if (!programIDs) {
+      return res.status(404).json({ message: "No program found for this TierID." });
+    }
+
+    res.json({ ProgramIDs: programIDs });
+  } catch (error) {
+    console.error(" Error fetching Program by Tier:", error);
+    res.status(500).json({ message: "Internal server error." });
+  }
+};
+
+
 module.exports = {
   getAllPrograms,
   postProgram,
@@ -164,5 +183,6 @@ module.exports = {
   getProgramById,
   getProgramBySignUp,
   deleteProgram,
-  getProgramsByProgramType
+  getProgramsByProgramType,
+  getProgramByTier,
 };
