@@ -101,7 +101,7 @@ function WorkshopDetails() {
 
     navigate("/payment", {
       state: {
-        programId: tier.ProgramID,
+        programId: id,
         tier: tier.Name,
         price: `$${discountedPrice.toFixed(2)}`,
         classSize: tier.ClassSize,
