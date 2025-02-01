@@ -6,19 +6,19 @@ const WorkshopForum = () => {
   const [threads, setThreads] = useState([]);
   const [newThread, setNewThread] = useState({ title: "", body: "", topic: "1" });
   const [customerName, setCustomerName] = useState("User");
-  const [likedThreads, setLikedThreads] = useState(new Set()); // Tracks liked threads
+  const [likedThreads, setLikedThreads] = useState(new Set());
   const [showCreateThread, setShowCreateThread] = useState(false);
-  const [viewedComments, setViewedComments] = useState(new Set()); // Tracks threads with visible comments
-  const [commentInputs, setCommentInputs] = useState({}); // Tracks comment input values for each thread
+  const [viewedComments, setViewedComments] = useState(new Set());
+  const [commentInputs, setCommentInputs] = useState({});
 
-  const userAccountID = localStorage.getItem("userId"); // Assume user ID is stored in localStorage
+  const userAccountID = localStorage.getItem("userId");
 
   // Fetch customer name
   useEffect(() => {
     const fetchCustomerName = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:8000/customer/id/${userAccountID}` // API to get customer by ID
+          `http://localhost:8000/customer/id/${userAccountID}`
         );
         if (response.data && response.data.length > 0) {
           setCustomerName(response.data[0].Name || "User");
@@ -36,23 +36,22 @@ const WorkshopForum = () => {
     const fetchThreads = async () => {
       try {
         const response = await axios.get("http://localhost:8000/thread", {
-          params: { topic: 1 }, // Filter threads by topic
+          params: { topic: 1 },
         });
 
-      // Fetch customer names for each thread
-      const threadsWithNames = await Promise.all(
-        response.data.map(async (thread) => {
-          const customerResponse = await axios.get(
-            `http://localhost:8000/customer/id/${thread.PostedBy}`
-          );
-          return {
-            ...thread,
-            PostedByName: customerResponse.data[0]?.Name || "Unknown", // Fetch and map name
-            CreatedAt: thread.CreatedOn || null, // Use the CreatedAt field from the backend
-            comments: thread.comments || [], // Ensure comments array exists
-          };
-        })
-      );
+        const threadsWithNames = await Promise.all(
+          response.data.map(async (thread) => {
+            const customerResponse = await axios.get(
+              `http://localhost:8000/customer/id/${thread.PostedBy}`
+            );
+            return {
+              ...thread,
+              PostedByName: customerResponse.data[0]?.Name || "Unknown",
+              CreatedAt: thread.CreatedOn || null,
+              comments: thread.comments || [],
+            };
+          })
+        );
         setThreads(threadsWithNames);
       } catch (error) {
         console.error("Error fetching threads:", error);
@@ -62,13 +61,11 @@ const WorkshopForum = () => {
     fetchThreads();
   }, []);
 
-  // Handle input changes for creating threads
   const handleNewThreadChange = (e) => {
     const { name, value } = e.target;
     setNewThread((prev) => ({ ...prev, [name]: value }));
   };
 
-  // Post a new thread
   const handlePostThread = async () => {
     try {
       const response = await axios.post("http://localhost:8000/thread/thread", {
@@ -92,7 +89,6 @@ const WorkshopForum = () => {
     }
   };
 
-  // Handle like functionality (users can only like once)
   const handleLikeThread = async (threadId) => {
     if (likedThreads.has(threadId)) {
       alert("You have already liked this thread.");
@@ -108,13 +104,11 @@ const WorkshopForum = () => {
             : thread
         )
       );
-      setLikedThreads((prev) => new Set(prev.add(threadId))); // Track liked threads
+      setLikedThreads((prev) => new Set(prev.add(threadId)));
     } catch (error) {
       console.error("Error liking thread:", error);
     }
   };
-
-
 
   const handleAddComment = async (threadId) => {
     const comment = commentInputs[threadId]?.trim();
@@ -122,37 +116,25 @@ const WorkshopForum = () => {
       alert("Comment cannot be empty!");
       return;
     }
-  
+
     try {
-      console.log("Posting comment:", {
-        Body: comment,
-        PostedBy: userAccountID,
-        Topic: "1",
-        ReplyTo: threadId,
-      });
-  
-      // Post the comment to the backend
       const response = await axios.post("http://localhost:8000/thread/comment", {
         Body: comment,
         PostedBy: userAccountID,
         Topic: "1",
         ReplyTo: threadId,
       });
-  
-      console.log("Comment posted successfully:", response.data);
-  
-      // Fetch the user's name for the comment
+
       const customerResponse = await axios.get(
         `http://localhost:8000/customer/id/${userAccountID}`
       );
-  
+
       const newComment = {
-        ...response.data, // Ensure the backend includes CreatedAt in the response
+        ...response.data,
         PostedByName: customerResponse.data[0]?.Name || "Unknown",
-        CreatedAt: response.data.CreatedOn || new Date().toISOString(), // Fallback to current date if missing
+        CreatedAt: response.data.CreatedOn || new Date().toISOString(),
       };
-  
-      // Update the thread's comments with the new comment
+
       setThreads((prev) =>
         prev.map((thread) =>
           thread.ThreadID === threadId
@@ -160,55 +142,44 @@ const WorkshopForum = () => {
             : thread
         )
       );
-  
-      // Clear the input for this thread's comment box
+
       setCommentInputs((prev) => ({ ...prev, [threadId]: "" }));
     } catch (error) {
       console.error("Error adding comment:", error);
-  
-      if (error.response) {
-        console.error("Response Data:", error.response.data);
-        console.error("Response Status:", error.response.status);
-      }
     }
   };
-  
-  
 
   const toggleComments = async (threadId) => {
     setThreads((prev) =>
-      prev.map((thread) =>
-        thread.ThreadID === threadId
-          ? { ...thread, showComments: !thread.showComments } // Toggle visibility
-          : thread
-      )
-    );
-  
-    try {
-      const response = await axios.get(
-        `http://localhost:8000/thread/${threadId}/comment`
-      );
-  
-      const fetchedComments = response.data.map((comment) => ({
-        ...comment,
-        CreatedAt: comment.CreatedOn || new Date().toISOString(), // Fallback to current date
-      }));
-  
-      setThreads((prev) =>
         prev.map((thread) =>
-          thread.ThreadID === threadId
-            ? { ...thread, comments: fetchedComments }
-            : thread
+            thread.ThreadID === threadId
+                ? { ...thread, showComments: !thread.showComments }
+                : thread
         )
-      );
-    } catch (error) {
-      console.error(`Error fetching comments for thread ID ${threadId}:`, error);
-    }
-  };
-  
+    );
 
-  
-  
+    try {
+        const response = await axios.get(
+            `http://localhost:8000/thread/${threadId}/comment`
+        );
+
+        const fetchedComments = response.data.map((comment) => ({
+            ...comment,
+            CreatedAt: comment.CreatedOn || new Date().toISOString(),
+        }));
+
+        setThreads((prev) =>
+            prev.map((thread) =>
+                thread.ThreadID === threadId
+                    ? { ...thread, comments: fetchedComments }
+                    : thread
+            )
+        );
+    } catch (error) {
+        console.error(`Error fetching comments for thread ID ${threadId}:`, error);
+    }
+};
+
   return (
     <div className="container mt-5">
       {/* Header */}
@@ -221,17 +192,14 @@ const WorkshopForum = () => {
           Create Thread
         </button>
       </div>
-  
+
       {/* Threads List */}
       {threads.map((thread) => (
         <div key={thread.ThreadID} className="card mb-4 shadow-sm">
           <div className="card-body">
-            {/* Author Info and Thread Content */}
             <div className="d-flex align-items-start mb-3">
-              <div
-                className="rounded-circle bg-secondary me-3"
-                style={{ width: "50px", height: "50px" }}
-              ></div>
+              {/* Replace profile picture with user icon */}
+              <i className="bi bi-person-circle fs-2 me-3"></i>
               <div>
                 <h5 className="card-title">{thread.Title}</h5>
                 <p className="text-muted mb-2 small">
@@ -243,8 +211,7 @@ const WorkshopForum = () => {
                 <p className="card-text">{thread.Body}</p>
               </div>
             </div>
-  
-            {/* Like and Comment Buttons */}
+
             <div className="d-flex align-items-center gap-3">
               <button
                 onClick={() => handleLikeThread(thread.ThreadID)}
@@ -265,65 +232,65 @@ const WorkshopForum = () => {
                 View Post
               </Link>
             </div>
-  
+
             {/* Comments Section */}
-            {thread.showComments && (
-              <div className="mt-4">
-                <h6 className="mb-3">Comments:</h6>
-                {thread.comments && thread.comments.length > 0 ? (
-                  thread.comments.map((comment, index) => (
-                    <div
-                      key={index}
-                      className="d-flex align-items-start mb-3 border p-2 rounded"
-                    >
-                      <div
-                        className="rounded-circle bg-secondary me-2"
-                        style={{ width: "40px", height: "40px" }}
-                      ></div>
-                      <div>
+{/* Comments Section */}
+{thread.showComments && (
+    <div className="mt-4">
+        <h6 className="mb-3">Comments:</h6>
+        {thread.comments && thread.comments.length > 0 ? (
+            thread.comments.map((comment, index) => (
+                <div
+                    key={index}
+                    className="d-flex align-items-start mb-3 border p-2 rounded"
+                >
+                    {/* User icon instead of profile picture */}
+                    <i className="bi bi-person-circle fs-4 me-2"></i>
+                    <div>
                         <p className="mb-1">
-                          <strong>{comment.PostedByName}</strong> on{" "}
-                          {new Date(comment.CreatedAt).toLocaleDateString()}
+                            <strong>{comment.PostedByName || "Anonymous"}</strong> on{" "}
+                            {comment.CreatedAt
+                                ? new Date(comment.CreatedAt).toLocaleDateString()
+                                : "Date unavailable"}
                         </p>
                         <p className="small text-muted">{comment.Body}</p>
-                      </div>
                     </div>
-                  ))
-                ) : (
-                  <p className="text-muted">No comments yet.</p>
-                )}
-  
-                {/* Add Comment Input */}
-                <div className="d-flex align-items-center mt-3">
-                  <div
-                    className="rounded-circle bg-secondary me-2"
-                    style={{ width: "40px", height: "40px" }}
-                  ></div>
-                  <input
-                    type="text"
-                    className="form-control"
-                    placeholder="Add a comment..."
-                    value={commentInputs[thread.ThreadID] || ""}
-                    onChange={(e) =>
-                      setCommentInputs((prev) => ({
+                </div>
+            ))
+        ) : (
+            <p className="text-muted">No comments yet.</p>
+        )}
+
+        {/* Add Comment Input */}
+        <div className="d-flex align-items-center mt-3">
+            {/* User icon for current commenter */}
+            <i className="bi bi-person-circle fs-4 me-2"></i>
+            <input
+                type="text"
+                className="form-control"
+                placeholder="Add a comment..."
+                value={commentInputs[thread.ThreadID] || ""}
+                onChange={(e) =>
+                    setCommentInputs((prev) => ({
                         ...prev,
                         [thread.ThreadID]: e.target.value,
-                      }))
-                    }
-                  />
-                  <button
-                    onClick={() => handleAddComment(thread.ThreadID)}
-                    className="btn btn-primary ms-2"
-                  >
-                    Post
-                  </button>
-                </div>
-              </div>
-            )}
+                    }))
+                }
+            />
+            <button
+                onClick={() => handleAddComment(thread.ThreadID)}
+                className="btn btn-primary ms-2"
+            >
+                Post
+            </button>
+        </div>
+    </div>
+)}
+
           </div>
         </div>
       ))}
-  
+
       {/* Create Thread Modal */}
       {showCreateThread && (
         <div className="modal d-block" tabIndex="-1">
@@ -379,8 +346,6 @@ const WorkshopForum = () => {
       )}
     </div>
   );
-  
-  
 };
 
 export default WorkshopForum;
