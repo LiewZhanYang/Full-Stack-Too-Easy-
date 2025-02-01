@@ -297,7 +297,11 @@ VALUES
 (3, '2025-02-20', '2025-02-21', '10:00:00', 'Auditorium C', 15, 2),
 (4, '2025-02-25', '2025-02-26', '14:00:00', 'Classroom D', 15, 2),
 (5, '2025-03-01', '2025-03-02', '10:00:00', 'Auditorium E', 15, 3),
-(6, '2025-03-05', '2025-03-06', '14:00:00', 'Classroom F', 15, 3);
+(6, '2025-03-05', '2025-03-06', '14:00:00', 'Classroom F', 15, 3),
+(7, '2025-03-10', '2025-03-11', '10:00:00', 'Auditorium G', 15, 4),
+(8, '2025-03-15', '2025-03-16', '14:00:00', 'Classroom H', 15, 4),
+(9, '2025-03-20', '2025-03-21', '10:00:00', 'Auditorium I', 15, 5),
+(10, '2025-03-25', '2025-03-26', '14:00:00', 'Classroom J', 15, 5);
 
 INSERT INTO Lunch (LunchOptionID, LunchDesc)
 VALUES
@@ -323,7 +327,12 @@ VALUES
 (12, 14, 5, 2, 12),
 (13, 15, 6, 1, 13),
 (14, 16, 1, 5, 14),
-(15, 16, 2, 1, 15);
+(15, 16, 2, 1, 15),
+(16, 1, 8, 1, 1),
+(17, 1, 8, 1, 2),
+(18, 2, 8, 1, 3),
+(19, 2, 7, 1, 4),
+(20, 1, 7, 1, 5);
 
 
 INSERT INTO Booking (BookingID, StartTime, EndTime, Date, URL, AccountID)
@@ -350,7 +359,12 @@ VALUES
 (12, 93157029, 1388, '2024-10-10 12:00:00', 'Pending', 'path/to/invoice-93157029.pdf', 5, 14, NULL, NULL),
 (13, 28653107, 1388, '2024-10-20 12:00:00', 'Pending', 'path/to/invoice-28653107.pdf', 6, 15, NULL, NULL),
 (14, 67491354, 788, '2024-10-15 12:00:00', 'Approved', 'path/to/invoice-67491354.pdf', 1, 16, 1, 'Approved by Admin 5'),
-(15, 93157030, 788, '2024-10-10 12:00:00', 'Pending', 'path/to/invoice-93157030.pdf', 2, 16, NULL, NULL);
+(15, 93157030, 788, '2024-10-10 12:00:00', 'Pending', 'path/to/invoice-93157030.pdf', 2, 16, NULL, NULL),
+(16, 93157030, 388, '2024-10-10 12:00:00', 'Pending', 'path/to/invoice-93157030.pdf', 8, 1, NULL, NULL),
+(17, 93157030, 388, '2024-10-10 12:00:00', 'Pending', 'path/to/invoice-93157030.pdf', 8, 1, NULL, NULL),
+(18, 93157030, 388, '2024-10-10 12:00:00', 'Pending', 'path/to/invoice-93157030.pdf', 8, 2, NULL, NULL),
+(19, 93157030, 388, '2024-10-10 12:00:00', 'Pending', 'path/to/invoice-93157030.pdf', 7, 2, NULL, NULL),
+(20, 93157030, 388, '2024-10-10 12:00:00', 'Pending', 'path/to/invoice-93157030.pdf', 7, 1, NULL, NULL);
 
 INSERT INTO Announcement (AnnouncementID, Title, Body, PostedDate)
 VALUES 
@@ -377,7 +391,9 @@ VALUES
 (13, 'The best public speaking workshop I’ve attended! I feel much more confident and prepared for future speaking engagements.', 5, '2025-02-01', 13, 1),
 (14, 'I never thought I could be this confident speaking in front of people. This workshop was a game-changer!', 5, '2025-02-01', 14, 1),
 (15, 'This program taught me so many useful techniques for engaging an audience. I can now deliver my speeches with ease!', 5, '2025-02-01', 15, 1),
-(16, 'Amazing experience! I’ve learned so much about structuring my speeches and keeping the audience engaged.', 5, '2025-02-01', 16, 1);
+(16, 'Amazing experience! I’ve learned so much about structuring my speeches and keeping the audience engaged.', 5, '2025-02-01', 16, 1),
+(17, 'The PSLE camp was fantastic! It really helped my child with exam techniques and gave them the confidence to excel!', 5, '2025-01-15', 1, 2),
+(18, 'I saw a significant improvement in my child’s performance after attending the PSLE camp. The teachers were very supportive!', 5, '2025-01-16', 2, 2);
 
 
 INSERT INTO Ticketing (TicketID, AccountID, Category, Content, StartDate, Status)
@@ -423,8 +439,10 @@ VALUES
     (NULL, 'The camp was fantastic! The facilitators were supportive, and I felt like I made huge progress in my speaking abilities. Will definitely attend again.', '2025-02-03', 10, 0.92, 13, 2, 10),
     ('Lab Work Experience', 'Can anyone share their experience working at the Lab? Would be nice to know what to expect.', '2025-02-04', 4, 0.6, 14, 3, NULL),
     (NULL, 'I had a great time at the Lab! The hands-on work was really insightful, and I learned a lot. Definitely worth it!', '2025-02-04', 7, 0.8, 15, 3, 14),
-    (NULL, 'The Lab was an incredible experience. It helped me understand the theoretical concepts in a more practical way. Highly recommend!', '2025-02-04', 6, 0.85, 16, 3, 14);
-
+    (NULL, 'The Lab was an incredible experience. It helped me understand the theoretical concepts in a more practical way. Highly recommend!', '2025-02-04', 6, 0.85, 16, 3, 14),
+    ('Enquiry about PSLE Camp', 'Hi everyone, I’m looking into enrolling my child in the PSLE camp. Can anyone share their experience and how it helped with exam preparation?', '2025-02-01', 5, 0.7, 10, 2, NULL),
+    (NULL, 'I enrolled my child last year, and the camp was really beneficial! It gave them a lot of practice and boosted their confidence for the exams.', '2025-02-02', 7, 0.8, 11, 1, 1),
+    (NULL, 'The PSLE camp was great! My child really enjoyed the interactive lessons and the mock exams. Highly recommend it for anyone preparing for PSLE!', '2025-02-03', 6, 0.85, 12, 2, 1);
 Trigger
 
 -- Add Age On Insertion
