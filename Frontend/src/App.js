@@ -56,6 +56,8 @@ import WorkshopForum from "./components/WorkshopForum.js";
 import ViewPost from "./components/ViewPost.js";
 import Ticketing from "./components/Ticketing.js";
 import ViewTicket from "./components/ViewTicket.js";
+import AdminViewTicket from "./components/AdminViewTicket.js";
+import AdminResolveTicket from "./components/AdminResolveTicket.js";
 import "./StripePayment.css";
 
 // Layout component to handle conditional rendering
@@ -113,7 +115,7 @@ function App() {
                   />
                   <Route path="/webinars" element={<Webinars />} />
                   <Route path="/workshopvm" element={<Workshopvm />} />
-                  <Route path="/ticketing" element={<Ticketing/>} />
+                  <Route path="/ticketing" element={<Ticketing />} />
                   <Route path="/ticket/:id" element={<ViewTicket />} />
                   <Route
                     path="/webinar-details/:id"
@@ -126,7 +128,7 @@ function App() {
                   <Route path="/coaching/:id" element={<Coaching />} />
                   <Route path="/chatbot" element={<Chatbot />} />
                   <Route path="/stripepayment" element={<StripePayment />} />
-                  <Route path="/complete" element={<CompletePage />} />       
+                  <Route path="/complete" element={<CompletePage />} />
                   <Route path="/workshopforum" element={<WorkshopForum />} />
                   <Route path="/viewpost/:id" element={<ViewPost />} />
                   {/* Admin routes */}
@@ -215,6 +217,11 @@ function App() {
                     path="/admin-view-session-details/:id"
                     element={<AdminViewSessionDetails />}
                   />
+                  <Route
+                    path="/admin-view-ticket"
+                    element={<AdminViewTicket />}
+                  />
+                  <Route path="/admin-resolve-ticket/:id" element={<AdminResolveTicket />} />
                   {/* Logout route redirects to login */}
                   <Route
                     path="/logout"

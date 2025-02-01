@@ -67,7 +67,11 @@ const AdminViewBooking = () => {
     const filteredBookings = filterBookings();
 
     if (filteredBookings.length === 0) {
-      return <p ><br></br>No bookings available.</p>;
+      return (
+        <p>
+          <br></br>No bookings available.
+        </p>
+      );
     }
 
     return filteredBookings.map((booking) => (
@@ -138,16 +142,14 @@ const AdminViewBooking = () => {
             eventKey="upcoming"
             className="admin-bookings-tab"
             style={{
-              color: activeTab === "upcoming" ? "#f59e0b" : "#6b7280",
+              color: activeTab === "upcoming" ? "#DCAF27" : "#6b7280",
               fontWeight: activeTab === "upcoming" ? "bold" : "normal",
               padding: "10px 20px",
               textAlign: "center",
               borderBottom:
                 activeTab === "upcoming"
-                  ? "2px solid #f59e0b"
+                  ? "2px solid #DCAF27"
                   : "2px solid transparent",
-              cursor: "pointer",
-              transition: "color 0.3s ease, border-bottom-color 0.3s ease",
             }}
           >
             Upcoming
@@ -158,16 +160,14 @@ const AdminViewBooking = () => {
             eventKey="past"
             className="admin-bookings-tab"
             style={{
-              color: activeTab === "past" ? "#f59e0b" : "#6b7280",
+              color: activeTab === "past" ? "#DCAF27" : "#6b7280",
               fontWeight: activeTab === "past" ? "bold" : "normal",
               padding: "10px 20px",
               textAlign: "center",
               borderBottom:
                 activeTab === "past"
-                  ? "2px solid #f59e0b"
+                  ? "2px solid #DCAF27"
                   : "2px solid transparent",
-              cursor: "pointer",
-              transition: "color 0.3s ease, border-bottom-color 0.3s ease",
             }}
           >
             Past

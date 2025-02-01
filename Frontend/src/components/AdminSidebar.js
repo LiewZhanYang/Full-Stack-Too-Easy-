@@ -227,6 +227,34 @@ function Sidebar() {
                     </div>
                   )}
                 </div>
+                {/* Ticketing Section */}
+                <div className="mt-3">
+                  <button
+                    onClick={() => toggleMenu("ticket")}
+                    className="btn d-flex align-items-center w-100 text-dark fw-bold px-3 py-2 border-0 bg-transparent"
+                  >
+                    <i className="bi bi-ticket me-2"></i>
+                    Ticketing
+                    <i
+                      className={`bi ${
+                        expandedMenu === "ticket"
+                          ? "bi-chevron-up"
+                          : "bi-chevron-down"
+                      } ms-auto`}
+                    ></i>
+                  </button>
+                  {expandedMenu === "ticket" && (
+                    <div className="ps-4">
+                      <Link
+                        to="/admin-view-ticket"
+                        className="d-block py-1 text-dark text-decoration-none"
+                        style={{ fontSize: "0.95rem" }}
+                      >
+                        Incoming Tickets
+                      </Link>
+                    </div>
+                  )}
+                </div>
               </div>
             </nav>
           </div>
