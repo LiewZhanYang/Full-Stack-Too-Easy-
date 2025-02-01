@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
 
-const WorkshopForum = () => {
+const CampForum = () => {
   const [threads, setThreads] = useState([]);
   const [newThread, setNewThread] = useState({ title: "", body: "", topic: "1" });
   const [customerName, setCustomerName] = useState("User");
@@ -36,7 +36,7 @@ const WorkshopForum = () => {
     const fetchThreads = async () => {
       try {
         const response = await axios.get("http://localhost:8000/thread", {
-          params: { topic: 1 },
+          params: { topic: 2 },
         });
   
         const threadsWithNames = await Promise.all(
@@ -394,4 +394,4 @@ const WorkshopForum = () => {
   );
 };
 
-export default WorkshopForum;
+export default CampForum;

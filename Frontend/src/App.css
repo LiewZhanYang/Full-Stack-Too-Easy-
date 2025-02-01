@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=League+Spartan:wght@400;600&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=League+Spartan:wght@400;600&display=swap");
 
 body {
   margin: 0;
@@ -603,15 +603,15 @@ code {
   font-size: 1.1rem;
   font-weight: 500;
   color: #333;
-  margin: 0; 
-  padding: 0; 
+  margin: 0;
+  padding: 0;
 }
 
 .workshops-card-text {
   font-size: 1rem;
   font-weight: normal;
   color: #6c757d;
-  margin: 0; 
+  margin: 0;
   padding: 0;
 }
 
@@ -619,7 +619,6 @@ code {
   margin: 0;
   padding: 0;
 }
-
 
 /* Admin Edit Program Page */
 .page-title {
@@ -661,7 +660,6 @@ code {
   font-weight: 500;
   color: #666;
 }
-
 
 .action-icon {
   color: #333;
@@ -960,7 +958,6 @@ code {
   color: white;
 }
 
-
 /* Announcements */
 .announcement {
   margin-top: 20px;
@@ -1017,14 +1014,14 @@ code {
 
 .calendar-sync-button {
   background-color: #28a745;
-  color: #fff; 
-  border: none; 
-  border-radius: 4px; 
-  transition: background-color 0.3s ease; 
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  transition: background-color 0.3s ease;
 }
 
 .calendar-sync-button:hover {
-  background-color: #218838; 
+  background-color: #218838;
   color: #fff;
 }
 
@@ -1032,8 +1029,8 @@ code {
   background-color: white;
   color: black;
   border: 1px solid black;
-  padding: 8px 16px; 
-  border-radius: 8px; 
+  padding: 8px 16px;
+  border-radius: 8px;
   font-weight: 500;
   transition: background-color 0.3s ease, color 0.3s ease;
   outline: none;
@@ -1041,10 +1038,83 @@ code {
 
 .custom-back-button:hover {
   background-color: black;
-  color: white; 
+  color: white;
 }
 
 .custom-back-button:focus {
   outline: none;
   box-shadow: none;
+}
+
+/* Analytics */
+.analytics-container {
+  padding: 20px;
+}
+
+.title {
+  text-align: center;
+  margin-bottom: 20px;
+  font-size: 24px;
+}
+
+.grid {
+  display: grid;
+  gap: 20px;
+}
+
+.grid-top {
+  grid-template-columns: 1fr 1fr;
+}
+
+.card {
+  background-color: #f5f7fa;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.card h5,
+.widget h5 {
+  margin-bottom: 15px;
+}
+
+.chart-container {
+  height: 300px;
+}
+
+.widget {
+  text-align: center;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 120px;
+  background-color: #f5f7fa;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.grid-bottom {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+
+.dropdown {
+  width: 100%;
+  padding: 8px;
+  margin-bottom: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background-color: #fff;
+}
+
+.grid-income {
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  align-items: start; 
+  gap: 20px
 }

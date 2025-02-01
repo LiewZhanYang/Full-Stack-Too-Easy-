@@ -113,7 +113,7 @@ const AdminResolveTicket = () => {
 
   return (
     <Container className="py-4">
-      <h1 className="h3">Admin Resolve Ticket</h1>
+      <h1 className="precoaching-title">Admin Resolve Ticket</h1>
       <div className="border rounded p-4 my-4">
         {/* Ticket Details */}
         <div className="mb-4">
