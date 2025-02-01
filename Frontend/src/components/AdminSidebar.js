@@ -253,7 +253,7 @@ function Sidebar() {
                         Analytics Dashboard
                       </Link>
                       <Link
-                        to="/admin-view-insights"
+                        to="/insights"
                         className="d-block py-1 text-dark text-decoration-none"
                         style={{ fontSize: "0.95rem" }}
                       >

@@ -107,7 +107,7 @@ function InsightsDashboard() {
 
   return (
     <Container fluid className="p-4">
-      <h2 className="page-title mb-4">Insights Dashboard</h2>
+      <h2 className="precoaching-title">Insights Dashboard</h2>
 
       {/* Program Attendees Table */}
       <div className="card mb-4 p-4 rounded shadow-sm">
