@@ -78,8 +78,7 @@ const AdminViewPayment = () => {
 
   return (
     <Container fluid className="admin-payments-page p-4">
-      <h2 className="admin-payments-title">Incoming Payments</h2>
-      <hr className="admin-payments-divider mb-4" />
+      <h2 className="precoaching-title">Incoming Payments</h2>
 
       {/* Tabs for Pending and Confirmed Payments */}
       <Nav
@@ -98,16 +97,14 @@ const AdminViewPayment = () => {
             eventKey="pending"
             className="admin-bookings-tab"
             style={{
-              color: activeTab === "pending" ? "#f59e0b" : "#6b7280", // Highlight current tab
-              fontWeight: activeTab === "pending" ? "bold" : "normal", // Bold text for active
+              color: activeTab === "pending" ? "#DCAF27" : "#6b7280",
+              fontWeight: activeTab === "pending" ? "bold" : "normal",
               padding: "10px 20px",
               textAlign: "center",
               borderBottom:
                 activeTab === "pending"
-                  ? "2px solid #f59e0b"
-                  : "2px solid transparent", // Underline for active tab
-              cursor: "pointer",
-              transition: "color 0.3s ease, border-bottom-color 0.3s ease", // Smooth transitions
+                  ? "2px solid #DCAF27"
+                  : "2px solid transparent",
               marginLeft: "10px",
             }}
           >
@@ -118,16 +115,14 @@ const AdminViewPayment = () => {
           <Nav.Link
             eventKey="confirmed"
             style={{
-              color: activeTab === "confirmed" ? "#f59e0b" : "#6b7280",
+              color: activeTab === "confirmed" ? "#DCAF27" : "#6b7280",
               fontWeight: activeTab === "confirmed" ? "bold" : "normal",
               padding: "10px 20px",
               textAlign: "center",
               borderBottom:
                 activeTab === "confirmed"
-                  ? "2px solid #f59e0b"
+                  ? "2px solid #DCAF27"
                   : "2px solid transparent",
-              cursor: "pointer",
-              transition: "color 0.3s ease, border-bottom-color 0.3s ease",
             }}
           >
             Confirmed

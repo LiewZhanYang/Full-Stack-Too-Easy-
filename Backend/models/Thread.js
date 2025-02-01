@@ -86,31 +86,43 @@ class Thread {
         });
       }
       
-    static async getCommentByThreadID(id) {
+      static async getCommentByThreadID(threadId) {
         const connection = await mysql.createConnection(dbConfig);
     
         const sqlQuery = `
-            SELECT * 
-            FROM Thread 
-            WHERE ReplyTo = ?;
+            SELECT 
+                Thread.ThreadID,
+                Thread.Body,
+                Thread.CreatedOn,
+                Thread.Likes,
+                Thread.SentimentValue,
+                Thread.PostedBy,
+                Customer.Name AS PostedByName,  -- Fetch user's name from Customer table
+                Thread.Topic,
+                Thread.ReplyTo
+            FROM Thread
+            LEFT JOIN Customer ON Thread.PostedBy = Customer.AccountID  -- Corrected table name
+            WHERE Thread.ReplyTo = ?
+            ORDER BY Thread.CreatedOn ASC;
         `;
-        const [result] = await connection.execute(sqlQuery, [id]);
     
+        const [result] = await connection.execute(sqlQuery, [threadId]);
         connection.end();
-        return result.map((row) => {
-            return new Thread(
-                row.ThreadID,
-                row.Title, 
-                row.Body,
-                row.CreatedOn, 
-                row.Likes,
-                row.SentimentValue,
-                row.Postedby,
-                row.Topic,
-                row.ReplyTo
-            );
-        });
+    
+        return result.map((row) => ({
+            ThreadID: row.ThreadID,
+            Body: row.Body,
+            CreatedOn: row.CreatedOn,
+            Likes: row.Likes,
+            SentimentValue: row.SentimentValue,
+            PostedBy: row.PostedBy,
+            PostedByName: row.PostedByName || "Anonymous", // Ensure a fallback name
+            Topic: row.Topic,
+            ReplyTo: row.ReplyTo
+        }));
     }
+    
+    
 
     static async postThread(threadDetails) {
         const connection = await mysql.createConnection(dbConfig);

@@ -105,7 +105,8 @@ class Webinar {
             INSERT INTO Webinar (WebinarName, WebinarDesc, Link, Date, StartTime, EndTime, Speaker)
             VALUES (?, ?, ?, ?, ?, ?, ?)
         `;
-
+        console.log("Webinar Data being inserted:", webinarDetails);
+        
       const values = [
         webinarDetails.WebinarName,
         webinarDetails.WebinarDesc,

@@ -67,8 +67,7 @@ const AdminCreateWebinar = () => {
 
   return (
     <Container fluid className="admin-create-webinar-page p-4">
-      <h2 className="admin-create-title">Create Webinar</h2>
-      <hr className="admin-create-divider mb-4" />
+      <h2 className="precoaching-title">Create Webinar</h2>
 
       <Form>
         <Form.Group controlId="webinarName" className="mb-3">

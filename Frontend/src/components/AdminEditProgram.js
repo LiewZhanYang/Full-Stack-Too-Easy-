@@ -189,8 +189,7 @@ const AdminEditProgram = () => {
 
   return (
     <Container fluid className="admin-create-program-page p-4">
-      <h2 className="admin-create-title">Edit Program</h2>
-      <hr className="admin-create-divider mb-4" />
+      <h2 className="precoaching-title">Edit Program</h2>
 
       <Form>
         <Form.Group controlId="programName" className="mb-3">

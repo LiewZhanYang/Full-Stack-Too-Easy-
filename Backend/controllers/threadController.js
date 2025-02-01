@@ -24,10 +24,16 @@ const getThreads = async (req, res) => {
 };
 
   
-  const getCommentByThreadID = async (req, res) => {
+const getCommentByThreadID = async (req, res) => {
     const threadId = req.params.id;
     try {
         const comments = await Thread.getCommentByThreadID(threadId);
+
+        // If no comments found, return an empty array
+        if (!comments || comments.length === 0) {
+            return res.status(200).json([]);
+        }
+
         res.status(200).json(comments);
     } catch (error) {
         console.error(`Error fetching comments for thread ID ${threadId}:`, error);

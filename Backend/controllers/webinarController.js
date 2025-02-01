@@ -5,6 +5,8 @@ const postWebinar = async (req, res) => {
   const webinarDetails = req.body;
   console.log(webinarDetails);
   try {
+    console.log("Received webinar details:", req.body);
+
     // Insert webinar data into the database
     const newWebinar = await Webinar.postWebinar(webinarDetails);
 
