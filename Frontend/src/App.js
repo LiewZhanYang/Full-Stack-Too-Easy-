@@ -62,6 +62,7 @@ import AdminViewTicket from "./components/AdminViewTicket.js";
 import AdminResolveTicket from "./components/AdminResolveTicket.js";
 import AnalyticsDashboard from "./components/AnalyticsDashboard.js";
 import InsightsDashboard from "./components/InsightsDashboard.js";
+import ForumDashboard from "./components/ForumDashboard.js";
 import "./StripePayment.css";
 
 // Layout component to handle conditional rendering
@@ -71,7 +72,8 @@ function Layout({ children }) {
   const isAdminPage =
     location.pathname.toLowerCase().startsWith("/admin") ||
     location.pathname.toLowerCase().startsWith("/analytics") ||
-    location.pathname.toLowerCase().startsWith("/insights");
+    location.pathname.toLowerCase().startsWith("/insights") ||
+    location.pathname.toLowerCase().startsWith("/forum-dashboard");
 
   if (isLoginPage) {
     return (
@@ -236,6 +238,7 @@ function App() {
                   />
                   <Route path="/analytics" element={<AnalyticsDashboard />} />
                   <Route path="/insights" element={<InsightsDashboard />} />
+                  <Route path="/forum-dashboard" element={<ForumDashboard />} />
                   {/* Logout route redirects to login */}
                   <Route
                     path="/logout"

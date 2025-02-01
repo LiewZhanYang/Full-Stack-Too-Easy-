@@ -41,8 +41,24 @@ router.get(
 
 router.get("/new-signups", customerInsightsController.getNewSignUpsToday);
 
-router.get("/program-attendees", customerInsightsController.getProgramAttendees);
-router.get("/highest-paying-customers", customerInsightsController.getHighestPayingCustomers);
-router.get("/customer-data-table", customerInsightsController.getCustomerDataTable);
+router.get(
+  "/program-attendees",
+  customerInsightsController.getProgramAttendees
+);
+router.get(
+  "/highest-paying-customers",
+  customerInsightsController.getHighestPayingCustomers
+);
+router.get(
+  "/customer-data-table",
+  customerInsightsController.getCustomerDataTable
+);
 router.get("/total-spent", customerInsightsController.getTotalAmountSpent);
+router.get(
+  "/top-threads/:forumID",
+  customerInsightsController.getTopSentimentThreads
+);
+router.get("/types", customerInsightsController.getForumTypes);
+router.get("/top-engagement", customerInsightsController.getTopForumEngagement);
+router.get("/comments", customerInsightsController.getThreadBodiesBySentiment);
 module.exports = router;

@@ -39,18 +39,43 @@ class Workshop {
     const [result] = await connection.execute(sqlQuery, [id]);
     return result[0] || null; // Return the most popular workshop or null if none found
   }
-
   static async getTotalForumEngagement() {
-    const connection = await mysql.createConnection(dbConfig);
-    const sqlQuery = `
-            SELECT COUNT(*) AS TotalEngagement FROM Thread
-            WHERE CreatedOn = CURDATE();
-        `;
+    let connection;
+    try {
+      connection = await mysql.createConnection(dbConfig);
 
-    const [result] = await connection.execute(sqlQuery);
-    connection.end();
+      const sqlQuery = `
+        SELECT 
+          c.AccountID,
+          c.Name AS CustomerName,
+          COUNT(t.ThreadID) AS TotalThreads,
+          SUM(CASE WHEN t.ReplyTo IS NOT NULL THEN 1 ELSE 0 END) AS TotalReplies,
+          (COUNT(t.ThreadID) + SUM(CASE WHEN t.ReplyTo IS NOT NULL THEN 1 ELSE 0 END)) AS TotalEngagement
+        FROM 
+          Customer c
+        LEFT JOIN 
+          Thread t ON c.AccountID = t.PostedBy
+        GROUP BY 
+          c.AccountID
+        ORDER BY 
+          TotalEngagement DESC
+        LIMIT 5;
+      `;
 
-    return result[0] || { TotalEngagement: 0 };
+      const [result] = await connection.execute(sqlQuery);
+
+      return result; // Return the top forum engagement by customers
+    } catch (error) {
+      console.error(
+        "Error fetching top forum engagement by customers:",
+        error.message
+      );
+      throw error; // Rethrow the error for the caller to handle
+    } finally {
+      if (connection) {
+        await connection.end(); // Ensure the connection is closed
+      }
+    }
   }
 }
 
