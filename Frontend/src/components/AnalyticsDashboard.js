@@ -71,13 +71,24 @@ function AnalyticsDashboard() {
   const fetchForumEngagement = async () => {
     try {
       const response = await axios.get(
-        `http://localhost:8000/engagement/${id}`
+        "http://localhost:8000/insight/engagement"
       );
-      setForumEngagement(response.data.totalEngagement);
+
+      if (response.data && response.data.TotalEngagement !== undefined) {
+        setForumEngagement(response.data.TotalEngagement);
+      } else {
+        console.error("Unexpected forum engagement response:", response.data);
+        setForumEngagement(0);
+      }
     } catch (error) {
       console.error("Error fetching forum engagement data:", error);
+      setForumEngagement(0);
     }
   };
+
+  useEffect(() => {
+    fetchForumEngagement();
+  }, []);
 
   const fetchNewSignUps = async () => {
     try {

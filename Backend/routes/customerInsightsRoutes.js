@@ -9,19 +9,17 @@ router.get(
   "/get-rating/:id",
   customerInsightsController.getAverageRatingByWorkshop
 );
-router.get(
-  "/engagement/:id",
-  customerInsightsController.getTotalForumEngagementToday
-);
+router.get("/engagement", customerInsightsController.getTotalForumEngagement);
+
 router.get("/top-programs", customerInsightsController.getTopPrograms);
 router.get(
   "/top-programs-by-type",
   customerInsightsController.getTopProgramByType
 );
-router.get(
-  "/average-rating/programs",
-  customerInsightsController.getAverageRatingByProgram
-);
+//router.get(
+//"/average-rating/programs",
+//customerInsightsController.getAverageRatingByProgram
+//);
 router.get(
   "/average-rating/program-types",
   customerInsightsController.getAverageRatingByProgramType

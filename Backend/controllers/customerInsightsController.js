@@ -53,14 +53,9 @@ exports.getAverageRatingByWorkshop = async (req, res) => {
   }
 };
 
-exports.getTotalForumEngagementToday = async (req, res) => {
-  const { id } = req.params;
+exports.getTotalForumEngagement = async (req, res) => {
   try {
-    const engagement = await Workshop.getTotalForumEngagementToday(id);
-
-    if (!engagement) {
-      return res.status(404).json({ message: "No engagement" });
-    }
+    const engagement = await Workshop.getTotalForumEngagement();
 
     res.status(200).json(engagement);
   } catch (error) {
