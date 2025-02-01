@@ -65,7 +65,9 @@ import "./StripePayment.css";
 function Layout({ children }) {
   const location = useLocation();
   const isLoginPage = location.pathname.toLowerCase() === "/login";
-  const isAdminPage = location.pathname.toLowerCase().startsWith("/admin");
+  const isAdminPage =
+    location.pathname.toLowerCase().startsWith("/admin") ||
+    location.pathname.toLowerCase().startsWith("/analytics");
 
   if (isLoginPage) {
     return (
@@ -222,7 +224,10 @@ function App() {
                     path="/admin-view-ticket"
                     element={<AdminViewTicket />}
                   />
-                  <Route path="/admin-resolve-ticket/:id" element={<AdminResolveTicket />} />
+                  <Route
+                    path="/admin-resolve-ticket/:id"
+                    element={<AdminResolveTicket />}
+                  />
                   <Route path="/analytics" element={<AnalyticsDashboard />} />
                   {/* Logout route redirects to login */}
                   <Route
