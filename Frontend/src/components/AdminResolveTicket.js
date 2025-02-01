@@ -139,49 +139,56 @@ const AdminResolveTicket = () => {
             <p>No comments yet.</p>
           )}
         </div>
-
-        {/* Add a Comment */}
-        <div className="mt-4">
-          <h6>Add a Comment</h6>
-          <div className="d-flex">
-            <input
-              type="text"
-              className="form-control me-2"
-              placeholder="Add a comment..."
-              value={newComment}
-              onChange={(e) => setNewComment(e.target.value)}
-            />
+        {!ticket || ticket.Status !== "Resolved" ? (
+          <div className="mt-4">
+            <h6>Add a Comment</h6>
+            <div className="d-flex">
+              <input
+                type="text"
+                className="form-control me-2"
+                placeholder="Add a comment..."
+                value={newComment}
+                onChange={(e) => setNewComment(e.target.value)}
+              />
+              <button
+                className="btn btn-warning text-white"
+                onClick={handleAddComment}
+              >
+                Send
+              </button>
+            </div>
+          </div>
+        ) : (
+          <p className="text-muted">
+            This ticket has been resolved. No further comments can be added.
+          </p>
+        )}
+        {!ticket || ticket.Status !== "Resolved" ? (
+          <div className="mt-4 text-end">
             <button
-              className="btn btn-warning text-white"
-              onClick={handleAddComment}
+              className="btn btn-danger"
+              onClick={async () => {
+                try {
+                  await axios.put(
+                    `http://localhost:8000/ticketing/${id}/status`,
+                    {
+                      Status: "Resolved",
+                    }
+                  );
+                  alert("Ticket has been resolved.");
+                  setTicket((prev) => ({ ...prev, Status: "Resolved" }));
+                } catch (error) {
+                  console.error("Error closing ticket:", error);
+                  alert("Failed to close ticket. Please try again.");
+                }
+              }}
             >
-              Send
+              Close Ticket
             </button>
           </div>
-        </div>
-        {/* Close Ticket Button */}
-        <div className="mt-4 text-end">
-          <button
-            className="btn btn-danger"
-            onClick={async () => {
-              try {
-                await axios.put(
-                  `http://localhost:8000/ticketing/${id}/status`,
-                  {
-                    Status: "Resolved",
-                  }
-                );
-                alert("Ticket has been resolved.");
-                setTicket((prev) => ({ ...prev, Status: "Resolved" }));
-              } catch (error) {
-                console.error("Error closing ticket:", error);
-                alert("Failed to close ticket. Please try again.");
-              }
-            }}
-          >
-            Close Ticket
-          </button>
-        </div>
+        ) : (
+          <p className="text-muted text-end"></p>
+        )}
       </div>
     </div>
   );
