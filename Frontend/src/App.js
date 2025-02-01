@@ -53,6 +53,8 @@ import AdminViewSingleAnnouncement from "./components/AdminViewSingleAnnouncemen
 import StripePayment from "./components/StripePayment.js";
 import CompletePage from "./components/CompletePage.js";
 import WorkshopForum from "./components/WorkshopForum.js";
+import CampForum from "./components/CampForum.js";
+import LabsForum from "./components/LabsForum.js";
 import ViewPost from "./components/ViewPost.js";
 import Ticketing from "./components/Ticketing.js";
 import ViewTicket from "./components/ViewTicket.js";
@@ -137,6 +139,8 @@ function App() {
                   <Route path="/stripepayment" element={<StripePayment />} />
                   <Route path="/complete" element={<CompletePage />} />
                   <Route path="/workshopforum" element={<WorkshopForum />} />
+                  <Route path="/campforum" element={<CampForum />} />
+                  <Route path="/labsforum" element={<LabsForum />} />
                   <Route path="/viewpost/:id" element={<ViewPost />} />
                   {/* Admin routes */}
                   <Route path="/adminhome" element={<AdminHome />} />

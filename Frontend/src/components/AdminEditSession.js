@@ -202,7 +202,7 @@ const AdminEditSession = () => {
             className="cancel-session-button ms-2"
             onClick={() => setShowCancelModal(true)}
           >
-            Cancel
+            Cancel Session
           </Button>
         </div>
       </Form>
@@ -216,7 +216,7 @@ const AdminEditSession = () => {
           <Modal.Title>Cancel Session</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          Are you sure you want to stop editing this session? This action cannot
+          Are you sure you want to cancel this session? This action cannot
           be undone.
         </Modal.Body>
         <Modal.Footer>
