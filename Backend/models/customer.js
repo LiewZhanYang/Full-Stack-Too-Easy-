@@ -252,37 +252,73 @@ class Customer {
     return result[0].newSignUps;
   }
 
-  static async getHighestPayingCustomers() {
+  static async getTotalAmountSpent() {
     const connection = await mysql.createConnection(dbConfig);
 
     const sqlQuery = `
       SELECT 
+          c.AccountID,
           c.Name AS CustomerName,
-          SUM(p.Amount) AS TotalSpent,
-          COUNT(DISTINCT pt.ProgramID) AS ProgramsBooked
-      FROM 
-          Payment p
-      JOIN 
-          Session s ON p.SessionID = s.SessionID
-      JOIN 
-          ProgramTier pt ON s.TierID = pt.TierID
-      JOIN 
-          Customer c ON p.PaidBy = c.AccountID
-      WHERE 
-          p.Status = 'Approved'
-      GROUP BY 
-          c.AccountID, c.Name
-      ORDER BY 
-          TotalSpent DESC
-      LIMIT 5;
+          COALESCE(SUM(
+              CASE 
+                  WHEN c.MemberStatus = TRUE THEN t.DiscountedCost
+                  ELSE t.Cost
+              END
+          ), 0) AS TotalSpent
+      FROM Customer c
+      LEFT JOIN SignUp s ON c.AccountID = s.AccountID
+      LEFT JOIN Session se ON s.SessionID = se.SessionID
+      LEFT JOIN Tier t ON se.TierID = t.TierID
+      GROUP BY c.AccountID, c.Name
+      ORDER BY TotalSpent DESC;
     `;
 
-    const [result] = await connection.execute(sqlQuery);
-    connection.end();
-
-    return result;
+    try {
+      const [result] = await connection.execute(sqlQuery);
+      connection.end();
+      return result;
+    } catch (error) {
+      console.error("Error fetching total amount spent:", error);
+      connection.end();
+      throw error;
+    }
   }
 
+  static async getHighestPayingCustomers(limit = 5) {
+    const connection = await mysql.createConnection(dbConfig);
+
+    // Dynamically include the `limit` value in the query string
+    const sqlQuery = `
+        SELECT 
+            c.AccountID,
+            c.Name AS CustomerName,
+            COALESCE(SUM(p.Amount), 0) AS TotalSpent,
+            COUNT(DISTINCT s.SessionID) AS SessionsBooked
+        FROM 
+            Customer c
+        LEFT JOIN 
+            Payment p ON c.AccountID = p.PaidBy AND p.Status = 'Approved'
+        LEFT JOIN 
+            Session s ON p.SessionID = s.SessionID
+        GROUP BY 
+            c.AccountID, c.Name
+        ORDER BY 
+            TotalSpent DESC
+        LIMIT ${mysql.escape(
+          limit
+        )}; -- Use mysql.escape to safely inject the limit value
+    `;
+
+    try {
+      const [result] = await connection.query(sqlQuery); // Use query instead of execute
+      connection.end();
+      return result;
+    } catch (error) {
+      console.error("Error fetching highest paying customers:", error);
+      connection.end();
+      throw error;
+    }
+  }
   static async getCustomerDataTable() {
     const connection = await mysql.createConnection(dbConfig);
 
@@ -290,25 +326,42 @@ class Customer {
       SELECT 
           c.AccountID,
           c.Name AS CustomerName,
-          COALESCE(SUM(p.Amount), 0) AS PurchaseTotal,
+          COALESCE(ts.TotalSpent, 0) AS PurchaseTotal,
           COALESCE((SELECT COUNT(*) FROM Thread t WHERE t.PostedBy = c.AccountID), 0) AS ForumEngagement,
           COALESCE(GROUP_CONCAT(DISTINCT ch.Notes ORDER BY ch.ChildID SEPARATOR ', '), 'No notes') AS Notes
       FROM 
           Customer c
       LEFT JOIN 
-          Payment p ON c.AccountID = p.PaidBy AND p.Status = 'Approved'
+          (SELECT 
+              c.AccountID,
+              SUM(
+                  CASE 
+                      WHEN c.MemberStatus = TRUE THEN t.DiscountedCost
+                      ELSE t.Cost
+                  END
+              ) AS TotalSpent
+          FROM Customer c
+          LEFT JOIN SignUp s ON c.AccountID = s.AccountID
+          LEFT JOIN Session se ON s.SessionID = se.SessionID
+          LEFT JOIN Tier t ON se.TierID = t.TierID
+          GROUP BY c.AccountID) ts ON c.AccountID = ts.AccountID
       LEFT JOIN 
           Child ch ON c.AccountID = ch.AccountID
       GROUP BY 
-          c.AccountID, c.Name
+          c.AccountID, c.Name, ts.TotalSpent
       ORDER BY 
           PurchaseTotal DESC;
     `;
 
-    const [result] = await connection.execute(sqlQuery);
-    connection.end();
-
-    return result;
+    try {
+      const [result] = await connection.execute(sqlQuery);
+      connection.end();
+      return result;
+    } catch (error) {
+      console.error("Error fetching customer data table:", error);
+      connection.end();
+      throw error;
+    }
   }
 }
 

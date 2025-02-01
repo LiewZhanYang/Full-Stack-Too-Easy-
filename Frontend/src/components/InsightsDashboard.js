@@ -11,11 +11,13 @@ function InsightsDashboard() {
   const [editingNotes, setEditingNotes] = useState({});
   const [expandedRows, setExpandedRows] = useState({});
   const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [totalSpent, setTotalSpent] = useState([]);
 
   useEffect(() => {
     fetchProgramAttendees();
     fetchHighestPayingCustomers();
     fetchCustomerDataTable();
+    fetchTotalSpent();
   }, []);
 
   const fetchProgramAttendees = async () => {
@@ -32,9 +34,9 @@ function InsightsDashboard() {
   const fetchHighestPayingCustomers = async () => {
     try {
       const response = await axios.get(
-        "http://localhost:8000/insight/highest-paying-customers"
+        "http://localhost:8000/insight/total-spent"
       );
-      setHighestPayingCustomers(response.data);
+      setHighestPayingCustomers(response.data.slice(0, 5));
     } catch (error) {
       console.error("Error fetching highest paying customers:", error);
     }
@@ -68,6 +70,17 @@ function InsightsDashboard() {
     }
   };
 
+  const fetchTotalSpent = async () => {
+    try {
+      const response = await axios.get(
+        "http://localhost:8000/insight/total-spent"
+      );
+      setTotalSpent(response.data);
+    } catch (error) {
+      console.error("Error fetching total amount spent:", error);
+    }
+  };
+
   const handleInputChange = (childID, newNotes) => {
     setEditingNotes((prev) => ({ ...prev, [childID]: newNotes }));
   };
@@ -96,14 +109,14 @@ function InsightsDashboard() {
     <Container fluid className="p-4">
       <h2 className="page-title mb-4">Insights Dashboard</h2>
 
-      {/* 📋 Program Attendees Table */}
+      {/* Program Attendees Table */}
       <div className="card mb-4 p-4 rounded shadow-sm">
         <h5 className="mb-3">All Programs</h5>
         <Table bordered hover responsive>
           <thead>
             <tr>
               <th>No.</th>
-              <th>Program Name</th>
+              <th>Program Name and Tier</th>
               <th>Program Type</th>
               <th>Attendees</th>
             </tr>
@@ -112,7 +125,7 @@ function InsightsDashboard() {
             {programAttendees.map((program, index) => (
               <tr key={index}>
                 <td>{index + 1}</td>
-                <td>{program.ProgramName}</td>
+                <td>{program.ProgramName} - {program.TierName}</td>
                 <td>{program.ProgramType}</td>
                 <td>{program.TotalAttendees}</td>
               </tr>
@@ -123,14 +136,13 @@ function InsightsDashboard() {
 
       {/* Highest Paying Customers Table */}
       <div className="card mb-4 p-4 rounded shadow-sm">
-        <h5 className="mb-3">Highest Paying Customers</h5>
+        <h5 className="mb-3">Top 5 Highest Paying Customers</h5>
         <Table bordered hover responsive>
           <thead>
             <tr>
               <th>No.</th>
               <th>Customer Name</th>
               <th>Total Spent</th>
-              <th>Programs Booked</th>
             </tr>
           </thead>
           <tbody>
@@ -138,8 +150,7 @@ function InsightsDashboard() {
               <tr key={index}>
                 <td>{index + 1}</td>
                 <td>{customer.CustomerName || "Unknown"}</td>
-                <td>${Number(customer.TotalSpending || 0).toFixed(2)}</td>
-                <td>{customer.ProgramsBooked || 0}</td>
+                <td>${Number(customer.TotalSpent || 0).toFixed(2)}</td>
               </tr>
             ))}
           </tbody>
@@ -154,7 +165,7 @@ function InsightsDashboard() {
             <tr>
               <th>No.</th>
               <th>Customer Name</th>
-              <th>Purchase Total</th>
+              <th>Total Spent</th>
               <th>Forum Engagement</th>
               <th className="text-end">Actions</th>
             </tr>
@@ -189,6 +200,7 @@ function InsightsDashboard() {
                             <th>Age</th>
                             <th>Strength</th>
                             <th>Special Needs</th>
+                            <th>Dietary Restrictions</th>
                             <th>Notes</th>
                             <th className="text-end">Actions</th>
                           </tr>
@@ -202,6 +214,7 @@ function InsightsDashboard() {
                                 <td>{child.Age}</td>
                                 <td>{child.Strength || "None"}</td>
                                 <td>{child.SpecialLearningNeeds || "None"}</td>
+                                <td>{child.DietaryRestrictions || "None"}</td>
                                 <td>
                                   {editingNotes[child.ChildID] !== undefined ? (
                                     <FormControl

@@ -196,10 +196,16 @@ exports.getNewSignUpsToday = async (req, res) => {
 exports.getProgramAttendees = async (req, res) => {
   try {
     const { programName, programType, programTier } = req.query;
-    const attendees = await Program.getProgramAttendees(programName, programType, programTier);
-    
+    const attendees = await Program.getProgramAttendees(
+      programName,
+      programType,
+      programTier
+    );
+
     if (!attendees.length) {
-      return res.status(404).json({ message: "No attendees found for the specified filters." });
+      return res
+        .status(404)
+        .json({ message: "No attendees found for the specified filters." });
     }
 
     res.status(200).json(attendees);
@@ -235,6 +241,21 @@ exports.getCustomerDataTable = async (req, res) => {
     res.status(200).json(customers);
   } catch (error) {
     console.error("Error fetching customer data table:", error);
+    res.status(500).json({ error: "Internal server error." });
+  }
+};
+
+exports.getTotalAmountSpent = async (req, res) => {
+  try {
+    const totalSpentData = await Customer.getTotalAmountSpent();
+
+    if (!totalSpentData.length) {
+      return res.status(404).json({ message: "No spending data found." });
+    }
+
+    res.status(200).json(totalSpentData);
+  } catch (error) {
+    console.error("Error fetching total amount spent:", error);
     res.status(500).json({ error: "Internal server error." });
   }
 };

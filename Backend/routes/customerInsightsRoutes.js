@@ -44,5 +44,5 @@ router.get("/new-signups", customerInsightsController.getNewSignUpsToday);
 router.get("/program-attendees", customerInsightsController.getProgramAttendees);
 router.get("/highest-paying-customers", customerInsightsController.getHighestPayingCustomers);
 router.get("/customer-data-table", customerInsightsController.getCustomerDataTable);
-
+router.get("/total-spent", customerInsightsController.getTotalAmountSpent);
 module.exports = router;

@@ -32,7 +32,7 @@ class Program {
 
   static async getProgramByTier(tierID) {
     const connection = await mysql.createConnection(dbConfig);
-    
+
     const sqlQuery = `
         SELECT ProgramID FROM ProgramTier 
         WHERE TierID = ?;
@@ -351,24 +351,24 @@ class Program {
     const connection = await mysql.createConnection(dbConfig);
 
     let sqlQuery = `
-      SELECT 
-          p.ProgramName,
-          pt.TypeDesc AS ProgramType,
-          t.Name AS ProgramTier,
-          COUNT(su.SignUpID) AS TotalAttendees
-      FROM 
-          SignUp su
-      JOIN 
-          Session s ON su.SessionID = s.SessionID
-      JOIN 
-          ProgramTier ptier ON s.TierID = ptier.TierID
-      JOIN 
-          Program p ON ptier.ProgramID = p.ProgramID
-      JOIN 
-          ProgramType pt ON p.TypeID = pt.TypeID
-      JOIN 
-          Tier t ON ptier.TierID = t.TierID
-      WHERE 1=1
+        SELECT 
+            p.ProgramName,
+            pt.TypeDesc AS ProgramType,
+            t.Name AS TierName,
+            COUNT(su.SignUpID) AS TotalAttendees
+        FROM 
+            SignUp su
+        JOIN 
+            Session s ON su.SessionID = s.SessionID
+        JOIN 
+            ProgramTier ptier ON s.TierID = ptier.TierID
+        JOIN 
+            Program p ON ptier.ProgramID = p.ProgramID
+        JOIN 
+            ProgramType pt ON p.TypeID = pt.TypeID
+        JOIN 
+            Tier t ON ptier.TierID = t.TierID
+        WHERE 1=1
     `;
 
     const queryParams = [];
@@ -386,16 +386,18 @@ class Program {
       queryParams.push(programTier);
     }
 
-    sqlQuery += ` GROUP BY p.ProgramID, p.ProgramName, pt.TypeDesc, t.Name ORDER BY TotalAttendees DESC;`;
+    sqlQuery += `
+        GROUP BY 
+            p.ProgramID, p.ProgramName, pt.TypeDesc, t.Name
+        ORDER BY 
+            TotalAttendees DESC;
+    `;
 
     const [result] = await connection.execute(sqlQuery, queryParams);
     connection.end();
 
     return result;
   }
-
-
-  
 }
 
 module.exports = Program;
