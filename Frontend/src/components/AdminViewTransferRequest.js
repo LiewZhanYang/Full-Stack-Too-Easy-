@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Container, Row, Col, Nav, Card } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 
@@ -6,23 +6,39 @@ const AdminViewTransferRequest = () => {
   const [activeTab, setActiveTab] = useState("pending");
   const navigate = useNavigate();
 
-  const pendingTransfers = [
-    { TransferID: 1, AccountID: "A123", ProgramName: "Coding Bootcamp" },
-    { TransferID: 2, AccountID: "B456", ProgramName: "Data Science 101" },
-  ];
+  // State to store pending and confirmed transfer requests
+  const [pendingTransfers, setPendingTransfers] = useState([]);
+  const [confirmedTransfers, setConfirmedTransfers] = useState([]);
 
-  const confirmedTransfers = [
-    { TransferID: 3, AccountID: "C789", ProgramName: "AI Fundamentals" },
-  ];
+  // Fetch transfer requests from backend when the component loads
+  useEffect(() => {
+    const fetchTransfers = async () => {
+      try {
+        const response = await fetch("http://localhost:8000/transfer-requests"); // Replace with your actual backend URL
+        const data = await response.json();
 
+        // Filter the requests based on their status
+        setPendingTransfers(data.filter((req) => req.Status === "Pending"));
+        setConfirmedTransfers(data.filter((req) => req.Status === "Confirmed"));
+      } catch (error) {
+        console.error("Error fetching transfer requests:", error);
+      }
+    };
+
+    fetchTransfers();
+  }, []);
+
+  // Handle tab selection (Pending or Confirmed)
   const handleSelect = (selectedTab) => {
     setActiveTab(selectedTab);
   };
 
+  // Navigate to the confirm transfer request page when a card is clicked
   const handleCardClick = (transferID) => {
     navigate(`/admin-confirm-transfer/${transferID}`);
   };
 
+  // Render transfer requests dynamically
   const renderTransfers = (transfers) => {
     return transfers.map((transfer) => (
       <Card
@@ -68,7 +84,10 @@ const AdminViewTransferRequest = () => {
               fontWeight: activeTab === "pending" ? "bold" : "normal",
               padding: "10px 20px",
               textAlign: "center",
-              borderBottom: activeTab === "pending" ? "2px solid #f59e0b" : "2px solid transparent",
+              borderBottom:
+                activeTab === "pending"
+                  ? "2px solid #f59e0b"
+                  : "2px solid transparent",
               cursor: "pointer",
               transition: "color 0.3s ease, border-bottom-color 0.3s ease",
               marginLeft: "10px",
@@ -85,7 +104,10 @@ const AdminViewTransferRequest = () => {
               fontWeight: activeTab === "confirmed" ? "bold" : "normal",
               padding: "10px 20px",
               textAlign: "center",
-              borderBottom: activeTab === "confirmed" ? "2px solid #f59e0b" : "2px solid transparent",
+              borderBottom:
+                activeTab === "confirmed"
+                  ? "2px solid #f59e0b"
+                  : "2px solid transparent",
               cursor: "pointer",
               transition: "color 0.3s ease, border-bottom-color 0.3s ease",
             }}
@@ -97,7 +119,9 @@ const AdminViewTransferRequest = () => {
 
       <Row>
         <Col>
-          {activeTab === "pending" ? renderTransfers(pendingTransfers) : renderTransfers(confirmedTransfers)}
+          {activeTab === "pending"
+            ? renderTransfers(pendingTransfers)
+            : renderTransfers(confirmedTransfers)}
         </Col>
       </Row>
     </Container>

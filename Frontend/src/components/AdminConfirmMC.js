@@ -1,39 +1,70 @@
-import React, { useState } from "react";
-import { Container, Row, Col, Card, Button } from "react-bootstrap";
-import { useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { Container, Row, Col, Button } from "react-bootstrap";
+import { useNavigate, useParams } from "react-router-dom";
 
 const AdminConfirmTransfer = () => {
   const navigate = useNavigate();
-  const transferDetails = {
-    TransferID: 1,
-    AccountID: "A123",
-    ProgramName: "Coding Bootcamp",
-    CurrentSession: {
-      Date: "1/4/2025",
-      Time: "10:00:00",
-      Location: "Auditorium A",
-    },
-    NewSession: {
-      Date: "31/3/2025",
-      Time: "10:00:00",
-      Location: "Auditorium A",
-    },
-    Reason: "Fever",
-  };
+  const { transferID } = useParams(); // Get the TransferID from the URL
+  const [transferDetails, setTransferDetails] = useState(null);
+
+  // Fetch transfer details on component load
+  useEffect(() => {
+    const fetchTransferDetails = async () => {
+      try {
+        const response = await fetch(
+          `http://localhost:8000/transfer-requests/${transferID}`
+        );
+        const data = await response.json();
+        setTransferDetails(data);
+      } catch (error) {
+        console.error("Error fetching transfer details:", error);
+      }
+    };
+
+    fetchTransferDetails();
+  }, [transferID]);
 
   const handleBackClick = () => {
-    navigate(-1);
+    navigate(-1); // Navigate back to the previous page
   };
 
-  const handleConfirmClick = () => {
-    alert("Transfer Approved");
-    navigate(-1);
+  const handleConfirmClick = async () => {
+    try {
+      await fetch(`http://localhost:8000/transfer-requests/${transferID}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ Status: "Confirmed" }),
+      });
+      alert("Transfer Approved");
+      navigate(-1); // Navigate back to the first page
+    } catch (error) {
+      console.error("Error approving transfer request:", error);
+      alert("Failed to approve the transfer request.");
+    }
   };
 
-  const handleRejectClick = () => {
-    alert("Transfer Rejected");
-    navigate(-1);
+  const handleRejectClick = async () => {
+    try {
+      await fetch(`http://localhost:8000/transfer-requests/${transferID}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ Status: "Rejected" }),
+      });
+      alert("Transfer Rejected");
+      navigate(-1); // Navigate back to the first page
+    } catch (error) {
+      console.error("Error rejecting transfer request:", error);
+      alert("Failed to reject the transfer request.");
+    }
   };
+
+  if (!transferDetails) {
+    return (
+      <Container className="p-4">
+        <h2>Loading transfer details...</h2>
+      </Container>
+    );
+  }
 
   return (
     <Container fluid className="admin-confirm-payment-page p-4">
@@ -92,9 +123,19 @@ const AdminConfirmTransfer = () => {
             <p>
               <strong>Medical Certificate:</strong>
             </p>
-            <div className="admin-confirm-screenshot-placeholder">
-              <p>No document available</p>
-            </div>
+            {transferDetails.MCPath ? (
+              <a
+                href={transferDetails.MCPath}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                View Document
+              </a>
+            ) : (
+              <div className="admin-confirm-screenshot-placeholder">
+                <p>No document available</p>
+              </div>
+            )}
           </div>
         </Col>
       </Row>
