@@ -5,46 +5,68 @@ import axios from "axios";
 import "../App.css";
 
 function AnalyticsDashboard() {
-  const [programData, setProgramData] = useState([]);
-  const [signupData, setSignupData] = useState([]);
   const [topPrograms, setTopPrograms] = useState([]);
+  const [programsByIncome, setProgramsByIncome] = useState([]);
+  const [topProgramsByType, setTopProgramsByType] = useState([]);
+  const [selectedRatingType, setSelectedRatingType] = useState("programs");
+  const [ratingData, setRatingData] = useState([]);
 
   useEffect(() => {
     fetchTopPrograms();
-  }, []);
+    fetchProgramsByIncome();
+    fetchTopProgramsByType();
+    fetchRatingData(selectedRatingType);
+  }, [selectedRatingType]);
 
   const fetchTopPrograms = async () => {
     try {
       const response = await axios.get(
         "http://localhost:8000/insight/top-programs"
       );
-      setTopPrograms(Array.isArray(response.data) ? response.data : []);
+      setTopPrograms(response.data);
     } catch (error) {
       console.error("Error fetching top programs:", error);
-      setTopPrograms([]);
     }
   };
 
-  const programChartData = {
-    labels: topPrograms.map((p) => p.ProgramName),
-    datasets: [
-      {
-        label: "Program Sign-ups",
-        data: topPrograms.map((p) => p.TotalSignups || 0),
-        backgroundColor: "rgba(54, 162, 235, 0.5)",
-      },
-    ],
+  const fetchProgramsByIncome = async () => {
+    try {
+      const response = await axios.get(
+        "http://localhost:8000/insight/programs-by-income"
+      );
+      setProgramsByIncome(response.data);
+    } catch (error) {
+      console.error("Error fetching programs ranked by income:", error);
+    }
   };
 
-  const donutChartData = {
-    labels: topPrograms.map((p) => p.ProgramName),
-    datasets: [
-      {
-        label: "Program Sign-ups",
-        data: topPrograms.map((p) => p.TotalSignups || 0),
-        backgroundColor: ["#FF6384", "#36A2EB", "#FFCE56"],
-      },
-    ],
+  const fetchTopProgramsByType = async () => {
+    try {
+      const response = await axios.get(
+        "http://localhost:8000/insight/top-programs-by-type"
+      );
+      setTopProgramsByType(response.data);
+    } catch (error) {
+      console.error("Error fetching top programs by type:", error);
+    }
+  };
+
+  const fetchRatingData = async (type) => {
+    let url = "";
+    if (type === "programs")
+      url = "http://localhost:8000/insight/average-rating/programs";
+    else if (type === "program-types")
+      url = "http://localhost:8000/insight/average-rating/program-types";
+    else if (type === "each-program")
+      url = "http://localhost:8000/insight/average-rating/all-programs";
+
+    try {
+      const response = await axios.get(url);
+      setRatingData(response.data);
+    } catch (error) {
+      console.error("Error fetching ratings:", error);
+      setRatingData([]);
+    }
   };
 
   return (
@@ -53,30 +75,63 @@ function AnalyticsDashboard() {
       <div className="row g-4">
         <div className="col-md-6">
           <div className="card p-3 shadow-sm">
-            <h5>Top 3 Programs by Sign-ups</h5>
-            <Bar data={programChartData} />
+            <h5>Top Programs by Type</h5>
+            <Bar
+              data={{
+                labels: topProgramsByType.map((p) => p.ProgramType),
+                datasets: [
+                  {
+                    label: "Top Programs",
+                    data: topProgramsByType.map((p) => p.TotalSignups),
+                  },
+                ],
+              }}
+            />
           </div>
         </div>
         <div className="col-md-6">
           <div className="card p-3 shadow-sm">
-            <h5>Program Sign-ups Distribution</h5>
-            <Doughnut data={donutChartData} />
+            <h5>Average Ratings</h5>
+            <select
+              className="form-select mb-3"
+              value={selectedRatingType}
+              onChange={(e) => setSelectedRatingType(e.target.value)}
+            >
+              <option value="programs">By Program</option>
+              <option value="program-types">By Program Type</option>
+              <option value="each-program">Each Program</option>
+            </select>
+            <Doughnut
+              data={{
+                labels: ratingData.map((p) => p.ProgramName || p.ProgramType),
+                datasets: [
+                  {
+                    label: "Average Rating",
+                    data: ratingData.map((p) => p.AverageRating),
+                  },
+                ],
+              }}
+            />
           </div>
         </div>
       </div>
-      <div className="mt-4">
-        <h4>Top 3 Most Popular Programs</h4>
-        {topPrograms.length > 0 ? (
-          <ul className="list-group">
-            {topPrograms.map((program, index) => (
-              <li key={index} className="list-group-item">
-                {program.ProgramName} - {program.TotalSignups} Sign-ups
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <p>No popular programs found.</p>
-        )}
+      <div className="row g-4 mt-4">
+        <div className="col-md-6">
+          <div className="card p-3 shadow-sm">
+            <h5>Programs Ranked by Income</h5>
+            <Bar
+              data={{
+                labels: programsByIncome.map((p) => p.ProgramName),
+                datasets: [
+                  {
+                    label: "Total Income Earned",
+                    data: programsByIncome.map((p) => p.TotalIncome),
+                  },
+                ],
+              }}
+            />
+          </div>
+        </div>
       </div>
     </div>
   );

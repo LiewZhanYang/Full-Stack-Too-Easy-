@@ -83,3 +83,102 @@ exports.getTopPrograms = async (req, res) => {
     res.status(500).json({ error: "Internal server error." });
   }
 };
+
+exports.getTopProgramByType = async (req, res) => {
+  try {
+    const topProgramsByType = await Program.getTopProgramByType();
+
+    if (!topProgramsByType.length) {
+      return res
+        .status(404)
+        .json({ message: "No data found for program types." });
+    }
+
+    res.status(200).json(topProgramsByType);
+  } catch (error) {
+    console.error("Error fetching top programs by type:", error);
+    res.status(500).json({ error: "Internal server error." });
+  }
+};
+
+exports.getAverageRatingByProgram = async (req, res) => {
+  try {
+    const ratings = await Program.getAverageRatingByProgram();
+
+    if (!ratings.length) {
+      return res
+        .status(404)
+        .json({ message: "No ratings found for programs." });
+    }
+
+    res.status(200).json(ratings);
+  } catch (error) {
+    console.error("Error fetching average ratings by program:", error);
+    res.status(500).json({ error: "Internal server error." });
+  }
+};
+
+exports.getAverageRatingByProgramType = async (req, res) => {
+  try {
+    const ratings = await Program.getAverageRatingByProgramType();
+
+    if (!ratings.length) {
+      return res
+        .status(404)
+        .json({ message: "No ratings found for program types." });
+    }
+
+    res.status(200).json(ratings);
+  } catch (error) {
+    console.error("Error fetching average ratings by program type:", error);
+    res.status(500).json({ error: "Internal server error." });
+  }
+};
+
+exports.getAverageRatingForEachProgram = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const rating = await Program.getAverageRatingForEachProgram(id);
+
+    if (!rating) {
+      return res
+        .status(404)
+        .json({ message: "No rating found for this program." });
+    }
+
+    res.status(200).json(rating);
+  } catch (error) {
+    console.error("Error fetching rating for program:", error);
+    res.status(500).json({ error: "Internal server error." });
+  }
+};
+
+exports.getProgramsByIncome = async (req, res) => {
+  try {
+    const programs = await Program.getProgramsByIncome();
+
+    if (!programs.length) {
+      return res.status(404).json({ message: "No income data available." });
+    }
+
+    res.status(200).json(programs);
+  } catch (error) {
+    console.error("Error fetching programs ranked by income:", error);
+    res.status(500).json({ error: "Internal server error." });
+  }
+};
+
+exports.getAverageRatingForAllPrograms = async (req, res) => {
+  try {
+    const programs = await Program.getAverageRatingForAllPrograms();
+
+    if (!programs.length) {
+      return res.status(404).json({ message: "No rating data available." });
+    }
+
+    res.status(200).json(programs);
+  } catch (error) {
+    console.error("Error fetching average ratings for all programs:", error);
+    res.status(500).json({ error: "Internal server error." });
+  }
+};

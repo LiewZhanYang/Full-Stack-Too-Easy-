@@ -200,6 +200,139 @@ class Program {
     const [result] = await connection.execute(sqlQuery);
     return result; // Returns the top 3 programs
   }
+
+  static async getTopProgramByType() {
+    const connection = await mysql.createConnection(dbConfig);
+    const sqlQuery = `
+        SELECT 
+            pt.TypeDesc AS ProgramType,
+            p.ProgramName,
+            COUNT(su.SignUpID) AS TotalSignups
+        FROM 
+            SignUp su
+        JOIN 
+            Session s ON su.SessionID = s.SessionID
+        JOIN 
+            ProgramTier ptier ON s.TierID = ptier.TierID
+        JOIN 
+            Program p ON ptier.ProgramID = p.ProgramID
+        JOIN 
+            ProgramType pt ON p.TypeID = pt.TypeID
+        GROUP BY 
+            pt.TypeID, pt.TypeDesc, p.ProgramName
+        ORDER BY 
+            pt.TypeID, TotalSignups DESC;
+    `;
+
+    const [result] = await connection.execute(sqlQuery);
+    return result;
+  }
+
+  static async getAverageRatingByProgram() {
+    const connection = await mysql.createConnection(dbConfig);
+    const sqlQuery = `
+        SELECT 
+            p.ProgramName,
+            ROUND(AVG(r.Star), 1) AS AverageRating
+        FROM 
+            Review r
+        JOIN 
+            Program p ON r.ProgramID = p.ProgramID
+        GROUP BY 
+            p.ProgramID, p.ProgramName;
+    `;
+
+    const [result] = await connection.execute(sqlQuery);
+    return result;
+  }
+
+  static async getAverageRatingByProgramType() {
+    const connection = await mysql.createConnection(dbConfig);
+    const sqlQuery = `
+        SELECT 
+            pt.TypeDesc AS ProgramType,
+            ROUND(AVG(r.Star), 1) AS AverageRating
+        FROM 
+            Review r
+        JOIN 
+            Program p ON r.ProgramID = p.ProgramID
+        JOIN 
+            ProgramType pt ON p.TypeID = pt.TypeID
+        GROUP BY 
+            pt.TypeID, pt.TypeDesc;
+    `;
+
+    const [result] = await connection.execute(sqlQuery);
+    return result;
+  }
+
+  static async getAverageRatingForEachProgram(programID) {
+    const connection = await mysql.createConnection(dbConfig);
+    const sqlQuery = `
+        SELECT 
+            ROUND(AVG(Star), 1) AS AverageRating
+        FROM 
+            Review
+        WHERE 
+            ProgramID = ?;
+    `;
+
+    const [result] = await connection.execute(sqlQuery, [programID]);
+    return result[0] || null;
+  }
+
+  static async getProgramsByIncome() {
+    const connection = await mysql.createConnection(dbConfig);
+    const sqlQuery = `
+        SELECT 
+            p.ProgramName,
+            SUM(
+                CASE 
+                    WHEN c.MemberStatus = TRUE THEN t.DiscountedCost
+                    ELSE t.Cost
+                END
+            ) AS TotalIncome
+        FROM 
+            SignUp su
+        JOIN 
+            Session s ON su.SessionID = s.SessionID
+        JOIN 
+            ProgramTier pt ON s.TierID = pt.TierID
+        JOIN 
+            Program p ON pt.ProgramID = p.ProgramID
+        JOIN 
+            Tier t ON pt.TierID = t.TierID
+        JOIN 
+            Customer c ON su.AccountID = c.AccountID
+        GROUP BY 
+            p.ProgramID, p.ProgramName
+        ORDER BY 
+            TotalIncome DESC;
+    `;
+
+    const [result] = await connection.execute(sqlQuery);
+    return result;
+  }
+
+  static async getAverageRatingForAllPrograms() {
+    const connection = await mysql.createConnection(dbConfig);
+    const sqlQuery = `
+        SELECT 
+            p.ProgramName,
+            ROUND(AVG(r.Star), 1) AS AverageRating
+        FROM 
+            Review r
+        JOIN 
+            Program p ON r.ProgramID = p.ProgramID
+        GROUP BY 
+            p.ProgramID, p.ProgramName
+        ORDER BY 
+            AverageRating DESC;
+    `;
+
+    const [result] = await connection.execute(sqlQuery);
+    return result;
+  }
 }
 
 module.exports = Program;
