@@ -131,7 +131,7 @@ function Profile() {
   const handleAddChild = () => {
     setChildren([
       ...children,
-      { id: null, fullName: "", dateOfBirth: "", strengths: "" },
+      { id: null, fullName: "", dateOfBirth: "", strengths: "", specialLearningNeeds: "", dietaryRestrictions: "" },
     ]);
   };
 
