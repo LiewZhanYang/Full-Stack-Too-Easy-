@@ -16,10 +16,16 @@ const AdminViewTransferRequest = () => {
       try {
         const response = await fetch("http://localhost:8000/transfer-requests"); // Replace with your actual backend URL
         const data = await response.json();
+        console.log("API Response:", data); // Check the raw data from the API
 
-        // Filter the requests based on their status
-        setPendingTransfers(data.filter((req) => req.Status === "Pending"));
-        setConfirmedTransfers(data.filter((req) => req.Status === "Confirmed"));
+        const pending = data.filter((req) => req.Status === "Pending");
+        const confirmed = data.filter((req) => req.Status === "Confirmed");
+
+        console.log("Pending Transfers:", pending); // Debugging log
+        console.log("Confirmed Transfers:", confirmed); // Debugging log
+
+        setPendingTransfers(data); // Display all transfers in the "Pending" tab
+        setConfirmedTransfers([]); // Keep the "Confirmed" tab empty for now
       } catch (error) {
         console.error("Error fetching transfer requests:", error);
       }
