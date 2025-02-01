@@ -67,8 +67,16 @@ const SubmitMc = () => {
   };
 
   const handleSubmit = async () => {
-    if (!file || !selectedSession || !reason) {
-      alert("Please provide a reason, upload a file, and select a session.");
+    if (!selectedSession) {
+      alert("Please select a session.");
+      return;
+    }
+    if (!reason) {
+      alert("Please provide a reason.");
+      return;
+    }
+    if (!file) {
+      alert("Please upload a file.");
       return;
     }
 
@@ -80,7 +88,7 @@ const SubmitMc = () => {
       formData.append("file", file);
 
       const response = await axios.post(
-        "http://localhost:8000/submit-mc-transfer",
+        "http://localhost:8000/transfer-requests/",
         formData,
         {
           headers: {
@@ -89,12 +97,8 @@ const SubmitMc = () => {
         }
       );
 
-      if (response.data.success) {
-        alert("Medical certificate submitted. Transfer request sent.");
-        navigate(-1);
-      } else {
-        alert("Failed to submit medical certificate.");
-      }
+      alert("Medical certificate submitted. Transfer request sent.");
+      navigate(-1);
     } catch (error) {
       console.error("Error submitting medical certificate:", error);
       alert("An error occurred while submitting the medical certificate.");
