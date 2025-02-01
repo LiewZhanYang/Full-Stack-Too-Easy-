@@ -192,3 +192,49 @@ exports.getNewSignUpsToday = async (req, res) => {
     res.status(500).json({ error: "Internal server error." });
   }
 };
+
+exports.getProgramAttendees = async (req, res) => {
+  try {
+    const { programName, programType, programTier } = req.query;
+    const attendees = await Program.getProgramAttendees(programName, programType, programTier);
+    
+    if (!attendees.length) {
+      return res.status(404).json({ message: "No attendees found for the specified filters." });
+    }
+
+    res.status(200).json(attendees);
+  } catch (error) {
+    console.error("Error fetching program attendees:", error);
+    res.status(500).json({ error: "Internal server error." });
+  }
+};
+
+exports.getHighestPayingCustomers = async (req, res) => {
+  try {
+    const customers = await Customer.getHighestPayingCustomers();
+
+    if (!customers.length) {
+      return res.status(404).json({ message: "No customer data found." });
+    }
+
+    res.status(200).json(customers);
+  } catch (error) {
+    console.error("Error fetching highest paying customers:", error);
+    res.status(500).json({ error: "Internal server error." });
+  }
+};
+
+exports.getCustomerDataTable = async (req, res) => {
+  try {
+    const customers = await Customer.getCustomerDataTable();
+
+    if (!customers.length) {
+      return res.status(404).json({ message: "No customer data found." });
+    }
+
+    res.status(200).json(customers);
+  } catch (error) {
+    console.error("Error fetching customer data table:", error);
+    res.status(500).json({ error: "Internal server error." });
+  }
+};

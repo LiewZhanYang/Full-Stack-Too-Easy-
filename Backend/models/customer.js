@@ -249,7 +249,65 @@ class Customer {
     `;
     const [result] = await connection.execute(sqlQuery);
     connection.end();
-    return result[0].newSignUps; 
+    return result[0].newSignUps;
+  }
+
+  static async getHighestPayingCustomers() {
+    const connection = await mysql.createConnection(dbConfig);
+
+    const sqlQuery = `
+      SELECT 
+          c.Name AS CustomerName,
+          SUM(p.Amount) AS TotalSpent,
+          COUNT(DISTINCT pt.ProgramID) AS ProgramsBooked
+      FROM 
+          Payment p
+      JOIN 
+          Session s ON p.SessionID = s.SessionID
+      JOIN 
+          ProgramTier pt ON s.TierID = pt.TierID
+      JOIN 
+          Customer c ON p.PaidBy = c.AccountID
+      WHERE 
+          p.Status = 'Approved'
+      GROUP BY 
+          c.AccountID, c.Name
+      ORDER BY 
+          TotalSpent DESC
+      LIMIT 5;
+    `;
+
+    const [result] = await connection.execute(sqlQuery);
+    connection.end();
+
+    return result;
+  }
+
+  static async getCustomerDataTable() {
+    const connection = await mysql.createConnection(dbConfig);
+
+    const sqlQuery = `
+      SELECT 
+          c.Name AS CustomerName,
+          COALESCE(SUM(p.Amount), 0) AS PurchaseTotal,
+          COALESCE((SELECT COUNT(*) FROM Thread t WHERE t.PostedBy = c.AccountID), 0) AS ForumEngagement,
+          COALESCE(GROUP_CONCAT(DISTINCT ch.Notes ORDER BY ch.ChildID SEPARATOR ', '), 'No notes') AS Notes
+      FROM 
+          Customer c
+      LEFT JOIN 
+          Payment p ON c.AccountID = p.PaidBy AND p.Status = 'Approved'
+      LEFT JOIN 
+          Child ch ON c.AccountID = ch.AccountID
+      GROUP BY 
+          c.AccountID, c.Name
+      ORDER BY 
+          PurchaseTotal DESC;
+    `;
+
+    const [result] = await connection.execute(sqlQuery);
+    connection.end();
+
+    return result;
   }
 }
 

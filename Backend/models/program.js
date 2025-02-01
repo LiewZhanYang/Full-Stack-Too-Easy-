@@ -328,6 +328,53 @@ class Program {
     const [result] = await connection.execute(sqlQuery);
     return result;
   }
+
+  static async getProgramAttendees(programName, programType, programTier) {
+    const connection = await mysql.createConnection(dbConfig);
+
+    let sqlQuery = `
+      SELECT 
+          p.ProgramName,
+          pt.TypeDesc AS ProgramType,
+          t.Name AS ProgramTier,
+          COUNT(su.SignUpID) AS TotalAttendees
+      FROM 
+          SignUp su
+      JOIN 
+          Session s ON su.SessionID = s.SessionID
+      JOIN 
+          ProgramTier ptier ON s.TierID = ptier.TierID
+      JOIN 
+          Program p ON ptier.ProgramID = p.ProgramID
+      JOIN 
+          ProgramType pt ON p.TypeID = pt.TypeID
+      JOIN 
+          Tier t ON ptier.TierID = t.TierID
+      WHERE 1=1
+    `;
+
+    const queryParams = [];
+
+    if (programName) {
+      sqlQuery += ` AND p.ProgramName = ?`;
+      queryParams.push(programName);
+    }
+    if (programType) {
+      sqlQuery += ` AND pt.TypeDesc = ?`;
+      queryParams.push(programType);
+    }
+    if (programTier) {
+      sqlQuery += ` AND t.Name = ?`;
+      queryParams.push(programTier);
+    }
+
+    sqlQuery += ` GROUP BY p.ProgramID, p.ProgramName, pt.TypeDesc, t.Name ORDER BY TotalAttendees DESC;`;
+
+    const [result] = await connection.execute(sqlQuery, queryParams);
+    connection.end();
+
+    return result;
+  }
 }
 
 module.exports = Program;

@@ -41,4 +41,11 @@ router.get(
 
 router.get("/new-signups", customerInsightsController.getNewSignUpsToday);
 
+router.get("/program-attendees", customerInsightsController.getProgramAttendees);
+router.get("/highest-paying-customers", customerInsightsController.getHighestPayingCustomers);
+router.get("/customer-data-table", customerInsightsController.getCustomerDataTable);
+
+module.exports = router;
+
+
 module.exports = router;
