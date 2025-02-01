@@ -179,9 +179,7 @@ const AdminViewAnnouncement = () => {
 
   return (
     <Container fluid className="admin-payments-page p-4">
-      <h2 className="admin-payments-title">Announcements</h2>
-      <hr className="admin-payments-divider mb-4" />
-
+      <h2 className="precoaching-title">Announcements</h2>
       {/* Tabs for Active and Past Announcements */}
       <Nav
         variant="tabs"

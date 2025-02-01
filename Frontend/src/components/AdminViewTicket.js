@@ -73,9 +73,7 @@ const AdminViewTicket = () => {
 
   return (
     <Container fluid className="admin-payments-page p-4">
-      <h2 className="admin-payments-title">Support Tickets</h2>
-      <hr className="admin-payments-divider mb-4" />
-
+      <h2 className="precoaching-title">Support Tickets</h2>
       <Nav
         variant="tabs"
         activeKey={activeTab}

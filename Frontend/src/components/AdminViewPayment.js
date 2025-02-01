@@ -78,8 +78,7 @@ const AdminViewPayment = () => {
 
   return (
     <Container fluid className="admin-payments-page p-4">
-      <h2 className="admin-payments-title">Incoming Payments</h2>
-      <hr className="admin-payments-divider mb-4" />
+      <h2 className="precoaching-title">Incoming Payments</h2>
 
       {/* Tabs for Pending and Confirmed Payments */}
       <Nav
