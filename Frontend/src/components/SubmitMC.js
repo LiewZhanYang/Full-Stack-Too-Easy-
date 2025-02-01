@@ -67,8 +67,16 @@ const SubmitMc = () => {
   };
 
   const handleSubmit = async () => {
-    if (!file || !selectedSession || !reason) {
-      alert("Please provide a reason, upload a file, and select a session.");
+    if (!selectedSession) {
+      alert("Please select a session.");
+      return;
+    }
+    if (!reason) {
+      alert("Please provide a reason.");
+      return;
+    }
+    if (!file) {
+      alert("Please upload a file.");
       return;
     }
 
