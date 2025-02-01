@@ -1,15 +1,18 @@
 import React, { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
+import { Container, Button, Modal } from "react-bootstrap";
 
 const AdminResolveTicket = () => {
   const { id } = useParams(); // Get ticket ID from route
+  const navigate = useNavigate(); // React Router's navigation hook
   const [ticket, setTicket] = useState(null);
   const [comments, setComments] = useState([]);
   const [newComment, setNewComment] = useState("");
-  const [customerName, setCustomerName] = useState(""); // State for customer name
-  const [commenters, setCommenters] = useState({}); // State to store commenter names
-  const adminId = localStorage.getItem("adminId"); // Fetch admin ID from localStorage
+  const [customerName, setCustomerName] = useState("");
+  const [commenters, setCommenters] = useState({});
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const adminId = localStorage.getItem("adminId");
 
   // Fetch ticket details and comments
   useEffect(() => {
@@ -61,22 +64,21 @@ const AdminResolveTicket = () => {
       alert("Comment cannot be empty!");
       return;
     }
-    const adminId = localStorage.getItem("adminId");
     console.log("Admin ID retrieved from localStorage:", adminId);
 
     try {
       const response = await axios.post(
         `http://localhost:8000/ticketing/${id}/comments`,
         {
-          Content: newComment, // Content of the comment
-          CommenterID: adminId ? parseInt(adminId, 10) : null, // Use the admin ID dynamically
-          IsAdmin: 1, // Indicates the comment is from an admin
+          Content: newComment,
+          CommenterID: adminId ? parseInt(adminId, 10) : null,
+          IsAdmin: 1,
         }
       );
 
       setComments((prev) => [...prev, response.data]);
       setNewComment("");
-      // If ticket is open, update status to "In Progress"
+
       if (ticket.Status === "Open") {
         await axios.put(`http://localhost:8000/ticketing/${id}/status`, {
           Status: "In Progress",
@@ -89,12 +91,28 @@ const AdminResolveTicket = () => {
     }
   };
 
+  const confirmResolveTicket = async () => {
+    try {
+      await axios.put(`http://localhost:8000/ticketing/${id}/status`, {
+        Status: "Resolved",
+      });
+
+      setShowConfirmModal(false);
+      setTicket((prev) => ({ ...prev, Status: "Resolved" }));
+
+      // Navigate back to the previous page after resolving
+      navigate(-1);
+    } catch (error) {
+      console.error("Error resolving ticket:", error);
+    }
+  };
+
   if (!ticket) {
     return <div>Loading ticket details...</div>;
   }
 
   return (
-    <div className="container py-4">
+    <Container className="py-4">
       <h1 className="h3">Admin Resolve Ticket</h1>
       <div className="border rounded p-4 my-4">
         {/* Ticket Details */}
@@ -139,7 +157,9 @@ const AdminResolveTicket = () => {
             <p>No comments yet.</p>
           )}
         </div>
-        {!ticket || ticket.Status !== "Resolved" ? (
+
+        {/* Add a Comment */}
+        {ticket.Status !== "Resolved" ? (
           <div className="mt-4">
             <h6>Add a Comment</h6>
             <div className="d-flex">
@@ -150,12 +170,13 @@ const AdminResolveTicket = () => {
                 value={newComment}
                 onChange={(e) => setNewComment(e.target.value)}
               />
-              <button
-                className="btn btn-warning text-white"
+              <Button
+                variant="warning"
+                className="text-white"
                 onClick={handleAddComment}
               >
                 Send
-              </button>
+              </Button>
             </div>
           </div>
         ) : (
@@ -163,34 +184,42 @@ const AdminResolveTicket = () => {
             This ticket has been resolved. No further comments can be added.
           </p>
         )}
-        {!ticket || ticket.Status !== "Resolved" ? (
+
+        {/* Close Ticket Button */}
+        {ticket.Status !== "Resolved" ? (
           <div className="mt-4 text-end">
-            <button
-              className="btn btn-danger"
-              onClick={async () => {
-                try {
-                  await axios.put(
-                    `http://localhost:8000/ticketing/${id}/status`,
-                    {
-                      Status: "Resolved",
-                    }
-                  );
-                  alert("Ticket has been resolved.");
-                  setTicket((prev) => ({ ...prev, Status: "Resolved" }));
-                } catch (error) {
-                  console.error("Error closing ticket:", error);
-                  alert("Failed to close ticket. Please try again.");
-                }
-              }}
-            >
+            <Button variant="danger" onClick={() => setShowConfirmModal(true)}>
               Close Ticket
-            </button>
+            </Button>
           </div>
         ) : (
           <p className="text-muted text-end"></p>
         )}
       </div>
-    </div>
+
+      {/* Confirmation Modal */}
+      <Modal
+        show={showConfirmModal}
+        onHide={() => setShowConfirmModal(false)}
+        centered
+      >
+        <Modal.Header closeButton>
+          <Modal.Title>Confirm Ticket Resolution</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>Are you sure you want to resolve this ticket?</Modal.Body>
+        <Modal.Footer>
+          <Button variant="primary" onClick={confirmResolveTicket}>
+            Confirm
+          </Button>
+          <Button
+            variant="secondary"
+            onClick={() => setShowConfirmModal(false)}
+          >
+            Cancel
+          </Button>
+        </Modal.Footer>
+      </Modal>
+    </Container>
   );
 };
 
