@@ -104,27 +104,32 @@ exports.uploadWebinar = async (file, WebinarID) => {
     throw new Error("Error processing file upload.");
   }
 };
-exports.uploadDocument = async (file, TransferID) => {
+exports.uploadDocument = async (file, transferID) => {
   if (!file) {
     throw new Error("No document provided for upload.");
   }
 
-  if (!AccountID) {
-    throw new Error("TransferID is required for upload.");
-  }
-
   try {
-    const data = await uploadFileToS3(file, `Transfer-Request/${TransferID}`);
-    console.log("document uploaded successfully:", data);
+    const s3Result = await uploadFileToS3(
+      file,
+      `Transfer-Request/${transferID}`
+    );
+    console.log("✅ Document uploaded successfully:", s3Result);
+
+    if (!s3Result || !s3Result.Location) {
+      throw new Error("S3 upload did not return a valid URL.");
+    }
+
     return {
-      message: "document uploaded successfully!",
-      data,
+      message: "Document uploaded successfully!",
+      url: s3Result.Location, // Ensure this key is `url`
     };
   } catch (error) {
-    console.error("Error during document upload:", error);
+    console.error("❌ Error during document upload:", error);
     throw new Error("Error uploading document to S3.");
   }
 };
+
 exports.getWebinarPicByWebinarID = async (req, res) => {
   const { webinarID } = req.params;
 
