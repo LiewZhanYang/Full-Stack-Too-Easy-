@@ -118,17 +118,20 @@ exports.deleteTransferRequest = async (req, res) => {
 exports.updateTransferRequestStatus = async (req, res) => {
   try {
     const { transferID } = req.params; // Extract the TransferID from the request
-    const { action } = req.body; // `action` determines if the request is approved or rejected
+    const { Status } = req.body; // Extract the Status field
 
-    if (!["approve", "reject"].includes(action)) {
+    if (!["Confirmed", "Rejected"].includes(Status)) {
       return res
         .status(400)
-        .json({ error: "Invalid action. Use 'approve' or 'reject'." });
+        .json({ error: "Invalid status. Use 'Confirmed' or 'Rejected'." });
     }
 
-    if (action === "approve") {
-      // Approve the transfer request
-      const success = await TransferRequest.approveTransferRequest(transferID);
+    if (Status === "Confirmed") {
+      // Approve the transfer request by updating its status
+      const success = await TransferRequest.updateTransferRequestStatus(
+        transferID,
+        "Confirmed"
+      );
 
       if (!success) {
         return res.status(404).json({ message: "Transfer request not found." });
@@ -138,7 +141,7 @@ exports.updateTransferRequestStatus = async (req, res) => {
         message: "Transfer request approved successfully.",
         transferID,
       });
-    } else if (action === "reject") {
+    } else if (Status === "Rejected") {
       // Reject the transfer request by deleting it
       const success = await TransferRequest.deleteTransferRequest(transferID);
 

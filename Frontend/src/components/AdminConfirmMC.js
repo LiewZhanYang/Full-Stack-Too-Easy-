@@ -1,23 +1,15 @@
 import React, { useState, useEffect } from "react";
-import { Container, Row, Col, Button } from "react-bootstrap";
+import { Container, Row, Col, Button, Modal } from "react-bootstrap";
 import { useNavigate, useParams } from "react-router-dom";
 
 const AdminConfirmTransfer = () => {
   const navigate = useNavigate();
   const { transferID } = useParams(); // Get the TransferID from the URL
   const [transferDetails, setTransferDetails] = useState(null);
+  const [showModal, setShowModal] = useState(false); // State to control modal visibility
+  const [modalTitle, setModalTitle] = useState(""); // State to set modal title
+  const [modalMessage, setModalMessage] = useState(""); // State to set modal message
 
-  // Hardcoded fallback data
-  const hardcodedData = {
-    AccountID: "12345",
-    ProgramName: "Coding Bootcamp",
-    Reason: "Medical emergency",
-    MCPath: "https://via.placeholder.com/300", // Replace with a real document URL for testing
-    RequestedAt: "2025-02-02T02:56:37.000Z",
-    Status: "Pending",
-  };
-
-  // Fetch transfer details on component load
   useEffect(() => {
     const fetchTransferDetails = async () => {
       try {
@@ -25,14 +17,12 @@ const AdminConfirmTransfer = () => {
           `http://localhost:8000/transfer-requests/${transferID}`
         );
         if (!response.ok) {
-          throw new Error(`Failed to fetch: ${response.statusText}`);
+          throw new Error("Failed to fetch transfer details");
         }
         const data = await response.json();
         setTransferDetails(data);
       } catch (error) {
         console.error("Error fetching transfer details:", error);
-        // Use hardcoded data if API call fails
-        setTransferDetails(hardcodedData);
       }
     };
 
@@ -43,15 +33,69 @@ const AdminConfirmTransfer = () => {
     navigate(-1); // Navigate back to the previous page
   };
 
-  const handleConfirmClick = () => {
-    alert("Transfer Approved (Simulated)");
-    navigate(-1); // Simulate navigation back after approval
+  const handleConfirmClick = async () => {
+    try {
+      const response = await fetch(
+        `http://localhost:8000/transfer-requests/${transferID}`,
+        {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ Status: "Confirmed" }),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to approve transfer request");
+      }
+
+      setModalTitle("Transfer Approved");
+      setModalMessage("The transfer request has been successfully approved.");
+      setShowModal(true);
+    } catch (error) {
+      console.error("Error approving transfer request:", error);
+      setModalTitle("Error");
+      setModalMessage("Failed to approve the transfer request.");
+      setShowModal(true);
+    }
   };
 
-  const handleRejectClick = () => {
-    alert("Transfer Rejected (Simulated)");
-    navigate(-1); // Simulate navigation back after rejection
+  const handleRejectClick = async () => {
+    try {
+      const response = await fetch(
+        `http://localhost:8000/transfer-requests/${transferID}`,
+        {
+          method: "DELETE",
+          headers: { "Content-Type": "application/json" },
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to reject transfer request");
+      }
+
+      setModalTitle("Transfer Rejected");
+      setModalMessage("The transfer request has been successfully rejected.");
+      setShowModal(true);
+    } catch (error) {
+      console.error("Error rejecting transfer request:", error);
+      setModalTitle("Error");
+      setModalMessage("Failed to reject the transfer request.");
+      setShowModal(true);
+    }
   };
+
+  const handleCloseModal = () => {
+    setShowModal(false);
+    navigate("/admin-view-transfer-request"); // Navigate back to transfer request page after modal closes
+  };
+
+  if (!transferDetails) {
+    return (
+      <Container className="p-4">
+        <h2>Loading transfer details...</h2>
+      </Container>
+    );
+  }
 
   return (
     <Container fluid className="admin-confirm-payment-page p-4">
@@ -77,33 +121,27 @@ const AdminConfirmTransfer = () => {
             <p>
               <strong>Account ID</strong>
               <br />
-              {transferDetails
-                ? transferDetails.AccountID
-                : hardcodedData.AccountID}
+              {transferDetails.AccountID}
             </p>
             <p>
               <strong>Program Name</strong>
               <br />
-              {transferDetails
-                ? transferDetails.ProgramName
-                : hardcodedData.ProgramName}
+              {transferDetails.ProgramName}
             </p>
             <p>
               <strong>Reason for Transfer</strong>
               <br />
-              {transferDetails ? transferDetails.Reason : hardcodedData.Reason}
+              {transferDetails.Reason}
             </p>
             <p>
               <strong>Requested At</strong>
               <br />
-              {transferDetails
-                ? transferDetails.RequestedAt
-                : hardcodedData.RequestedAt}
+              {transferDetails.RequestedAt}
             </p>
             <p>
               <strong>Status</strong>
               <br />
-              {transferDetails ? transferDetails.Status : hardcodedData.Status}
+              {transferDetails.Status}
             </p>
           </div>
         </Col>
@@ -112,9 +150,9 @@ const AdminConfirmTransfer = () => {
             <p>
               <strong>Medical Certificate:</strong>
             </p>
-            {transferDetails?.MCPath || hardcodedData.MCPath ? (
+            {transferDetails.MCPath ? (
               <a
-                href={transferDetails?.MCPath || hardcodedData.MCPath}
+                href={transferDetails.MCPath}
                 target="_blank"
                 rel="noopener noreferrer"
               >
@@ -143,6 +181,19 @@ const AdminConfirmTransfer = () => {
           Reject
         </Button>
       </div>
+
+      {/* Modal for showing approval/rejection message */}
+      <Modal show={showModal} onHide={handleCloseModal} centered>
+        <Modal.Header closeButton>
+          <Modal.Title>{modalTitle}</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>{modalMessage}</Modal.Body>
+        <Modal.Footer>
+          <Button variant="primary" onClick={handleCloseModal}>
+            Close
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </Container>
   );
 };
