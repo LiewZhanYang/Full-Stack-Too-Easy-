@@ -196,6 +196,70 @@ function Sidebar() {
                 )}
               </div>
 
+              {/* Announcement Dropdown */}
+              <div className="mt-3">
+                <button
+                  onClick={() => toggleMenu("announcement")}
+                  className="btn d-flex align-items-center w-100 text-dark fw-bold px-3 py-2 border-0 bg-transparent"
+                >
+                  <i className="bi bi-bell me-2"></i>
+                  Announcement
+                  <i
+                    className={`bi ${
+                      expandedMenu === "announcement"
+                        ? "bi-chevron-up"
+                        : "bi-chevron-down"
+                    } ms-auto`}
+                  ></i>
+                </button>
+                {expandedMenu === "announcement" && (
+                  <div className="ps-4">
+                    <Link
+                      to="/admin-view-announcement"
+                      className="d-block py-1 text-dark text-decoration-none"
+                      style={{ fontSize: "0.95rem" }}
+                    >
+                      View All
+                    </Link>
+                    <Link
+                      to="/admin-create-announcement"
+                      className="d-block py-1 text-dark text-decoration-none"
+                      style={{ fontSize: "0.95rem" }}
+                    >
+                      Create
+                    </Link>
+                  </div>
+                )}
+              </div>
+              {/* Registration Dropdown */}
+              <div className="mt-3">
+                <button
+                  onClick={() => toggleMenu("events")}
+                  className="btn d-flex align-items-center w-100 text-dark fw-bold px-3 py-2 border-0 bg-transparent"
+                >
+                  <i className="bi bi-calendar-event me-2"></i>
+                  Registration
+                  <i
+                    className={`bi ${
+                      expandedMenu === "events"
+                        ? "bi-chevron-up"
+                        : "bi-chevron-down"
+                    } ms-auto`}
+                  ></i>
+                </button>
+                {expandedMenu === "events" && (
+                  <div className="ps-4">
+                    <Link
+                      to="/admin-view-payment"
+                      className="d-block py-1 text-dark text-decoration-none"
+                      style={{ fontSize: "0.95rem" }}
+                    >
+                      Incoming Payments
+                    </Link>
+                  </div>
+                )}
+              </div>
+
               {/* CMS (Customer Management System) Dropdown */}
               <div className="mt-3">
                 <button
