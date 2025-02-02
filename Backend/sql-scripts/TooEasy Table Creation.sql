@@ -163,7 +163,7 @@ CREATE TABLE TransferRequest (
     SignUpID INT NOT NULL,
     NewSessionID INT NOT NULL,
     Reason VARCHAR(255) NOT NULL,
-    MCPath TEXT NULL,
+    MCPath VARCHAR(255) NULL,
     RequestedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     Status ENUM('Pending', 'Confirmed') NOT NULL DEFAULT 'Pending',
 

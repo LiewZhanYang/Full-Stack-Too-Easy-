@@ -33,7 +33,6 @@ router.post(
   upload.single("file"), // Middleware for handling single file uploads (field name: 'file')
   uploadController.uploadFile
 );
-router.post("/file", upload.single("file"), uploadController.uploadDocument);
 router.post(
   "/profile-pic",
   upload.single("file"), // Middleware to handle single file upload (file field name is 'file')

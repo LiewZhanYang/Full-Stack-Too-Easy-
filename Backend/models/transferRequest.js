@@ -18,18 +18,7 @@ class TransferRequest {
     ]);
     return result.insertId; // Return the ID of the new request
   }
-  static async updateMCPath(transferID, mcPath) {
-    const connection = await mysql.createConnection(dbConfig);
 
-    const sqlQuery = `
-      UPDATE TransferRequest 
-      SET MCPath = ? 
-      WHERE TransferID = ?;
-    `;
-    const [result] = await connection.execute(sqlQuery, [mcPath, transferID]);
-
-    return result.affectedRows > 0; // Returns true if update was successful
-  }
   // Get all transfer requests
   static async getAllTransferRequests() {
     const connection = await mysql.createConnection(dbConfig);

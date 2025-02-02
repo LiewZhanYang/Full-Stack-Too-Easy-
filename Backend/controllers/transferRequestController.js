@@ -1,74 +1,69 @@
 const TransferRequest = require("../models/transferRequest");
 const dbConfig = require("../dbConfig");
 const mysql = require("mysql2/promise");
-const {
-  uploadFileToS3,
-  getSignedUrlFromS3,
-  listObjectsByPrefix,
-} = require("../models/upload");
+const { uploadDocument } = require("./uploadController");
+
 // Create a new transfer request (ensures the 3-day rule)
 exports.createTransferRequest = async (req, res) => {
   try {
-    const { signUpID, newSessionID, reason } = req.body;
-    let mcPath = null;
-
+    let { signUpID, newSessionID, reason, MCpath } = req.body;
+    // Handle document upload if a file is provided
+    if (req.file) {
+      try {
+        const id = 1;
+        const uploadResult = await uploadDocument(req.file, id); // Use uploadController for file upload
+        MCpath = uploadResult.data.Location || null; // Ensure mcPath is set to null if no URL is returned
+      } catch (uploadError) {
+        console.error("Error uploading document:", uploadError);
+        return res.status(500).json({ message: "Error uploading document" });
+      }
+    }
     if (!signUpID || !newSessionID || !reason) {
       return res
         .status(400)
         .json({ error: "SignUpID, NewSessionID, and Reason are required." });
     }
+    const connection = await mysql.createConnection(dbConfig);
 
-    // Step 1: Create Transfer Request FIRST (without MCPath)
+    // Check if the transfer is made at least 3 days before session start
+    const sessionCheckQuery = `
+      SELECT s.StartDate 
+      FROM SignUp su
+      JOIN Session s ON su.SessionID = s.SessionID
+      WHERE su.SignUpID = ?;
+    `;
+    const [sessionResult] = await connection.execute(sessionCheckQuery, [
+      signUpID,
+    ]);
+
+    if (sessionResult.length === 0) {
+      return res.status(404).json({ error: "Original session not found." });
+    }
+
+    const sessionStartDate = new Date(sessionResult[0].StartDate);
+    const today = new Date();
+    const threeDaysBeforeSession = new Date(sessionStartDate);
+    threeDaysBeforeSession.setDate(sessionStartDate.getDate() - 3);
+
+    if (today > threeDaysBeforeSession) {
+      return res.status(400).json({
+        error:
+          "Transfer requests must be made at least 3 days before the session starts.",
+      });
+    }
+
+    // Create the transfer request
     const transferID = await TransferRequest.createTransferRequest(
       signUpID,
       newSessionID,
       reason,
-      mcPath
+      MCpath
     );
-
-    // Step 2: Upload File & Get Signed URL (if file is uploaded)
-    if (req.file) {
-      try {
-        console.log(
-          `📂 Uploading file: ${req.file.originalname} for TransferID: ${transferID}`
-        );
-
-        // Upload file using the existing function from upload model
-        await uploadFileToS3(req.file, `Transfer-Request/${transferID}`);
-
-        // ✅ Get the latest uploaded file in the folder using the function from upload model
-        const files = await listObjectsByPrefix(
-          `Transfer-Request/${transferID}`
-        );
-
-        if (files.length > 0) {
-          const latestFile = files[files.length - 1].split("/").pop(); // Get the last uploaded file
-
-          // ✅ Generate signed URL using the function from upload model
-          mcPath = await getSignedUrlFromS3(
-            `Transfer-Request/${transferID}`,
-            latestFile
-          );
-          console.log("✅ Generated Signed URL:", mcPath);
-
-          // Step 3: Update MCPath in database
-          await TransferRequest.updateMCPath(transferID, mcPath);
-        } else {
-          console.warn(`⚠️ No file found in Transfer-Request/${transferID}`);
-        }
-      } catch (error) {
-        console.error("❌ Error uploading document:", error);
-        return res.status(500).json({ message: "Error uploading document" });
-      }
-    }
-
-    res.status(201).json({
-      message: "Transfer request created successfully",
-      transferID,
-      mcPath,
-    });
+    res
+      .status(201)
+      .json({ message: "Transfer request created successfully", transferID });
   } catch (error) {
-    console.error("❌ Error creating transfer request:", error);
+    console.error("Error creating transfer request:", error);
     res.status(500).json({ error: "Internal server error." });
   }
 };
