@@ -14,7 +14,11 @@ const AdminConfirmTransfer = () => {
         const response = await fetch(
           `http://localhost:8000/transfer-requests/${transferID}`
         );
+        if (!response.ok) {
+          throw new Error(`Failed to fetch: ${response.statusText}`);
+        }
         const data = await response.json();
+        console.log("Fetched Transfer Details:", data);
         setTransferDetails(data);
       } catch (error) {
         console.error("Error fetching transfer details:", error);
@@ -30,11 +34,17 @@ const AdminConfirmTransfer = () => {
 
   const handleConfirmClick = async () => {
     try {
-      await fetch(`http://localhost:8000/transfer-requests/${transferID}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ Status: "Confirmed" }),
-      });
+      const response = await fetch(
+        `http://localhost:8000/transfer-requests/${transferID}`,
+        {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ Status: "Confirmed" }),
+        }
+      );
+      if (!response.ok) {
+        throw new Error("Failed to approve transfer request");
+      }
       alert("Transfer Approved");
       navigate(-1); // Navigate back to the first page
     } catch (error) {
@@ -45,11 +55,17 @@ const AdminConfirmTransfer = () => {
 
   const handleRejectClick = async () => {
     try {
-      await fetch(`http://localhost:8000/transfer-requests/${transferID}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ Status: "Rejected" }),
-      });
+      const response = await fetch(
+        `http://localhost:8000/transfer-requests/${transferID}`,
+        {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ Status: "Rejected" }),
+        }
+      );
+      if (!response.ok) {
+        throw new Error("Failed to reject transfer request");
+      }
       alert("Transfer Rejected");
       navigate(-1); // Navigate back to the first page
     } catch (error) {
@@ -88,31 +104,24 @@ const AdminConfirmTransfer = () => {
         <Col md={6}>
           <div className="admin-confirm-details">
             <p>
-              <strong>Account ID</strong>
+              <strong>Account ID:</strong>
               <br />
               {transferDetails.AccountID}
             </p>
             <p>
-              <strong>Current Program</strong>
+              <strong>Program Name:</strong>
               <br />
               {transferDetails.ProgramName}
             </p>
             <p>
-              <strong>Current Session</strong>
-              <br />
-              Date: {transferDetails.CurrentSession.Date} <br />
-              Time: {transferDetails.CurrentSession.Time} <br />
-              Location: {transferDetails.CurrentSession.Location}
-            </p>
-            <p>
-              <strong>New Session</strong>
+              <strong>New Session:</strong>
               <br />
               Date: {transferDetails.NewSession.Date} <br />
               Time: {transferDetails.NewSession.Time} <br />
               Location: {transferDetails.NewSession.Location}
             </p>
             <p>
-              <strong>Reason for Transfer</strong>
+              <strong>Reason for Transfer:</strong>
               <br />
               {transferDetails.Reason}
             </p>

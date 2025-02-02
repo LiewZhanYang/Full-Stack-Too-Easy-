@@ -61,6 +61,19 @@ JOIN
     const [result] = await connection.execute(sqlQuery, [transferID]);
     return result.affectedRows > 0;
   }
+
+  static async approveTransferRequest(transferID) {
+    const connection = await mysql.createConnection(dbConfig);
+
+    const sqlQuery = `
+      UPDATE TransferRequest
+      SET Status = 'Confirmed'
+      WHERE TransferID = ?;
+    `;
+
+    const [result] = await connection.execute(sqlQuery, [transferID]);
+    return result.affectedRows > 0; // Return true if the request was updated
+  }
 }
 
 module.exports = TransferRequest;
