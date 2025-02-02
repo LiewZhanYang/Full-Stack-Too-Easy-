@@ -425,7 +425,8 @@ INSERT INTO Forum (Topic) VALUES
 ('Camp'), 
 ('Lab');
 
-INSERT INTO Thread (Title, Body, CreatedOn, Likes, SentimentValue, PostedBy, Topic, ReplyTo) 
+
+INSERT INTO Thread (Title, Body, CreatedOn, Likes, SentimentValue, PostedBy, Topic, ReplyTo)
 VALUES
     ('Workshop on Machine Learning', 'Hi all, what do those who have attended this workshop feel about it? Please comment under this thread and share with me thanks!', '2025-02-02', 10, 0.8, 1, 1, NULL),
     (NULL, 'I think this workshop is wonderful and you will not regret signing up for it!', '2025-02-02', 5, 0.9, 2, 1, 1),

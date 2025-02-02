@@ -53,7 +53,6 @@ const postProgram = async (req, res) => {
   console.log("Received program details:", programDetails);
 
   try {
-    // Create the new program in the database
     const newProgram = await Program.postProgram(programDetails);
     console.log("New program created:", newProgram);
 
@@ -61,10 +60,9 @@ const postProgram = async (req, res) => {
       return res.status(500).json({ error: "Failed to create new program" });
     }
 
-    // Optional: Upload a program picture if a file is provided
     if (req.file) {
       try {
-        await uploadController.uploadProgramPic(req.file, newProgram.ProgramID); // Corrected parameter handling
+        await uploadController.uploadProgramPic(req.file, newProgram.ProgramID);
       } catch (uploadError) {
         console.error("Error uploading program picture:", uploadError);
         return res
@@ -86,16 +84,13 @@ const updateProgram = async (req, res) => {
   const updateData = req.body;
 
   try {
-    // Update program data in the database
     const result = await Program.updateProgram(id, updateData);
     if (result.affectedRows === 0) {
       return res.status(404).json({ message: "Program not found" });
     }
 
-    // Handle file upload if present
     if (req.file) {
       console.log("File received for upload during update:", req.file);
-
       try {
         await uploadController.uploadProgramPic(req.file, id);
       } catch (uploadError) {
@@ -131,6 +126,7 @@ const getProgramBySignUp = async (req, res) => {
   }
 };
 
+// Delete a program
 const deleteProgram = async (req, res) => {
   const id = req.params.id;
   try {
@@ -141,14 +137,17 @@ const deleteProgram = async (req, res) => {
     console.error(error);
     res.status(403).send("Cannot delete Programs, there are sessions");
   }
-}
+};
 
+// Retrieve programs by type
 const getProgramsByProgramType = async (req, res) => {
   const { typeID } = req.params;
   try {
     const programs = await Program.getProgramsByType(typeID);
     if (!programs || programs.length === 0) {
-      return res.status(404).json({ message: "No programs found for this type" });
+      return res
+        .status(404)
+        .json({ message: "No programs found for this type" });
     }
     res.json(programs);
   } catch (error) {
@@ -165,7 +164,9 @@ const getProgramByTier = async (req, res) => {
     const programIDs = await Program.getProgramByTier(tierID);
 
     if (!programIDs) {
-      return res.status(404).json({ message: "No program found for this TierID." });
+      return res
+        .status(404)
+        .json({ message: "No program found for this TierID." });
     }
 
     res.json({ ProgramIDs: programIDs });
@@ -174,7 +175,6 @@ const getProgramByTier = async (req, res) => {
     res.status(500).json({ message: "Internal server error." });
   }
 };
-
 
 module.exports = {
   getAllPrograms,

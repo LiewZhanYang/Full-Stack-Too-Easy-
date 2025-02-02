@@ -9,6 +9,7 @@ class Program {
     this.TypeID = TypeID;
   }
 
+  // Get program by ID
   static async getProgramById(id) {
     const connection = await mysql.createConnection(dbConfig);
     const sqlQuery = `
@@ -30,14 +31,13 @@ class Program {
     );
   }
 
+  // Get program by Tier ID
   static async getProgramByTier(tierID) {
     const connection = await mysql.createConnection(dbConfig);
-
     const sqlQuery = `
         SELECT ProgramID FROM ProgramTier 
         WHERE TierID = ?;
     `;
-
     const [rows] = await connection.execute(sqlQuery, [tierID]);
     connection.end();
 
@@ -48,6 +48,7 @@ class Program {
     return rows.map((row) => row.ProgramID); // Return list of ProgramIDs
   }
 
+  // Get program by signup
   static async getProgramBySignUp(AccountID) {
     const connection = await mysql.createConnection(dbConfig);
     const sqlQuery = `
@@ -72,6 +73,7 @@ class Program {
     });
   }
 
+  // Get all programs
   static async getAllPrograms() {
     const connection = await mysql.createConnection(dbConfig);
 
@@ -91,6 +93,7 @@ class Program {
     });
   }
 
+  // Get programs by type
   static async getProgramsByType(typeID) {
     const connection = await mysql.createConnection(dbConfig);
     const sqlQuery = `
@@ -108,16 +111,12 @@ class Program {
         row.ProgramID,
         row.ProgramName,
         row.ProgramDesc,
-        row.Cost,
-        row.DiscountedCost,
-        row.LunchProvided,
-        row.Duration,
-        row.ClassSize,
         row.TypeID
       );
     });
   }
 
+  // Post a new program
   static async postProgram(programDetails) {
     let connection;
     try {
@@ -144,6 +143,7 @@ class Program {
     }
   }
 
+  // Update a program
   static async updateProgram(id, updateData) {
     let connection;
     try {
@@ -185,6 +185,7 @@ class Program {
     }
   }
 
+  // Delete a program
   static async deleteProgram(ProgramID) {
     const connection = await mysql.createConnection(dbConfig);
     const sqlQuery = `
