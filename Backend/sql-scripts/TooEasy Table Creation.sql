@@ -162,10 +162,12 @@ CREATE TABLE TransferRequest (
     Reason VARCHAR(255) NOT NULL,
     MCPath VARCHAR(255) NULL,
     RequestedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    Status ENUM('Pending', 'Confirmed') NOT NULL DEFAULT 'Pending',
 
     FOREIGN KEY (SignUpID) REFERENCES SignUp(SignUpID),
     FOREIGN KEY (NewSessionID) REFERENCES Session(SessionID)
 );
+
 
 CREATE TABLE Ticketing (
     TicketID INT PRIMARY KEY AUTO_INCREMENT,
@@ -355,6 +357,13 @@ VALUES
     (NULL, 'I found the public speaking workshops to be incredibly helpful. I learned valuable techniques for structuring presentations, engaging the audience, and managing my nerves. The practical exercises and constructive feedback from the instructor were invaluable. Im already applying what I learned in my professional and personal life.', '2024-01-15', 8, 0.95, 4, 1, 3),
     (NULL, 'The workshops significantly boosted my confidence in public speaking. I used to dread presenting, but now I feel much more comfortable and prepared. The supportive environment and encouraging feedback from the instructor and fellow participants made a huge difference. I highly recommend these workshops to anyone looking to improve their public speaking skills.', '2024-01-20', 7, 0.85, 5, 1, 3);
 
+INSERT INTO TransferRequest (SignUpID, NewSessionID, Reason, MCPath, Status)
+VALUES
+(1, 2, 'Medical Emergency', 'path/to/medical_certificate1.pdf', 'Pending'),
+(2, 3, 'Schedule Conflict', 'path/to/medical_certificate2.pdf', 'Confirmed'),
+(3, 4, 'Travel Issues', NULL, 'Pending'),
+(4, 1, 'Personal Reasons', 'path/to/medical_certificate3.pdf', 'Confirmed');
+
 Trigger
 
 -- Add Age On Insertion
@@ -515,3 +524,6 @@ BEGIN
 END //
 
 DELIMITER ;
+
+
+
