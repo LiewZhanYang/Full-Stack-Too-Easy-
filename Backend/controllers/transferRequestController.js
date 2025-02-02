@@ -6,10 +6,11 @@ const { uploadDocument } = require("./uploadController");
 // Create a new transfer request (ensures the 3-day rule)
 exports.createTransferRequest = async (req, res) => {
   try {
-    const { signUpID, newSessionID, reason, MCpath } = req.body;
+    let { signUpID, newSessionID, reason, MCpath } = req.body;
     // Handle document upload if a file is provided
     if (req.file) {
       try {
+        const id = 1;
         const uploadResult = await uploadDocument(req.file, id); // Use uploadController for file upload
         MCpath = uploadResult.data.Location || null; // Ensure mcPath is set to null if no URL is returned
       } catch (uploadError) {
@@ -110,6 +111,50 @@ exports.deleteTransferRequest = async (req, res) => {
     res.status(200).json({ message: "Transfer request deleted successfully." });
   } catch (error) {
     console.error("Error deleting transfer request:", error);
+    res.status(500).json({ error: "Internal server error." });
+  }
+};
+
+exports.updateTransferRequestStatus = async (req, res) => {
+  try {
+    const { transferID } = req.params; // Extract the TransferID from the request
+    const { Status } = req.body; // Extract the Status field
+
+    if (!["Confirmed", "Rejected"].includes(Status)) {
+      return res
+        .status(400)
+        .json({ error: "Invalid status. Use 'Confirmed' or 'Rejected'." });
+    }
+
+    if (Status === "Confirmed") {
+      // Approve the transfer request by updating its status
+      const success = await TransferRequest.updateTransferRequestStatus(
+        transferID,
+        "Confirmed"
+      );
+
+      if (!success) {
+        return res.status(404).json({ message: "Transfer request not found." });
+      }
+
+      res.status(200).json({
+        message: "Transfer request approved successfully.",
+        transferID,
+      });
+    } else if (Status === "Rejected") {
+      // Reject the transfer request by deleting it
+      const success = await TransferRequest.deleteTransferRequest(transferID);
+
+      if (!success) {
+        return res.status(404).json({ message: "Transfer request not found." });
+      }
+
+      res.status(200).json({
+        message: "Transfer request rejected and deleted successfully.",
+      });
+    }
+  } catch (error) {
+    console.error("Error updating transfer request status:", error);
     res.status(500).json({ error: "Internal server error." });
   }
 };

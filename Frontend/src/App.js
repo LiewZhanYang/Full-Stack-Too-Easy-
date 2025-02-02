@@ -58,11 +58,7 @@ import LabsForum from "./components/LabsForum.js";
 import ViewPost from "./components/ViewPost.js";
 import Ticketing from "./components/Ticketing.js";
 import ViewTicket from "./components/ViewTicket.js";
-import AdminViewTicket from "./components/AdminViewTicket.js";
-import AdminResolveTicket from "./components/AdminResolveTicket.js";
-import AnalyticsDashboard from "./components/AnalyticsDashboard.js";
-import InsightsDashboard from "./components/InsightsDashboard.js";
-import ForumDashboard from "./components/ForumDashboard.js";
+
 import "./StripePayment.css";
 
 // Layout component to handle conditional rendering
@@ -228,17 +224,7 @@ function App() {
                     path="/admin-view-session-details/:id"
                     element={<AdminViewSessionDetails />}
                   />
-                  <Route
-                    path="/admin-view-ticket"
-                    element={<AdminViewTicket />}
-                  />
-                  <Route
-                    path="/admin-resolve-ticket/:id"
-                    element={<AdminResolveTicket />}
-                  />
-                  <Route path="/analytics" element={<AnalyticsDashboard />} />
-                  <Route path="/insights" element={<InsightsDashboard />} />
-                  <Route path="/forum-dashboard" element={<ForumDashboard />} />
+
                   {/* Logout route redirects to login */}
                   <Route
                     path="/logout"
