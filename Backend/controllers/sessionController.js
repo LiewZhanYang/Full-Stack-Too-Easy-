@@ -1,4 +1,5 @@
 const Session = require("../models/session");
+const { postAnnouncement } = require("./announcementController");
 
 const getSessionsByTierID = async (req, res) => {
   const tierID = req.params.id;
@@ -88,11 +89,9 @@ const deleteSession = async (req, res) => {
   } catch (error) {
     console.error("Error deleting session:", error);
     if (error.message.includes("Payments are associated")) {
-      return res
-        .status(403)
-        .json({
-          message: "Cannot delete session as it has associated payments.",
-        });
+      return res.status(403).json({
+        message: "Cannot delete session as it has associated payments.",
+      });
     }
     res.status(500).json({ message: "Error deleting session" });
   }
@@ -115,19 +114,22 @@ const getSessionBySessionID = async (req, res) => {
   }
 };
 
-
 const getSessionsByProgramAndTier = async (req, res) => {
   const { programId } = req.params;
   const { tier } = req.query;
 
   if (!programId || !tier) {
-    return res.status(400).json({ error: "Missing required parameters: programId and tier." });
+    return res
+      .status(400)
+      .json({ error: "Missing required parameters: programId and tier." });
   }
 
   try {
     const sessions = await Session.getSessionsByProgramAndTier(programId, tier);
     if (sessions.length === 0) {
-      return res.status(404).json({ error: "No sessions found for the specified program and tier." });
+      return res.status(404).json({
+        error: "No sessions found for the specified program and tier.",
+      });
     }
     res.status(200).json(sessions);
   } catch (error) {
@@ -136,6 +138,42 @@ const getSessionsByProgramAndTier = async (req, res) => {
   }
 };
 
+const handleCancelSession = async (req, res) => {
+  const sessionID = req.params.id;
+  const { StartDate, Location } = req.body; // Extract necessary fields for announcement
+
+  try {
+    // Update session status to "Cancelled"
+    const result = await Session.updateSession(sessionID, {
+      Status: "Cancelled",
+    });
+
+    if (!result) {
+      return res.status(404).json({ message: "Session not found" });
+    }
+
+    // Prepare announcement details
+    const announcementDetails = {
+      Title: "Session Cancellation",
+      Body: `The session scheduled on ${StartDate} at ${Location} has been cancelled. Please check our website for other available sessions.`,
+    };
+
+    // Call the announcement controller to send the announcement
+    await postAnnouncement(
+      { body: announcementDetails }, // Simulate a request object
+      res // Use the current response object to handle errors properly
+    );
+
+    res.json({
+      message: "Session cancelled and announcement sent successfully.",
+    });
+  } catch (error) {
+    console.error("Error cancelling session or sending announcement:", error);
+    res
+      .status(500)
+      .json({ message: "Error cancelling session or sending announcement" });
+  }
+};
 
 module.exports = {
   getSessionsByTierID,
@@ -144,4 +182,5 @@ module.exports = {
   deleteSession,
   getSessionBySessionID,
   getSessionsByProgramAndTier,
+  handleCancelSession, // Add this import
 };

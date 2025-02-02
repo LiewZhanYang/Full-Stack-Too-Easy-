@@ -156,10 +156,45 @@ const getProgramsByProgramType = async (req, res) => {
   }
 };
 
+// Retrieve programs by TierID
+const getProgramByTierID = async (req, res) => {
+  const { tierID } = req.params;
+  try {
+    const programs = await Program.getProgramByTierID(tierID);
+    if (!programs || programs.length === 0) {
+      return res
+        .status(404)
+        .json({ message: "No programs found for this TierID" });
+    }
+    res.json(programs);
+  } catch (error) {
+    console.error("Error retrieving programs by TierID:", error);
+    res.status(500).json({ message: "Error retrieving programs by TierID" });
+  }
+};
+
+// Retrieve programs by SessionID
+const getProgramBySessionID = async (req, res) => {
+  const { sessionID } = req.params;
+  try {
+    const programs = await Program.getProgramBySessionID(sessionID);
+    if (!programs || programs.length === 0) {
+      return res
+        .status(404)
+        .json({ message: "No programs found for this SessionID" });
+    }
+    res.json(programs);
+  } catch (error) {
+    console.error("Error retrieving programs by SessionID:", error);
+    res.status(500).json({ message: "Error retrieving programs by SessionID" });
+  }
+};
+
+// Retrieve program by Tier
 const getProgramByTier = async (req, res) => {
   try {
     const { tierID } = req.params;
-    console.log(" Fetching ProgramID for TierID:", tierID);
+    console.log("Fetching ProgramID for TierID:", tierID);
 
     const programIDs = await Program.getProgramByTier(tierID);
 
@@ -171,7 +206,7 @@ const getProgramByTier = async (req, res) => {
 
     res.json({ ProgramIDs: programIDs });
   } catch (error) {
-    console.error(" Error fetching Program by Tier:", error);
+    console.error("Error fetching Program by Tier:", error);
     res.status(500).json({ message: "Internal server error." });
   }
 };
@@ -184,5 +219,7 @@ module.exports = {
   getProgramBySignUp,
   deleteProgram,
   getProgramsByProgramType,
+  getProgramByTierID,
+  getProgramBySessionID,
   getProgramByTier,
 };
