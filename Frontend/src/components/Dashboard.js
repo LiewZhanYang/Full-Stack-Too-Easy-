@@ -15,6 +15,9 @@ function Dashboard() {
   const [reviewPrompt, setReviewPrompt] = useState(null); // Store program for review
   const [reviewContent, setReviewContent] = useState(""); // Review input from user
   const [reviewRating, setReviewRating] = useState(5); // Default rating
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [showCancelConfirm, setShowCancelConfirm] = useState(false);
+  
 
   const userAccountID = localStorage.getItem("userId"); // Assuming user ID is stored in localStorage
 
@@ -170,77 +173,76 @@ function Dashboard() {
 
 const handleReviewSubmit = async () => {
   if (!reviewContent.trim()) {
-      alert("Please write a review before submitting.");
-      return;
+    alert("Please write a review before submitting.");
+    return;
   }
-
-  console.log("🔍 Review Prompt Data:", reviewPrompt);
 
   if (!reviewPrompt || !reviewPrompt.session) {
-      console.error(" Error: `session` object is missing in reviewPrompt.");
-      alert("Session data is missing. Unable to submit review.");
-      return;
+    alert("Session data is missing. Unable to submit review.");
+    return;
   }
 
-  //  Fetch ProgramID directly from reviewPrompt.session
   const programID = reviewPrompt.session.ProgramID;
-  const signUpID = reviewPrompt.SignUpID; // Get the SignUpID for deletion
-
-  console.log(" ProgramID from `reviewPrompt.session`:", programID);
-  console.log(" SignUpID for deletion:", signUpID);
+  const signUpID = reviewPrompt.SignUpID;
 
   if (!programID || !signUpID) {
-      console.error(" Error: `ProgramID` or `SignUpID` is missing in session data.");
-      alert("Required IDs are missing. Unable to submit review.");
-      return;
+    alert("Required IDs are missing. Unable to submit review.");
+    return;
   }
 
   const payload = {
-      Content: reviewContent,
-      Star: reviewRating,
-      AccountID: userAccountID,
-      Date: new Date().toISOString(),
-      ProgramID: programID, //  Now ProgramID is guaranteed
+    Content: reviewContent,
+    Star: reviewRating,
+    AccountID: userAccountID,
+    Date: new Date().toISOString(),
+    ProgramID: programID,
   };
 
-  console.log(" Submitting review:", payload);
-
   try {
-      //  Submit the review
-      const reviewResponse = await axios.post(`http://localhost:8000/review/`, payload);
-      console.log("Review submission successful:", reviewResponse.data);
+    await axios.post(`http://localhost:8000/review/`, payload);
+    await axios.delete(`http://localhost:8000/signup/${signUpID}`);
 
-      // Delete the SignUp entry to remove the program from the database
-      console.log(`Deleting SignUp entry with SignUpID: ${signUpID}`);
-      await axios.delete(`http://localhost:8000/signup/${signUpID}`);
-      console.log("Successfully removed ended program from database.");
+    // Update the UI
+    setPrograms((prevPrograms) =>
+      prevPrograms.filter((program) => program.SignUpID !== signUpID)
+    );
 
-      alert("Thank you for your review!");
-
-      // Remove the reviewed program from the UI
-      setPrograms((prevPrograms) => prevPrograms.filter(
-          (program) => program.SignUpID !== signUpID
-      ));
-
-      // Close the review prompt and reset form
-      setReviewPrompt(null);
-      setReviewContent("");
-      setReviewRating(5); // Reset review form
-
+    setShowSuccessModal(true); // Show the success modal
+    setReviewPrompt(null); // Close the review modal
+    setReviewContent(""); // Clear review input
+    setReviewRating(5); // Reset rating
   } catch (error) {
-      console.error(" Error submitting review or removing program:", error);
-
-      if (error.response) {
-          console.error(" Server responded with:", error.response.data);
-          alert(`Failed to submit review: ${error.response.data.message || "Unknown error"}`);
-      } else {
-          alert("Failed to submit review. Please check your network connection.");
-      }
+    console.error("Error submitting review or removing program:", error);
+    alert("Failed to submit review. Please try again.");
   }
 };
 
 
-  
+const handleCancelReview = async () => {
+  if (!reviewPrompt || !reviewPrompt.SignUpID) {
+    alert("Error: No SignUpID available to remove.");
+    setShowCancelConfirm(false);
+    return;
+  }
+
+  const signUpID = reviewPrompt.SignUpID;
+
+  try {
+    await axios.delete(`http://localhost:8000/signup/${signUpID}`);
+    setPrograms((prevPrograms) =>
+      prevPrograms.filter((program) => program.SignUpID !== signUpID)
+    );
+
+    setShowCancelConfirm(false); // Close cancel confirmation modal
+    setReviewPrompt(null); // Close the review modal
+    setReviewContent(""); // Clear review input
+    setReviewRating(5); // Reset rating
+  } catch (error) {
+    console.error("Error removing program:", error);
+    alert("Failed to remove sign-up. Please try again.");
+  }
+};
+
   
   const renderProgramCard = (data) => (
     <div
@@ -437,97 +439,229 @@ const handleReviewSubmit = async () => {
           </div>
 
                 {/* Review Prompt Modal */}
-      {reviewPrompt &&  (
-        <div
-          style={{
-            position: "fixed",
-            top: 0,
-            left: 0,
-            width: "100%",
-            height: "100%",
-            backgroundColor: "rgba(0, 0, 0, 0.5)",
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-          }}
+                {reviewPrompt && (
+                  <div style={reviewModalOverlayStyle}>
+  <div style={reviewModalContentStyle}>
+    <h2 style={reviewModalHeaderStyle}>
+      Leave a Review for {reviewPrompt.tier?.[0]?.Name}
+    </h2>
+    <textarea
+      value={reviewContent}
+      onChange={(e) => setReviewContent(e.target.value)}
+      placeholder="Write your review here..."
+      style={reviewTextareaStyle}
+    />
+    <div style={starContainerStyle}>
+      {[1, 2, 3, 4, 5].map((star) => (
+        <span
+          key={star}
+          onClick={() => setReviewRating(star)}
+          style={starStyle(star <= reviewRating)}
         >
-          <div
-            style={{
-              backgroundColor: "white",
-              padding: "20px",
-              borderRadius: "8px",
-              maxWidth: "500px",
-              width: "90%",
-            }}
-          >
-            <h2 style={{ marginBottom: "10px", fontSize: "18px", fontWeight: "bold" }}>
-              Leave a Review for {reviewPrompt.tier[0]?.Name}
-            </h2>
-            <textarea
-              value={reviewContent}
-              onChange={(e) => setReviewContent(e.target.value)}
-              placeholder="Write your review here..."
-              style={{
-                width: "100%",
-                height: "100px",
-                marginBottom: "10px",
-                padding: "10px",
-                borderRadius: "4px",
-                border: "1px solid #ddd",
-              }}
-            />
-            <div style={{ marginBottom: "10px" }}>
-              <label>Rating: </label>
-              <select
-                value={reviewRating}
-                onChange={(e) => setReviewRating(Number(e.target.value))}
-                style={{
-                  padding: "5px",
-                  borderRadius: "4px",
-                  border: "1px solid #ddd",
-                }}
-              >
-                {[1, 2, 3, 4, 5].map((rating) => (
-                  <option key={rating} value={rating}>
-                    {rating} ⭐
-                  </option>
-                ))}
-              </select>
-            </div>
-            <button
-              onClick={handleReviewSubmit}
-              style={{
-                backgroundColor: "#4CAF50",
-                color: "white",
-                padding: "10px 20px",
-                border: "none",
-                borderRadius: "4px",
-                cursor: "pointer",
-                marginRight: "10px",
-              }}
-            >
-              Submit
-            </button>
-            <button
-              onClick={() => setReviewPrompt(null)}
-              style={{
-                backgroundColor: "#f44336",
-                color: "white",
-                padding: "10px 20px",
-                border: "none",
-                borderRadius: "4px",
-                cursor: "pointer",
-              }}
-            >
-              Cancel
-            </button>
-          </div>
-        </div>
-      )}
+          ★
+        </span>
+      ))}
+    </div>
+    <button onClick={handleReviewSubmit} style={reviewSubmitButtonStyle}>
+      Submit
+    </button>
+    <button
+      onClick={() => setShowCancelConfirm(true)}
+      style={reviewCancelButtonStyle}
+    >
+      Cancel
+    </button>
+  </div>
+</div>
+
+)}
+      {/* Success Modal */}
+      {showSuccessModal && (
+  <div style={successModalOverlayStyle}>
+    <div style={successModalContentStyle}>
+      <h2 style={successModalHeaderStyle}>Review Submitted</h2>
+      <p style={{ marginBottom: "20px" }}>Thank you for your feedback!</p>
+      <button
+        onClick={() => setShowSuccessModal(false)}
+        style={successModalCloseButtonStyle}
+      >
+        Close
+      </button>
+    </div>
+  </div>
+)}
+
+       {/* Cancel Confirmation Modal */}
+       {showCancelConfirm && (
+  <div style={reviewModalOverlayStyle}>
+    <div style={reviewModalContentStyle}>
+      <h2 style={reviewModalHeaderStyle}>Are you sure?</h2>
+      <p>Cancelling will remove your sign-up.</p>
+      <button onClick={handleCancelReview} style={reviewSubmitButtonStyle}>
+        Yes, Remove
+      </button>
+      <button
+        onClick={() => setShowCancelConfirm(false)}
+        style={reviewCancelButtonStyle}
+      >
+        No, Keep It
+      </button>
+    </div>
+  </div>
+)}
         </div>
       </div>
     </div>
   );
+
+  
 }
+
+const cancelModalOverlayStyle = {
+  position: "fixed",
+  top: 0,
+  left: 0,
+  width: "100%",
+  height: "100%",
+  backgroundColor: "rgba(0, 0, 0, 0.5)", // Dimmed background
+  display: "flex",
+  justifyContent: "center",
+  alignItems: "center",
+};
+
+const cancelModalContentStyle = {
+  backgroundColor: "white",
+  padding: "25px",
+  borderRadius: "10px",
+  maxWidth: "400px",
+  width: "90%",
+  textAlign: "center",
+  boxShadow: "0px 6px 12px rgba(0, 0, 0, 0.2)",
+  border: "3px solid #FFC107", // Gold Border
+};
+
+
+
+const successModalOverlayStyle = {
+  position: "fixed",
+  top: 0,
+  left: 0,
+  width: "100%",
+  height: "100%",
+  backgroundColor: "rgba(0, 0, 0, 0.5)", // Dimmed background
+  display: "flex",
+  justifyContent: "center",
+  alignItems: "center",
+};
+
+const successModalContentStyle = {
+  backgroundColor: "white",
+  padding: "25px",
+  borderRadius: "10px",
+  maxWidth: "400px",
+  width: "90%",
+  textAlign: "center",
+  boxShadow: "0px 6px 12px rgba(0, 0, 0, 0.2)",
+  border: "#FFC107", // Blue Border
+};
+
+const successModalHeaderStyle = {
+  marginBottom: "15px",
+  fontSize: "22px",
+  fontWeight: "bold",
+  color: "3px solid #FFC107", // Bootstrap Green for Success
+};
+
+const successModalCloseButtonStyle = {
+  backgroundColor: " #FFC107", // Bootstrap Green
+  color: "black",
+  padding: "12px 20px",
+  border: "none",
+  cursor: "pointer",
+  borderRadius: "6px",
+  fontSize: "16px",
+  fontWeight: "bold",
+  transition: "background-color 0.3s ease",
+};
+const reviewModalOverlayStyle = {
+  position: "fixed",
+  top: 0,
+  left: 0,
+  width: "100%",
+  height: "100%",
+  backgroundColor: "rgba(0, 0, 0, 0.5)", // Dimmed background
+  display: "flex",
+  justifyContent: "center",
+  alignItems: "center",
+  zIndex: 1000,
+};
+
+const reviewModalContentStyle = {
+  backgroundColor: "white",
+  padding: "25px",
+  borderRadius: "10px",
+  maxWidth: "500px",
+  width: "90%",
+  textAlign: "center",
+  boxShadow: "0px 6px 12px rgba(0, 0, 0, 0.2)", // Smooth shadow
+  border: "3px solid #FFC107", // Gold Border
+};
+
+const reviewModalHeaderStyle = {
+  marginBottom: "15px",
+  fontSize: "22px",
+  fontWeight: "bold",
+  color: "#0D6EFD", // Blue Header Text
+};
+
+const reviewTextareaStyle = {
+  width: "100%",
+  height: "120px",
+  padding: "12px",
+  borderRadius: "6px",
+  border: "2px solid black", // Black border for input
+  marginBottom: "15px",
+  fontSize: "16px",
+  outline: "none",
+};
+
+const starContainerStyle = {
+  display: "flex",
+  justifyContent: "center",
+  marginBottom: "15px",
+};
+
+const starStyle = (isActive) => ({
+  fontSize: "24px",
+  cursor: "pointer",
+  color: isActive ? "#FFC107" : "#CCCCCC", // Gold for active stars, Gray for inactive
+});
+
+const reviewSubmitButtonStyle = {
+  backgroundColor: "#FFC107", // Gold for Submit Button
+  color: "black",
+  padding: "12px 20px",
+  border: "none",
+  cursor: "pointer",
+  borderRadius: "6px",
+  fontSize: "16px",
+  fontWeight: "bold",
+  marginRight: "10px",
+  transition: "background-color 0.3s ease",
+};
+
+const reviewCancelButtonStyle = {
+  backgroundColor: "#DC3545", // Red for Cancel Button
+  color: "white",
+  padding: "12px 20px",
+  border: "none",
+  cursor: "pointer",
+  borderRadius: "6px",
+  fontSize: "16px",
+  fontWeight: "bold",
+  transition: "background-color 0.3s ease",
+};
+
+
 
 export default Dashboard;
