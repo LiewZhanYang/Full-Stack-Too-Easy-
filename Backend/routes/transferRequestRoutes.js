@@ -21,4 +21,9 @@ router.get("/:transferID", transferRequestController.getTransferRequestById);
 // Delete a transfer request
 router.delete("/:transferID", transferRequestController.deleteTransferRequest);
 
+router.put(
+  "/:transferID",
+  transferRequestController.updateTransferRequestStatus
+);
+
 module.exports = router;

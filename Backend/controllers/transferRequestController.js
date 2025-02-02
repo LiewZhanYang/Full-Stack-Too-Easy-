@@ -146,11 +146,9 @@ exports.updateTransferRequestStatus = async (req, res) => {
         return res.status(404).json({ message: "Transfer request not found." });
       }
 
-      res
-        .status(200)
-        .json({
-          message: "Transfer request rejected and deleted successfully.",
-        });
+      res.status(200).json({
+        message: "Transfer request rejected and deleted successfully.",
+      });
     }
   } catch (error) {
     console.error("Error updating transfer request status:", error);
