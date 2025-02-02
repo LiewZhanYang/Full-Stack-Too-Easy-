@@ -195,6 +195,52 @@ class Program {
     connection.end();
   }
 
+  // Get program by TierID
+  static async getProgramByTierID(TierID) {
+    const connection = await mysql.createConnection(dbConfig);
+    const sqlQuery = `
+        SELECT p.ProgramID, p.ProgramName, p.ProgramDesc, p.TypeID 
+        FROM Program p
+        JOIN ProgramTier pt ON p.ProgramID = pt.ProgramID
+        WHERE pt.TierID = ?;
+    `;
+    const [rows] = await connection.execute(sqlQuery, [TierID]);
+    connection.end();
+
+    if (rows.length === 0) {
+      return null; // No program found for the given TierID
+    }
+
+    return rows.map(
+      (row) =>
+        new Program(row.ProgramID, row.ProgramName, row.ProgramDesc, row.TypeID)
+    );
+  }
+
+  // Get program by SessionID
+  static async getProgramBySessionID(SessionID) {
+    const connection = await mysql.createConnection(dbConfig);
+    const sqlQuery = `
+        SELECT p.ProgramID, p.ProgramName, p.ProgramDesc, p.TypeID 
+        FROM Program p
+        JOIN ProgramTier pt ON p.ProgramID = pt.ProgramID
+        JOIN Session s ON pt.TierID = s.TierID
+        WHERE s.SessionID = ?;
+    `;
+    const [rows] = await connection.execute(sqlQuery, [SessionID]);
+    connection.end();
+
+    if (rows.length === 0) {
+      return null; // No program found for the given SessionID
+    }
+
+    return rows.map(
+      (row) =>
+        new Program(row.ProgramID, row.ProgramName, row.ProgramDesc, row.TypeID)
+    );
+  }
+
+  // Get top programs by signups
   static async getTopPrograms() {
     const connection = await mysql.createConnection(dbConfig);
     const sqlQuery = `
@@ -220,81 +266,7 @@ class Program {
     return result; // Returns the top 3 programs
   }
 
-  static async getTopProgramByType() {
-    const connection = await mysql.createConnection(dbConfig);
-    const sqlQuery = `
-        SELECT 
-            pt.TypeDesc AS ProgramType,
-            p.ProgramName,
-            COUNT(su.SignUpID) AS TotalSignups
-        FROM 
-            SignUp su
-        JOIN 
-            Session s ON su.SessionID = s.SessionID
-        JOIN 
-            ProgramTier ptier ON s.TierID = ptier.TierID
-        JOIN 
-            Program p ON ptier.ProgramID = p.ProgramID
-        JOIN 
-            ProgramType pt ON p.TypeID = pt.TypeID
-        GROUP BY 
-            pt.TypeID, pt.TypeDesc, p.ProgramName
-        ORDER BY 
-            pt.TypeID, TotalSignups DESC;
-    `;
-
-    const [result] = await connection.execute(sqlQuery);
-    return result;
-  }
-
-  // static async getAverageRatingByProgram() {
-  //   const connection = await mysql.createConnection(dbConfig);
-  //   const sqlQuery = `
-  //     SELECT ROUND(AVG(Star), 1) AS AverageRating
-  //     FROM Review;
-  //   `;
-
-  //   const [result] = await connection.execute(sqlQuery);
-  //   connection.end();
-
-  //   return result[0]?.AverageRating || null;
-  // }
-
-  static async getAverageRatingByProgramType() {
-    const connection = await mysql.createConnection(dbConfig);
-    const sqlQuery = `
-        SELECT 
-            pt.TypeDesc AS ProgramType,
-            ROUND(AVG(r.Star), 1) AS AverageRating
-        FROM 
-            Review r
-        JOIN 
-            Program p ON r.ProgramID = p.ProgramID
-        JOIN 
-            ProgramType pt ON p.TypeID = pt.TypeID
-        GROUP BY 
-            pt.TypeID, pt.TypeDesc;
-    `;
-
-    const [result] = await connection.execute(sqlQuery);
-    return result;
-  }
-
-  static async getAverageRatingForEachProgram(programID) {
-    const connection = await mysql.createConnection(dbConfig);
-    const sqlQuery = `
-        SELECT 
-            ROUND(AVG(Star), 1) AS AverageRating
-        FROM 
-            Review
-        WHERE 
-            ProgramID = ?;
-    `;
-
-    const [result] = await connection.execute(sqlQuery, [programID]);
-    return result[0] || null;
-  }
-
+  // Get programs by income
   static async getProgramsByIncome() {
     const connection = await mysql.createConnection(dbConfig);
     const sqlQuery = `
@@ -325,78 +297,6 @@ class Program {
     `;
 
     const [result] = await connection.execute(sqlQuery);
-    return result;
-  }
-
-  static async getAverageRatingForAllPrograms() {
-    const connection = await mysql.createConnection(dbConfig);
-    const sqlQuery = `
-        SELECT 
-            p.ProgramName,
-            ROUND(AVG(r.Star), 1) AS AverageRating
-        FROM 
-            Review r
-        JOIN 
-            Program p ON r.ProgramID = p.ProgramID
-        GROUP BY 
-            p.ProgramID, p.ProgramName
-        ORDER BY 
-            AverageRating DESC;
-    `;
-
-    const [result] = await connection.execute(sqlQuery);
-    return result;
-  }
-
-  static async getProgramAttendees(programName, programType, programTier) {
-    const connection = await mysql.createConnection(dbConfig);
-
-    let sqlQuery = `
-        SELECT 
-            p.ProgramName,
-            pt.TypeDesc AS ProgramType,
-            t.Name AS TierName,
-            COUNT(su.SignUpID) AS TotalAttendees
-        FROM 
-            SignUp su
-        JOIN 
-            Session s ON su.SessionID = s.SessionID
-        JOIN 
-            ProgramTier ptier ON s.TierID = ptier.TierID
-        JOIN 
-            Program p ON ptier.ProgramID = p.ProgramID
-        JOIN 
-            ProgramType pt ON p.TypeID = pt.TypeID
-        JOIN 
-            Tier t ON ptier.TierID = t.TierID
-        WHERE 1=1
-    `;
-
-    const queryParams = [];
-
-    if (programName) {
-      sqlQuery += ` AND p.ProgramName = ?`;
-      queryParams.push(programName);
-    }
-    if (programType) {
-      sqlQuery += ` AND pt.TypeDesc = ?`;
-      queryParams.push(programType);
-    }
-    if (programTier) {
-      sqlQuery += ` AND t.Name = ?`;
-      queryParams.push(programTier);
-    }
-
-    sqlQuery += `
-        GROUP BY 
-            p.ProgramID, p.ProgramName, pt.TypeDesc, t.Name
-        ORDER BY 
-            TotalAttendees DESC;
-    `;
-
-    const [result] = await connection.execute(sqlQuery, queryParams);
-    connection.end();
-
     return result;
   }
 }
