@@ -8,5 +8,7 @@ router.post("/", sessionController.postSession);
 router.put("/:id", sessionController.updateSession)
 router.delete("/:id", sessionController.deleteSession)
 router.get("/sessionID/:sessionID", sessionController.getSessionBySessionID);
+router.get("/program/:programId", sessionController.getSessionsByProgramAndTier);
 
 module.exports = router;
+

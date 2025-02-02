@@ -112,10 +112,33 @@ const getSessionBySessionID = async (req, res) => {
   }
 };
 
+
+const getSessionsByProgramAndTier = async (req, res) => {
+  const { programId } = req.params;
+  const { tier } = req.query;
+
+  if (!programId || !tier) {
+    return res.status(400).json({ error: "Missing required parameters: programId and tier." });
+  }
+
+  try {
+    const sessions = await Session.getSessionsByProgramAndTier(programId, tier);
+    if (sessions.length === 0) {
+      return res.status(404).json({ error: "No sessions found for the specified program and tier." });
+    }
+    res.status(200).json(sessions);
+  } catch (error) {
+    console.error("Error fetching sessions:", error);
+    res.status(500).json({ error: "Failed to fetch sessions." });
+  }
+};
+
+
 module.exports = {
   getSessionsByTierID,
   postSession,
   updateSession,
   deleteSession,
   getSessionBySessionID,
+  getSessionsByProgramAndTier,
 };

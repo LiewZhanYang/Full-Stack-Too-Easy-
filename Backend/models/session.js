@@ -22,6 +22,34 @@ class Session {
     this.TierID = TierID;
   }
 
+
+  static async getSessionsByProgramAndTier(programId, tierName) {
+    const connection = await mysql.createConnection(dbConfig);
+
+    const sqlQuery = `
+        SELECT s.* 
+        FROM Session s
+        JOIN Tier t ON s.TierID = t.TierID
+        JOIN ProgramTier pt ON t.TierID = pt.TierID
+        WHERE pt.ProgramID = ? AND t.Name = ?
+        AND s.StartDate > CURDATE() -- Ensure only upcoming sessions are shown
+    `;
+
+    try {
+        console.log(`Executing query for Program ID: ${programId}, Tier: ${tierName}`);
+        const [result] = await connection.execute(sqlQuery, [programId, tierName]);
+        console.log(`Query result:`, result);
+        return result;
+    } catch (error) {
+        console.error("Error fetching sessions:", error);
+        throw error;
+    } finally {
+        connection.end();
+    }
+}
+
+ 
+
   static async getSessionsByTierID(TierID) {
     const connection = await mysql.createConnection(dbConfig);
     console.log(`Executing query for TierID: ${TierID}`);
