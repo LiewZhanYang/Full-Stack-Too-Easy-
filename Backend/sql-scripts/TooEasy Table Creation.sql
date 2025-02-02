@@ -165,10 +165,12 @@ CREATE TABLE TransferRequest (
     Reason VARCHAR(255) NOT NULL,
     MCPath TEXT NULL,
     RequestedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    Status ENUM('Pending', 'Confirmed') NOT NULL DEFAULT 'Pending',
 
     FOREIGN KEY (SignUpID) REFERENCES SignUp(SignUpID),
     FOREIGN KEY (NewSessionID) REFERENCES Session(SessionID)
 );
+
 
 CREATE TABLE Ticketing (
     TicketID INT PRIMARY KEY AUTO_INCREMENT,
@@ -427,25 +429,7 @@ INSERT INTO Forum (Topic) VALUES
 
 INSERT INTO Thread (Title, Body, CreatedOn, Likes, SentimentValue, PostedBy, Topic, ReplyTo) 
 VALUES
-    ('Workshop on Machine Learning', 'Hi all, what do those who have attended this workshop feel about it? Please comment under this thread and share with me thanks!', '2025-02-02', 10, 0.8, 1, 1, NULL),
-    (NULL, 'I think this workshop is wonderful and you will not regret signing up for it!', '2025-02-02', 5, 0.9, 2, 1, 1),
-    (NULL, 'Absolutely loved it! The content was so informative and the instructors were fantastic.', '2025-02-02', 6, 0.95, 3, 1, 1),
-    (NULL, 'I gained so many valuable insights and learned practical skills that I can apply immediately.', '2025-02-02', 7, 0.85, 4, 1, 1),
-    (NULL, 'I agree, this workshop exceeded my expectations. The hands-on exercises really helped solidify the concepts.', '2025-02-02', 8, 0.9, 5, 1, 1),
-    (NULL, 'Great to hear all the positive feedback! I’m definitely signing up for the next session.', '2025-02-02', 4, 0.8, 6, 1, 1),
-    ('Enquiry on Public Speaking workshop', 'Im interested in the public speaking workshops. Could someone please share with me the how the experience was like?', '2025-02-02', 3, 0.7, 7, 1, NULL),
-    (NULL, 'I found the public speaking workshops to be incredibly helpful. I learned valuable techniques for structuring presentations, engaging the audience, and managing my nerves. The practical exercises and constructive feedback from the instructor were invaluable. Im already applying what I learned in my professional and personal life.', '2025-02-02', 8, 0.95, 8, 1, 7),
-    (NULL, 'The workshops significantly boosted my confidence in public speaking. I used to dread presenting, but now I feel much more comfortable and prepared. The supportive environment and encouraging feedback from the instructor and fellow participants made a huge difference. I highly recommend these workshops to anyone looking to improve their public speaking skills.', '2025-02-02', 7, 0.85, 9, 1, 7),
-    ('Camp for Young Speakers', 'Is anyone planning to join the Young Speakers camp? Would love to hear about past experiences!', '2025-02-03', 6, 0.8, 10, 2, NULL),
-    (NULL, 'I attended the camp last year, and it was an amazing experience! I gained so much confidence and learned a lot about public speaking and presentation skills.', '2025-02-03', 9, 0.95, 11, 2, 10),
-    (NULL, 'I went last summer, and the camp provided a great balance of learning and fun activities. Highly recommend it!', '2025-02-03', 8, 0.9, 12, 2, 10),
-    (NULL, 'The camp was fantastic! The facilitators were supportive, and I felt like I made huge progress in my speaking abilities. Will definitely attend again.', '2025-02-03', 10, 0.92, 13, 2, 10),
-    ('Lab Work Experience', 'Can anyone share their experience working at the Lab? Would be nice to know what to expect.', '2025-02-04', 4, 0.6, 14, 3, NULL),
-    (NULL, 'I had a great time at the Lab! The hands-on work was really insightful, and I learned a lot. Definitely worth it!', '2025-02-04', 7, 0.8, 15, 3, 14),
-    (NULL, 'The Lab was an incredible experience. It helped me understand the theoretical concepts in a more practical way. Highly recommend!', '2025-02-04', 6, 0.85, 16, 3, 14),
-    ('Enquiry about PSLE Camp', 'Hi everyone, I’m looking into enrolling my child in the PSLE camp. Can anyone share their experience and how it helped with exam preparation?', '2025-02-01', 5, 0.7, 10, 2, NULL),
-    (NULL, 'I enrolled my child last year, and the camp was really beneficial! It gave them a lot of practice and boosted their confidence for the exams.', '2025-02-02', 7, 0.8, 11, 1, 1),
-    (NULL, 'The PSLE camp was great! My child really enjoyed the interactive lessons and the mock exams. Highly recommend it for anyone preparing for PSLE!', '2025-02-03', 6, 0.85, 12, 2, 1);
+
 Trigger
 
 -- Add Age On Insertion
@@ -606,3 +590,6 @@ BEGIN
 END //
 
 DELIMITER ;
+
+
+

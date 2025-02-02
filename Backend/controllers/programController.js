@@ -141,37 +141,21 @@ const deleteProgram = async (req, res) => {
     console.error(error);
     res.status(403).send("Cannot delete Programs, there are sessions");
   }
-}
+};
 
 const getProgramsByProgramType = async (req, res) => {
   const { typeID } = req.params;
   try {
     const programs = await Program.getProgramsByType(typeID);
     if (!programs || programs.length === 0) {
-      return res.status(404).json({ message: "No programs found for this type" });
+      return res
+        .status(404)
+        .json({ message: "No programs found for this type" });
     }
     res.json(programs);
   } catch (error) {
     console.error("Error retrieving programs by type:", error);
     res.status(500).json({ message: "Error retrieving programs by type" });
-  }
-};
-
-const getProgramByTier = async (req, res) => {
-  try {
-    const { tierID } = req.params;
-    console.log(" Fetching ProgramID for TierID:", tierID);
-
-    const programIDs = await Program.getProgramByTier(tierID);
-
-    if (!programIDs) {
-      return res.status(404).json({ message: "No program found for this TierID." });
-    }
-
-    res.json({ ProgramIDs: programIDs });
-  } catch (error) {
-    console.error(" Error fetching Program by Tier:", error);
-    res.status(500).json({ message: "Internal server error." });
   }
 };
 
@@ -184,5 +168,5 @@ module.exports = {
   getProgramBySignUp,
   deleteProgram,
   getProgramsByProgramType,
-  getProgramByTier,
+
 };
