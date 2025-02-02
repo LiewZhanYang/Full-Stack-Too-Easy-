@@ -17,10 +17,6 @@ User Interface
 - Access Webinars (Membership only): Access links to webinars and view details
 - 1 to 1 Coaching (Membership only): Book a session with a calendar system and attend coaching using Whereby API
 - Profile Management: Update any information in the profile and add children
-- Forum: Community Engagement regarding programs offered
-- Telegram Channel: Allows customers to be updated on the latest news
-- Google Calendar Sync: Reminds customers on upcoming programs
-- Ticketing System: Allow customers to send in enquiries such as programs or transfer requests
 
 Admin Console
 - Home page: Allow admin to view the sidebar, number of pending invoice confirmations and shortcuts
@@ -31,9 +27,6 @@ Admin Console
 - 1 to 1 Coaching on website: For admin to conduct coaching with users
 - Manage announcements: Create, view, update and delete announcements
 - Manage registration: Allow admins to accept or reject payments
-- Customer Management System: Allows admins to view and add notes on customers
-- Ticketing Reply: Reply enquiries customers have
-- Analytics and Insights Dashboard: Gives admins an overview of the latest popularity of programs
 
 ### Dependencies and Tools used
 - ReactJS (https://react.dev/)

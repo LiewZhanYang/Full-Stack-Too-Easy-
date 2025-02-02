@@ -48,8 +48,8 @@ import AdminSideBar from "./components/AdminSidebar.js";
 import Workshopvm from "./components/Workshopvm.js";
 import AdminCreateAnnouncement from "./components/AdminCreateAnnouncement.js";
 import AdminViewAnnouncement from "./components/AdminViewAnnouncement.js";
-import AdminEditAnnouncement from "./components/AdminEditAnnouncement.js";
-import AdminViewSingleAnnouncement from "./components/AdminViewSingleAnnouncement.js";
+import AdminEditAnnouncement from "./components/AdminEditAnnouncement.js"; // Import the componen
+import AdminViewSingleAnnouncement from "./components/AdminViewSingleAnnouncement";
 import StripePayment from "./components/StripePayment.js";
 import CompletePage from "./components/CompletePage.js";
 import WorkshopForum from "./components/WorkshopForum.js";
@@ -58,19 +58,11 @@ import LabsForum from "./components/LabsForum.js";
 import ViewPost from "./components/ViewPost.js";
 import Ticketing from "./components/Ticketing.js";
 import ViewTicket from "./components/ViewTicket.js";
-
-// From Submit-MC
-import SubmitMC from "./components/SubmitMC.js";
-import AdminConfirmMC from "./components/AdminConfirmMC.js";
-import AdminViewTransferRequest from "./components/AdminViewTransferRequest.js";
-
-// From main
 import AdminViewTicket from "./components/AdminViewTicket.js";
 import AdminResolveTicket from "./components/AdminResolveTicket.js";
 import AnalyticsDashboard from "./components/AnalyticsDashboard.js";
 import InsightsDashboard from "./components/InsightsDashboard.js";
 import ForumDashboard from "./components/ForumDashboard.js";
-
 import "./StripePayment.css";
 
 // Layout component to handle conditional rendering
@@ -247,16 +239,6 @@ function App() {
                   <Route path="/analytics" element={<AnalyticsDashboard />} />
                   <Route path="/insights" element={<InsightsDashboard />} />
                   <Route path="/forum-dashboard" element={<ForumDashboard />} />
-                  <Route path="/submitmc/:sessionid" element={<SubmitMC />} />
-                  <Route
-                    path="/admin-confirm-mc/:transferID"
-                    element={<AdminConfirmMC />}
-                  />
-                  <Route
-                    path="/admin-view-transfer-request"
-                    element={<AdminViewTransferRequest />}
-                  />
-
                   {/* Logout route redirects to login */}
                   <Route
                     path="/logout"
@@ -276,5 +258,11 @@ function App() {
     </AppProvider>
   );
 }
+
+// testing integrate
+fetch("http://localhost:8000/payment")
+  .then((response) => response.json())
+  .then((data) => console.log(data)) // This should log the list of customers
+  .catch((error) => console.error("Error:", error));
 
 export default App;

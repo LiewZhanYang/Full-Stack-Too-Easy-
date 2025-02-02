@@ -137,7 +137,6 @@ function Sidebar() {
                   </div>
                 )}
               </div>
-
               {/* Coaching Dropdown */}
               <div className="mt-3">
                 <button
@@ -165,107 +164,139 @@ function Sidebar() {
                     </Link>
                   </div>
                 )}
-              </div>
-
-              {/* MC Submission Dropdown */}
-              <div className="mt-3">
-                <button
-                  onClick={() => toggleMenu("mcSubmission")}
-                  className="btn d-flex align-items-center w-100 text-dark fw-bold px-3 py-2 border-0 bg-transparent"
-                >
-                  <i className="bi bi-file-earmark-text me-2"></i>
-                  MC Submission
-                  <i
-                    className={`bi ${
-                      expandedMenu === "mcSubmission"
-                        ? "bi-chevron-up"
-                        : "bi-chevron-down"
-                    } ms-auto`}
-                  ></i>
-                </button>
-                {expandedMenu === "mcSubmission" && (
-                  <div className="ps-4">
-                    <Link
-                      to="/admin-view-transfer-request"
-                      className="d-block py-1 text-dark text-decoration-none"
-                      style={{ fontSize: "0.95rem" }}
-                    >
-                      Transfer Requests
-                    </Link>
-                  </div>
-                )}
-              </div>
-
-              {/* CMS (Customer Management System) Dropdown */}
-              <div className="mt-3">
-                <button
-                  onClick={() => toggleMenu("cms")}
-                  className="btn d-flex align-items-center w-100 text-dark fw-bold px-3 py-2 border-0 bg-transparent"
-                >
-                  <i className="bi bi-briefcase me-2"></i>
-                  CMS
-                  <i
-                    className={`bi ${
-                      expandedMenu === "cms"
-                        ? "bi-chevron-up"
-                        : "bi-chevron-down"
-                    } ms-auto`}
-                  ></i>
-                </button>
-                {expandedMenu === "cms" && (
-                  <div className="ps-4">
-                    <Link
-                      to="/analytics"
-                      className="d-block py-1 text-dark text-decoration-none"
-                      style={{ fontSize: "0.95rem" }}
-                    >
-                      Analytics Dashboard
-                    </Link>
-                    <Link
-                      to="/insights"
-                      className="d-block py-1 text-dark text-decoration-none"
-                      style={{ fontSize: "0.95rem" }}
-                    >
-                      Insights Dashboard
-                    </Link>
-                    <Link
-                      to="/forum-dashboard"
-                      className="d-block py-1 text-dark text-decoration-none"
-                      style={{ fontSize: "0.95rem" }}
-                    >
-                      Forum Dashboard
-                    </Link>
-                  </div>
-                )}
-              </div>
-
-              {/* Ticketing Section */}
-              <div className="mt-3">
-                <button
-                  onClick={() => toggleMenu("ticket")}
-                  className="btn d-flex align-items-center w-100 text-dark fw-bold px-3 py-2 border-0 bg-transparent"
-                >
-                  <i className="bi bi-ticket me-2"></i>
-                  Ticketing
-                  <i
-                    className={`bi ${
-                      expandedMenu === "ticket"
-                        ? "bi-chevron-up"
-                        : "bi-chevron-down"
-                    } ms-auto`}
-                  ></i>
-                </button>
-                {expandedMenu === "ticket" && (
-                  <div className="ps-4">
-                    <Link
-                      to="/admin-view-ticket"
-                      className="d-block py-1 text-dark text-decoration-none"
-                      style={{ fontSize: "0.95rem" }}
-                    >
-                      Incoming Tickets
-                    </Link>
-                  </div>
-                )}
+                {/* Announcement Dropdown */}
+                <div className="mt-3">
+                  <button
+                    onClick={() => toggleMenu("announcement")}
+                    className="btn d-flex align-items-center w-100 text-dark fw-bold px-3 py-2 border-0 bg-transparent"
+                  >
+                    <i className="bi bi-bell me-2"></i>
+                    Announcement
+                    <i
+                      className={`bi ${
+                        expandedMenu === "announcement"
+                          ? "bi-chevron-up"
+                          : "bi-chevron-down"
+                      } ms-auto`}
+                    ></i>
+                  </button>
+                  {expandedMenu === "announcement" && (
+                    <div className="ps-4">
+                      <Link
+                        to="/admin-view-announcement"
+                        className="d-block py-1 text-dark text-decoration-none"
+                        style={{ fontSize: "0.95rem" }}
+                      >
+                        View All
+                      </Link>
+                      <Link
+                        to="/admin-create-announcement"
+                        className="d-block py-1 text-dark text-decoration-none"
+                        style={{ fontSize: "0.95rem" }}
+                      >
+                        Create
+                      </Link>
+                    </div>
+                  )}
+                </div>
+                {/* Registration Dropdown */}
+                <div className="mt-3">
+                  <button
+                    onClick={() => toggleMenu("events")}
+                    className="btn d-flex align-items-center w-100 text-dark fw-bold px-3 py-2 border-0 bg-transparent"
+                  >
+                    <i className="bi bi-calendar-event me-2"></i>
+                    Registration
+                    <i
+                      className={`bi ${
+                        expandedMenu === "events"
+                          ? "bi-chevron-up"
+                          : "bi-chevron-down"
+                      } ms-auto`}
+                    ></i>
+                  </button>
+                  {expandedMenu === "events" && (
+                    <div className="ps-4">
+                      <Link
+                        to="/admin-view-payment"
+                        className="d-block py-1 text-dark text-decoration-none"
+                        style={{ fontSize: "0.95rem" }}
+                      >
+                        Incoming Payments
+                      </Link>
+                    </div>
+                  )}
+                </div>
+                {/* CMS (Customer Management System) Dropdown */}
+                <div className="mt-3">
+                  <button
+                    onClick={() => toggleMenu("cms")}
+                    className="btn d-flex align-items-center w-100 text-dark fw-bold px-3 py-2 border-0 bg-transparent"
+                  >
+                    <i className="bi bi-briefcase me-2"></i>
+                    CMS
+                    <i
+                      className={`bi ${
+                        expandedMenu === "cms"
+                          ? "bi-chevron-up"
+                          : "bi-chevron-down"
+                      } ms-auto`}
+                    ></i>
+                  </button>
+                  {expandedMenu === "cms" && (
+                    <div className="ps-4">
+                      <Link
+                        to="/analytics"
+                        className="d-block py-1 text-dark text-decoration-none"
+                        style={{ fontSize: "0.95rem" }}
+                      >
+                        Analytics Dashboard
+                      </Link>
+                      <Link
+                        to="/insights"
+                        className="d-block py-1 text-dark text-decoration-none"
+                        style={{ fontSize: "0.95rem" }}
+                      >
+                        Insights Dashboard
+                      </Link>
+                      <Link
+                        to="/forum-dashboard"
+                        className="d-block py-1 text-dark text-decoration-none"
+                        style={{ fontSize: "0.95rem" }}
+                      >
+                        Forum Dashboard
+                      </Link>
+                    </div>
+                  )}
+                </div>
+                {/* Ticketing Section */}
+                <div className="mt-3">
+                  <button
+                    onClick={() => toggleMenu("ticket")}
+                    className="btn d-flex align-items-center w-100 text-dark fw-bold px-3 py-2 border-0 bg-transparent"
+                  >
+                    <i className="bi bi-ticket me-2"></i>
+                    Ticketing
+                    <i
+                      className={`bi ${
+                        expandedMenu === "ticket"
+                          ? "bi-chevron-up"
+                          : "bi-chevron-down"
+                      } ms-auto`}
+                    ></i>
+                  </button>
+                  {expandedMenu === "ticket" && (
+                    <div className="ps-4">
+                      <Link
+                        to="/admin-view-ticket"
+                        className="d-block py-1 text-dark text-decoration-none"
+                        style={{ fontSize: "0.95rem" }}
+                      >
+                        Incoming Tickets
+                      </Link>
+                    </div>
+                  )}
+                </div>
               </div>
             </nav>
           </div>

@@ -25,20 +25,17 @@ class TransferRequest {
 
     const sqlQuery = `
       SELECT 
-    tr.TransferID,
-    su.AccountID,
-    p.ProgramName,
-    tr.Reason,
-    tr.MCPath,
-    tr.RequestedAt,
-    tr.Status
-FROM 
-    TransferRequest tr
-JOIN 
-    SignUp su ON tr.SignUpID = su.SignUpID
-JOIN 
-    Program p ON su.SessionID = p.ProgramID;
-
+          tr.TransferID, 
+          tr.SignUpID, 
+          tr.NewSessionID, 
+          s1.StartDate AS CurrentSessionStart, 
+          s2.StartDate AS NewSessionStart, 
+          tr.Reason, 
+          tr.MCPath, 
+          tr.RequestedAt
+      FROM TransferRequest tr
+      JOIN Session s1 ON tr.SignUpID = s1.SessionID
+      JOIN Session s2 ON tr.NewSessionID = s2.SessionID;
     `;
     const [result] = await connection.execute(sqlQuery);
     return result;
@@ -48,22 +45,7 @@ JOIN
   static async getTransferRequestById(transferID) {
     const connection = await mysql.createConnection(dbConfig);
 
-    const sqlQuery = ` SELECT 
-      tr.TransferID,
-      su.AccountID,
-      p.ProgramName,
-      tr.Reason,
-      tr.MCPath,
-      tr.RequestedAt,
-      tr.Status
-    FROM 
-      TransferRequest tr
-    JOIN 
-      SignUp su ON tr.SignUpID = su.SignUpID
-    JOIN 
-      Program p ON su.SessionID = p.ProgramID
-    WHERE 
-      tr.TransferID = ?;`;
+    const sqlQuery = `SELECT * FROM TransferRequest WHERE TransferID = ?;`;
     const [result] = await connection.execute(sqlQuery, [transferID]);
     return result[0] || null;
   }
@@ -75,14 +57,6 @@ JOIN
     const sqlQuery = `DELETE FROM TransferRequest WHERE TransferID = ?;`;
     const [result] = await connection.execute(sqlQuery, [transferID]);
     return result.affectedRows > 0;
-  }
-
-  static async updateTransferRequestStatus(transferID, status) {
-    const connection = await mysql.createConnection(dbConfig);
-
-    const sqlQuery = `UPDATE TransferRequest SET Status = ? WHERE TransferID = ?`;
-    const [result] = await connection.execute(sqlQuery, [status, transferID]);
-    return result.affectedRows > 0; // Return true if the update was successful
   }
 }
 
