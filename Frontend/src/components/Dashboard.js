@@ -85,82 +85,99 @@ function Dashboard() {
   useEffect(() => {
     const fetchProgramsAndSessions = async () => {
       try {
-          console.log(" Fetching signed-up programs for AccountID:", userAccountID);
-  
-          const signUpResponse = await axios.get(`http://localhost:8000/signup/${userAccountID}`);
-          const signUps = Array.isArray(signUpResponse.data) ? signUpResponse.data : [signUpResponse.data];
-  
-          console.log(" Raw sign-up data:", signUps);
-  
-          const signUpsWithDetails = await Promise.all(
-              signUps.map(async (signup) => {
-                  if (signup.SessionID) {
-                      console.log(" Fetching session details for SessionID:", signup.SessionID);
-  
-                      const sessionResponse = await axios.get(
-                          `http://localhost:8000/session/SessionID/${signup.SessionID}`
-                      );
-  
-                      console.log(" Session API Response:", sessionResponse.data);
-  
-                      console.log(" Fetching tier details for TierID:", sessionResponse.data.TierID);
-                      const tierResponse = await axios.get(
-                          `http://localhost:8000/tier/${sessionResponse.data.TierID}`
-                      );
-  
-                      console.log(" Tier API Response:", tierResponse.data);
-  
-                      console.log(" Fetching ProgramID for TierID:", sessionResponse.data.TierID);
-                      const programResponse = await axios.get(
-                          `http://localhost:8000/program/tier/${sessionResponse.data.TierID}`
-                      );
-  
-                      console.log(" Program API Response:", programResponse.data);
-  
-                      //  Ensure ProgramID is correctly assigned inside `session`
-                      return {
-                          ...signup,
-                          session: {
-                              ...sessionResponse.data,
-                              ProgramID: programResponse.data.ProgramIDs ? programResponse.data.ProgramIDs[0] : null,
-                          },
-                          tier: tierResponse.data,
-                      };
-                  }
-                  return { ...signup, session: null, tier: null };
-              })
-          );
-  
-          console.log("🔍 Sign-ups with session & program details:", signUpsWithDetails);
-  
-          //  Find an ended program
-          const endedPrograms = signUpsWithDetails.find((program) => {
-              if (program.session && program.session.EndDate) {
-                  const endDate = new Date(program.session.EndDate);
-                  console.log(" Checking program end date:", endDate, "(Now:", new Date(), ")");
-                  return endDate < new Date(); // Compare dates
+        console.log("Fetching signed-up programs for AccountID:", userAccountID);
+    
+        const signUpResponse = await axios.get(`http://localhost:8000/signup/${userAccountID}`);
+        const signUps = Array.isArray(signUpResponse.data) ? signUpResponse.data : [signUpResponse.data];
+    
+        console.log("Raw sign-up data:", signUps);
+    
+        const signUpsWithDetails = await Promise.all(
+          signUps.map(async (signup) => {
+            if (signup.SessionID) {
+              console.log("Fetching session details for SessionID:", signup.SessionID);
+    
+              const sessionResponse = await axios.get(
+                `http://localhost:8000/session/SessionID/${signup.SessionID}`
+              );
+              console.log("Session API Response:", sessionResponse.data);
+    
+              const tierResponse = await axios.get(
+                `http://localhost:8000/tier/${sessionResponse.data.TierID}`
+              );
+              console.log("Tier API Response:", tierResponse.data);
+    
+              // Determine ProgramID
+              let programID = sessionResponse.data.ProgramIDs?.[0]; // From session
+              console.log("ProgramID from Session:", programID);
+    
+              if (!programID) {
+                console.log("Attempting to fetch ProgramID from Tier data...");
+                programID = tierResponse.data?.ProgramID || null; // From tier
+                console.log("ProgramID from Tier:", programID);
               }
-              return false;
-          });
-  
-          if (endedPrograms) {
-              console.log(" Ended program for review:", endedPrograms);
-              if (endedPrograms.session?.ProgramID) {
-                  setReviewPrompt(endedPrograms);
-              } else {
-                  console.error(" Error: `ProgramID` is missing in endedPrograms.session", endedPrograms.session);
+    
+              if (!programID && sessionResponse.data.TierID) {
+                console.log("Fetching ProgramID mapping for TierID:", sessionResponse.data.TierID);
+                const programMappingResponse = await axios.get(
+                  `http://localhost:8000/program/tier/${sessionResponse.data.TierID}`
+                );
+                console.log("Program Mapping Response:", programMappingResponse.data);
+                programID = programMappingResponse.data?.ProgramIDs?.[0] || null;
+                console.log("ProgramID from Tier Mapping API:", programID);
               }
-          }
-  
-          setPrograms(signUpsWithDetails);
+    
+              if (!programID) {
+                console.error("ProgramID could not be determined for session:", sessionResponse.data);
+              }
+    
+              // Fetch program details if ProgramID is found
+              let programName = null;
+              if (programID) {
+                console.log("Fetching program details for ProgramID:", programID);
+                const programResponse = await axios.get(`http://localhost:8000/program/${programID}`);
+                console.log("Program API Response (Full):", programResponse.data);
+              
+                if (programResponse.data && typeof programResponse.data === "object") {
+                  console.log("Extracting program name...");
+                  programName = programResponse.data.ProgramName || "Unknown Program";
+                } else {
+                  console.error("Unexpected program response format:", programResponse.data);
+                }
+              }
+              
+    
+              // Combine all details into one object
+              return {
+                ...signup,
+                session: {
+                  ...sessionResponse.data,
+                  ProgramID: programID, // Include ProgramID
+                },
+                tier: tierResponse.data,
+                program: {
+                  id: programID,
+                  name: programName, // Include Program Name
+                },
+              };
+            }
+            return { ...signup, session: null, tier: null, program: null };
+          })
+        );
+    
+        console.log("Sign-ups with session, tier & program details:", signUpsWithDetails);
+    
+        setPrograms(signUpsWithDetails);
       } catch (err) {
-          console.error(" Error in fetchProgramsAndSessions:", err);
-          setError("You have not signed up for any programs.");
+        console.error("Error in fetchProgramsAndSessions:", err);
+        setError("You have not signed up for any programs.");
       } finally {
-          setLoading(false);
-          console.log(" Finished fetching programs.");
+        setLoading(false);
+        console.log("Finished fetching programs.");
       }
-  };
+    };
+    
+    
   
   
   fetchProgramsAndSessions();
@@ -244,7 +261,11 @@ const handleCancelReview = async () => {
 };
 
   
-  const renderProgramCard = (data) => (
+const renderProgramCard = (data) => {
+  // Debug: Log the full `data` object to inspect its structure
+  console.log("Rendering Program Card:", data);
+
+  return (
     <div
       key={data.SignUpID}
       style={{
@@ -279,6 +300,7 @@ const handleCancelReview = async () => {
       </div>
 
       <div style={{ flexGrow: 1 }}>
+        {/* Display Program Name */}
         <h3
           style={{
             fontSize: "16px",
@@ -287,8 +309,10 @@ const handleCancelReview = async () => {
             marginBottom: "4px",
           }}
         >
-          {data.tier[0]?.Name || "Unknown Program"}
+          {data.program?.name || data.tier[0]?.Name || "Unknown Program"}
         </h3>
+
+        {/* Program Dates */}
         <p
           style={{
             fontSize: "14px",
@@ -296,19 +320,28 @@ const handleCancelReview = async () => {
             marginBottom: "4px",
           }}
         >
-          {new Date(data.session?.StartDate).toLocaleDateString()} -{" "}
-          {new Date(data.session?.EndDate).toLocaleDateString()}
+          {data.session?.StartDate
+            ? new Date(data.session.StartDate).toLocaleDateString()
+            : "N/A"}{" "}
+          -{" "}
+          {data.session?.EndDate
+            ? new Date(data.session.EndDate).toLocaleDateString()
+            : "N/A"}
         </p>
+
+        {/* Program Time and Location */}
         <p
           style={{
             fontSize: "14px",
             color: "#666",
           }}
         >
-          {data.session?.Time} | {data.session?.Location}
+          {data.session?.Time || "Time not available"} |{" "}
+          {data.session?.Location || "Location not available"}
         </p>
       </div>
 
+      {/* View More Button */}
       <button
         onClick={() =>
           navigate("/workshopvm", { state: { sessionId: data.session?.SessionID } })
@@ -332,6 +365,9 @@ const handleCancelReview = async () => {
       </button>
     </div>
   );
+};
+
+
 
   return (
     <div className="p-4">
