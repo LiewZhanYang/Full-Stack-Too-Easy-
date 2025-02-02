@@ -12,6 +12,6 @@ router.get(
   "/program/:programId",
   sessionController.getSessionsByProgramAndTier
 );
-router.get("/:id/affected-customers", sessionController.getAffectedCustomers);
+router.put("/:id/cancel", sessionController.handleCancelSession);
 
 module.exports = router;

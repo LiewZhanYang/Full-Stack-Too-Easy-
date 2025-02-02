@@ -258,19 +258,26 @@ class Session {
     );
   }
 
-  static async getAffectedCustomers(sessionID) {
-    const query = `
-      SELECT 
-        cust.Name AS parentName,
-        cust.ContactNo AS contactNumber,
-        c.Name AS childName
-      FROM SignUp su
-      JOIN Child c ON su.ChildID = c.ChildID
-      JOIN Customer cust ON su.AccountID = cust.AccountID
-      WHERE su.SessionID = ?;
+  static async updateSession(SessionID, SessionDetails) {
+    const connection = await mysql.createConnection(dbConfig);
+
+    const sqlQuery = `
+      UPDATE session 
+      SET Status = ?
+      WHERE SessionID = ?
     `;
-    const [results] = await db.execute(query, [sessionID]);
-    return results;
+
+    const values = [SessionDetails.Status, SessionID];
+
+    try {
+      const [result] = await connection.execute(sqlQuery, values);
+      return result.affectedRows > 0; // Return true if a session was updated
+    } catch (error) {
+      console.error("Error updating session:", error);
+      throw error;
+    } finally {
+      await connection.end();
+    }
   }
 }
 
