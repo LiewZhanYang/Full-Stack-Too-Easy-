@@ -52,7 +52,7 @@ function Payment() {
     const fetchMembershipStatus = async () => {
       const userId = localStorage.getItem("userId");
       if (!userId) return;
-
+  
       try {
         const response = await axios.get(
           `http://localhost:8000/customer/id/${userId}`
@@ -64,19 +64,26 @@ function Payment() {
         console.error("Error fetching membership status:", error);
       }
     };
-
+  
     const fetchSessions = async () => {
       try {
+        console.log("Fetching Sessions for Program ID:", programId);
+        console.log("Tier Selected:", location.state.tier);
+    
         const response = await axios.get(
-          `http://localhost:8000/session/${programId}`
+          `http://localhost:8000/session/program/${programId}`,
+          { params: { tier: location.state.tier } }
         );
+    
         setSessions(response.data);
         console.log("Sessions fetched successfully:", response.data);
       } catch (error) {
         console.error("Error fetching sessions:", error);
       }
     };
-
+    
+    
+  
     const fetchProgramName = async () => {
       try {
         const response = await axios.get(
@@ -88,31 +95,69 @@ function Payment() {
         console.error("Error fetching program name:", error);
       }
     };
-
+  
     const fetchChildren = async () => {
       const userId = localStorage.getItem("userId");
       if (!userId) return;
-
+    
       try {
-        const response = await axios.get(
+        // Fetch children for the user
+        const childrenResponse = await axios.get(
           `http://localhost:8000/children/${userId}`
         );
-        setChildren(
-          response.data.map((child) => ({
-            ...child,
-            DOB: child.DOB || "", // Ensure DOB is at least an empty string
-          }))
-        );
+    
+        if (!childrenResponse.data || childrenResponse.data.length === 0) {
+          console.warn("No children found for this user.");
+          setChildren([]); // Reset children state if no data found
+          return;
+        }
+    
+        console.log("Children fetched:", childrenResponse.data);
+    
+        // Set children without signed-up sessions initially
+        setChildren(childrenResponse.data);
       } catch (error) {
         console.error("Error fetching children:", error);
+        setChildren([]); // Reset children state in case of an error
       }
     };
-
+    
+    const fetchSignups = async () => {
+      const userId = localStorage.getItem("userId");
+      if (!userId) return;
+    
+      try {
+        // Fetch signups for the user
+        const signupResponse = await axios.get(
+          `http://localhost:8000/signup/${userId}`
+        );
+    
+        const existingSignups = signupResponse.data || [];
+        console.log("Existing Signups:", existingSignups);
+    
+        // Update children with signed-up sessions
+        setChildren((prevChildren) =>
+          prevChildren.map((child) => {
+            const signedUpSessions = existingSignups
+              .filter((signup) => signup.ChildID === child.ChildID)
+              .map((signup) => signup.SessionID); // Extract only SessionIDs
+    
+            return { ...child, signedUpSessions };
+          })
+        );
+      } catch (error) {
+        console.error("Error fetching signups:", error);
+      }
+    };
+    
+    
+  
     fetchSessions();
     fetchChildren();
     fetchProgramName();
+    fetchSignups();
   }, [programId]);
-
+  
   useEffect(() => {
     const pricePerChild = parseFloat(price?.replace("$", "") || 0);
     setTotalPrice(pricePerChild * selectedChildren.length);
@@ -120,14 +165,20 @@ function Payment() {
 
   const handleChildSelection = (childId) => {
     setSelectedChildren((prevSelected) => {
+      const existingChild = children.find((child) => child.ChildID === childId);
+  
+      if (!existingChild) return prevSelected; // Safety check
+  
       if (prevSelected.some((child) => child.ChildID === childId)) {
         // Remove child if already selected
         return prevSelected.filter((child) => child.ChildID !== childId);
       }
-      // Add new child with default lunch option
-      return [...prevSelected, { ChildID: childId, lunchOption: "" }];
+  
+      // Add child with signedUpSessions included
+      return [...prevSelected, { ...existingChild }];
     });
   };
+  
 
   const handleLunchOptionChange = (childId, lunchOption) => {
     setSelectedChildren((prevSelected) =>
@@ -341,19 +392,35 @@ function Payment() {
                 : "Select a Session"}
             </button>
             <ul className="dropdown-menu">
-              {sessions.map((session) => (
-                <li key={session.SessionID}>
-                  <button
-                    className="dropdown-item"
-                    onClick={() => setSelectedSession(session)}
-                  >
-                    {new Date(session.StartDate).toLocaleDateString()} -{" "}
-                    {new Date(session.EndDate).toLocaleDateString()} (
-                    {session.Location})
-                  </button>
-                </li>
-              ))}
-            </ul>
+        {sessions.map((session) => {
+          //  Check if any selected child has signed up for this session
+          const isSessionDisabled = selectedChildren.some((child) =>
+            child.signedUpSessions?.includes(session.SessionID)
+          );
+
+          console.log(
+            `Session ${session.SessionID} Disabled? ${isSessionDisabled}`
+          );
+
+          return (
+            <li key={session.SessionID}>
+              <button
+                className="dropdown-item"
+                onClick={() => setSelectedSession(session)}
+                disabled={isSessionDisabled} //  Disable already signed-up sessions
+                style={{
+                  color: isSessionDisabled ? "#d3d3d3" : "inherit",
+                  pointerEvents: isSessionDisabled ? "none" : "auto",
+                }}
+              >
+                {new Date(session.StartDate).toLocaleDateString()} -{" "}
+                {new Date(session.EndDate).toLocaleDateString()} ({session.Location}){" "}
+                {isSessionDisabled && "(Already signed up)"}
+              </button>
+            </li>
+          );
+        })}
+      </ul>
           </div>
 
           <h3 className="fs-5 mb-3">Select Children Attending</h3>

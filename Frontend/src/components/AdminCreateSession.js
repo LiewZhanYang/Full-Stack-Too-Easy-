@@ -8,44 +8,80 @@ const AdminCreateSession = () => {
   const [time, setTime] = useState("");
   const [location, setLocation] = useState("");
   const [vacancy, setVacancy] = useState("");
+  const [programID, setProgramID] = useState(null); 
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
 
   const navigate = useNavigate();
-  const { id: programID } = useParams();
+  const { id: tierID } = useParams();
+
 
   const handleCreateSession = async () => {
-    const sessionDetails = {
-      StartDate: startDate,
-      EndDate: endDate,
-      Time: time,
-      Location: location,
-      Vacancy: vacancy,
-      TierID: programID, 
-    };
-
-    console.log("Session Details:", sessionDetails); // Debug log
-
+    console.log("Start Date:", startDate);
+    console.log("End Date:", endDate);
+    console.log("Time:", time);
+    console.log("Location:", location);
+    console.log("Vacancy:", vacancy);
+    console.log("TierID:", tierID);
+  
     try {
-      const response = await fetch("http://localhost:8000/session", {
+      // 🔹 Fetch ProgramID before submitting
+      console.log("Fetching ProgramID for TierID:", tierID);
+      const response = await fetch(`http://localhost:8000/program/tier/${tierID}`);
+      const data = await response.json();
+  
+      console.log("Full API Response:", data); // 🔥 Debugging log
+  
+      if (!response.ok || !data.ProgramIDs || data.ProgramIDs.length === 0) {
+        console.error("Error fetching ProgramID:", data.error || "No ProgramID found.");
+        alert("Error fetching ProgramID. Please try again.");
+        return;
+      }
+  
+      const fetchedProgramID = data.ProgramIDs[0]; // ✅ Extract first value from array
+      console.log("Fetched ProgramID:", fetchedProgramID); // 🔥 Debugging log
+  
+      // 🔹 Validate all inputs including fetched ProgramID
+      if (!startDate || !endDate || !time || !location || !vacancy || !tierID || !fetchedProgramID) {
+        alert("Please fill in all fields before submitting.");
+        return;
+      }
+  
+      // 🔹 Prepare session details
+      const sessionDetails = {
+        StartDate: startDate,
+        EndDate: endDate,
+        Time: time,
+        Location: location,
+        Vacancy: parseInt(vacancy, 10),
+        TierID: parseInt(tierID, 10),
+        ProgramID: parseInt(fetchedProgramID, 10),
+      };
+  
+      console.log("Sending session details:", sessionDetails);
+  
+      // 🔹 Submit session to the backend
+      const createResponse = await fetch("http://localhost:8000/session", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(sessionDetails),
       });
-
-      if (!response.ok) {
-        throw new Error("Failed to create session");
+  
+      const createData = await createResponse.json();
+      console.log("Response from server:", createData);
+  
+      if (!createResponse.ok) {
+        throw new Error(createData.error || "Failed to create session");
       }
-
-      console.log("Session Created:", sessionDetails);
-      setShowConfirmModal(false);
+  
+      alert("Session created successfully!");
       setShowSuccessModal(true);
     } catch (error) {
       console.error("Error creating session:", error);
+      alert("Failed to create session. Check console for details.");
     }
   };
+  
 
   const handleCancel = () => {
     navigate("/admin-view-program");
