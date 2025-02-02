@@ -165,6 +165,7 @@ CREATE TABLE TransferRequest (
     Reason VARCHAR(255) NOT NULL,
     MCPath TEXT NULL,
     RequestedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    Status ENUM('Pending', 'Confirmed') NOT NULL DEFAULT 'Pending',
 
     FOREIGN KEY (SignUpID) REFERENCES SignUp(SignUpID),
     FOREIGN KEY (NewSessionID) REFERENCES Session(SessionID)
@@ -447,6 +448,14 @@ VALUES
     ('Enquiry about PSLE Camp', 'Hi everyone, I’m looking into enrolling my child in the PSLE camp. Can anyone share their experience and how it helped with exam preparation?', '2025-02-01', 5, 0.7, 10, 2, NULL),
     (NULL, 'I enrolled my child last year, and the camp was really beneficial! It gave them a lot of practice and boosted their confidence for the exams.', '2025-02-02', 7, 0.8, 11, 1, 1),
     (NULL, 'The PSLE camp was great! My child really enjoyed the interactive lessons and the mock exams. Highly recommend it for anyone preparing for PSLE!', '2025-02-03', 6, 0.85, 12, 2, 1);
+
+
+    INSERT INTO TransferRequest (SignUpID, NewSessionID, Reason, MCPath, Status)
+VALUES
+(1, 2, 'Medical Emergency', 'path/to/medical_certificate1.pdf', 'Pending'),
+(2, 3, 'Schedule Conflict', 'path/to/medical_certificate2.pdf', 'Confirmed'),
+(3, 4, 'Travel Issues', NULL, 'Pending'),
+(4, 1, 'Personal Reasons', 'path/to/medical_certificate3.pdf', 'Confirmed');
 Trigger
 
 -- Add Age On Insertion
