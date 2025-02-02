@@ -10,14 +10,14 @@ import { Check } from "lucide-react";
 // Store amount in localstorage, then multiply by 100, not sure ask CADEN
 // const amount = localStorage.getItem("amount");
 
-
-
 // Make sure to call loadStripe outside of a component’s render to avoid
 // recreating the Stripe object on every render.
 // This is your test publishable API key.
 const stripePromise = loadStripe("pk_test_51QRx0kG1MaTqtP83A1bjOVMHB8mwcVhkQXB78H4P09xvzdujOBWNPecVloIGJQqPxp9vGZRJNtqllzBw83IzG80300ScbDBaxz");
 
-export default function StripePayment() {
+export default function StripePayment(props) {
+
+    const { totalPrice, programId, selectedChildren, SessionID, UserID } = props; // Destructure props
     const [clientSecret, setClientSecret] = useState("");
 
     useEffect(() => {
@@ -25,9 +25,7 @@ export default function StripePayment() {
         fetch("http://localhost:8000/create-payment-intent", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            // $50 = amount: 5000 (must multiply by 100)
-            // YOU HAVE TO CHANGE 1000 TO A VARIABLE
-            body: JSON.stringify({ amount: 1000 }),
+            body: JSON.stringify({ amount: totalPrice*100 }),
         })
         .then((res) => res.json())
         .then((data) => setClientSecret(data.clientSecret));
@@ -35,10 +33,15 @@ export default function StripePayment() {
 
     return (
         <>
-            <h1>React Stripe and the Payment Element</h1>
             {stripePromise && clientSecret && (
                 <Elements stripe={stripePromise} options={ {clientSecret} }>
-                    <CheckoutForm />
+                    <CheckoutForm 
+                        programId={programId}
+                        selectedChildren={selectedChildren}
+                        SessionID={SessionID}
+                        userId={UserID}
+                        totalPrice={totalPrice}
+                    />
                 </Elements>
             )}
         </>

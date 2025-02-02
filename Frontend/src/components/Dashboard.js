@@ -15,6 +15,9 @@ function Dashboard() {
   const [reviewPrompt, setReviewPrompt] = useState(null); // Store program for review
   const [reviewContent, setReviewContent] = useState(""); // Review input from user
   const [reviewRating, setReviewRating] = useState(5); // Default rating
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [showCancelConfirm, setShowCancelConfirm] = useState(false);
+  
 
   const userAccountID = localStorage.getItem("userId"); // Assuming user ID is stored in localStorage
 
@@ -82,121 +85,164 @@ function Dashboard() {
   useEffect(() => {
     const fetchProgramsAndSessions = async () => {
       try {
-        const signUpResponse = await axios.get(
-          `http://localhost:8000/signup/${userAccountID}`
-        );
-        const signUps = Array.isArray(signUpResponse.data)
-          ? signUpResponse.data
-          : [signUpResponse.data];
+          console.log(" Fetching signed-up programs for AccountID:", userAccountID);
   
-        const signUpsWithDetails = await Promise.all(
-          signUps.map(async (signup) => {
-            if (signup.SessionID) {
-              const sessionResponse = await axios.get(
-                `http://localhost:8000/session/SessionID/${signup.SessionID}`
-              );
-              const tierResponse = await axios.get(
-                `http://localhost:8000/tier/${sessionResponse.data.TierID}`
-              );
+          const signUpResponse = await axios.get(`http://localhost:8000/signup/${userAccountID}`);
+          const signUps = Array.isArray(signUpResponse.data) ? signUpResponse.data : [signUpResponse.data];
   
-              return {
-                ...signup,
-                session: sessionResponse.data,
-                tier: tierResponse.data,
-              };
-            }
-            return { ...signup, session: null, tier: null };
-          })
-        );
+          console.log(" Raw sign-up data:", signUps);
   
-        console.log("Sign-ups with details:", signUpsWithDetails);
+          const signUpsWithDetails = await Promise.all(
+              signUps.map(async (signup) => {
+                  if (signup.SessionID) {
+                      console.log(" Fetching session details for SessionID:", signup.SessionID);
   
-        const endedPrograms = signUpsWithDetails.find((program) => {
-          if (program.session && program.session.EndDate) {
-            const endDate = new Date(program.session.EndDate);
-            console.log(
-              "Checking program:",
-              program,
-              "End Date:",
-              endDate,
-              "Current Date:",
-              currentDate,
-              "Comparison Result:",
-              endDate < currentDate
-            );
-            return endDate < currentDate; // Compare dates
+                      const sessionResponse = await axios.get(
+                          `http://localhost:8000/session/SessionID/${signup.SessionID}`
+                      );
+  
+                      console.log(" Session API Response:", sessionResponse.data);
+  
+                      console.log(" Fetching tier details for TierID:", sessionResponse.data.TierID);
+                      const tierResponse = await axios.get(
+                          `http://localhost:8000/tier/${sessionResponse.data.TierID}`
+                      );
+  
+                      console.log(" Tier API Response:", tierResponse.data);
+  
+                      console.log(" Fetching ProgramID for TierID:", sessionResponse.data.TierID);
+                      const programResponse = await axios.get(
+                          `http://localhost:8000/program/tier/${sessionResponse.data.TierID}`
+                      );
+  
+                      console.log(" Program API Response:", programResponse.data);
+  
+                      //  Ensure ProgramID is correctly assigned inside `session`
+                      return {
+                          ...signup,
+                          session: {
+                              ...sessionResponse.data,
+                              ProgramID: programResponse.data.ProgramIDs ? programResponse.data.ProgramIDs[0] : null,
+                          },
+                          tier: tierResponse.data,
+                      };
+                  }
+                  return { ...signup, session: null, tier: null };
+              })
+          );
+  
+          console.log("🔍 Sign-ups with session & program details:", signUpsWithDetails);
+  
+          //  Find an ended program
+          const endedPrograms = signUpsWithDetails.find((program) => {
+              if (program.session && program.session.EndDate) {
+                  const endDate = new Date(program.session.EndDate);
+                  console.log(" Checking program end date:", endDate, "(Now:", new Date(), ")");
+                  return endDate < new Date(); // Compare dates
+              }
+              return false;
+          });
+  
+          if (endedPrograms) {
+              console.log(" Ended program for review:", endedPrograms);
+              if (endedPrograms.session?.ProgramID) {
+                  setReviewPrompt(endedPrograms);
+              } else {
+                  console.error(" Error: `ProgramID` is missing in endedPrograms.session", endedPrograms.session);
+              }
           }
-          return false;
-        });
-        
-        console.log("Ended Programs Result:", endedPrograms);
-        
   
-        console.log("Ended Programs:", endedPrograms);
-  
-        if (endedPrograms) {
-          setReviewPrompt(endedPrograms);
-        }
-  
-        setPrograms(signUpsWithDetails);
+          setPrograms(signUpsWithDetails);
       } catch (err) {
-        setError("You have not signed up for any programmes.");
-        console.error(err);
+          console.error(" Error in fetchProgramsAndSessions:", err);
+          setError("You have not signed up for any programs.");
       } finally {
-        setLoading(false);
+          setLoading(false);
+          console.log(" Finished fetching programs.");
       }
-    };
-  
-    fetchProgramsAndSessions();
-  }, [userAccountID]);
-  
-  
-
-  const handleReviewSubmit = async () => {
-    if (!reviewContent.trim()) {
-      alert("Please write a review before submitting.");
-      return;
-    }
-  
-    // Ensure ProgramID is valid
-    const programID = reviewPrompt?.session?.ProgramID;
-    if (!programID) {
-      alert("Program ID is missing. Unable to submit review.");
-      return;
-    }
-  
-    const payload = {
-      Content: reviewContent,
-      Star: reviewRating,
-      AccountID: userAccountID, // User submitting the review
-      Date: new Date().toISOString(), // Current date and time
-    };
-  
-    console.log(`Submitting review for ProgramID: ${programID}`, payload);
-  
-    try {
-      const response = await axios.post(`http://localhost:8000/review/${programID}`, payload);
-  
-      // Log success response
-      console.log("Review submission successful:", response.data);
-  
-      alert("Thank you for your review!");
-      setReviewPrompt(null); // Close the review prompt
-      setReviewContent("");
-      setReviewRating(5); // Reset review form
-    } catch (error) {
-      console.error("Error submitting review:", error);
-  
-      if (error.response) {
-        console.error("Server responded with:", error.response.data);
-        alert(`Failed to submit review: ${error.response.data.message || "Unknown error"}`);
-      } else {
-        alert("Failed to submit review. Please check your network connection.");
-      }
-    }
   };
   
   
+  fetchProgramsAndSessions();
+  
+
+    fetchProgramsAndSessions();
+}, [userAccountID]);
+
+  
+
+const handleReviewSubmit = async () => {
+  if (!reviewContent.trim()) {
+    alert("Please write a review before submitting.");
+    return;
+  }
+
+  if (!reviewPrompt || !reviewPrompt.session) {
+    alert("Session data is missing. Unable to submit review.");
+    return;
+  }
+
+  const programID = reviewPrompt.session.ProgramID;
+  const signUpID = reviewPrompt.SignUpID;
+
+  if (!programID || !signUpID) {
+    alert("Required IDs are missing. Unable to submit review.");
+    return;
+  }
+
+  const payload = {
+    Content: reviewContent,
+    Star: reviewRating,
+    AccountID: userAccountID,
+    Date: new Date().toISOString(),
+    ProgramID: programID,
+  };
+
+  try {
+    await axios.post(`http://localhost:8000/review/`, payload);
+    await axios.delete(`http://localhost:8000/signup/${signUpID}`);
+
+    // Update the UI
+    setPrograms((prevPrograms) =>
+      prevPrograms.filter((program) => program.SignUpID !== signUpID)
+    );
+
+    setShowSuccessModal(true); // Show the success modal
+    setReviewPrompt(null); // Close the review modal
+    setReviewContent(""); // Clear review input
+    setReviewRating(5); // Reset rating
+  } catch (error) {
+    console.error("Error submitting review or removing program:", error);
+    alert("Failed to submit review. Please try again.");
+  }
+};
+
+
+const handleCancelReview = async () => {
+  if (!reviewPrompt || !reviewPrompt.SignUpID) {
+    alert("Error: No SignUpID available to remove.");
+    setShowCancelConfirm(false);
+    return;
+  }
+
+  const signUpID = reviewPrompt.SignUpID;
+
+  try {
+    await axios.delete(`http://localhost:8000/signup/${signUpID}`);
+    setPrograms((prevPrograms) =>
+      prevPrograms.filter((program) => program.SignUpID !== signUpID)
+    );
+
+    setShowCancelConfirm(false); // Close cancel confirmation modal
+    setReviewPrompt(null); // Close the review modal
+    setReviewContent(""); // Clear review input
+    setReviewRating(5); // Reset rating
+  } catch (error) {
+    console.error("Error removing program:", error);
+    alert("Failed to remove sign-up. Please try again.");
+  }
+};
+
   
   const renderProgramCard = (data) => (
     <div
@@ -393,97 +439,229 @@ function Dashboard() {
           </div>
 
                 {/* Review Prompt Modal */}
-      {reviewPrompt &&  (
-        <div
-          style={{
-            position: "fixed",
-            top: 0,
-            left: 0,
-            width: "100%",
-            height: "100%",
-            backgroundColor: "rgba(0, 0, 0, 0.5)",
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-          }}
+                {reviewPrompt && (
+                  <div style={reviewModalOverlayStyle}>
+  <div style={reviewModalContentStyle}>
+    <h2 style={reviewModalHeaderStyle}>
+      Leave a Review for {reviewPrompt.tier?.[0]?.Name}
+    </h2>
+    <textarea
+      value={reviewContent}
+      onChange={(e) => setReviewContent(e.target.value)}
+      placeholder="Write your review here..."
+      style={reviewTextareaStyle}
+    />
+    <div style={starContainerStyle}>
+      {[1, 2, 3, 4, 5].map((star) => (
+        <span
+          key={star}
+          onClick={() => setReviewRating(star)}
+          style={starStyle(star <= reviewRating)}
         >
-          <div
-            style={{
-              backgroundColor: "white",
-              padding: "20px",
-              borderRadius: "8px",
-              maxWidth: "500px",
-              width: "90%",
-            }}
-          >
-            <h2 style={{ marginBottom: "10px", fontSize: "18px", fontWeight: "bold" }}>
-              Leave a Review for {reviewPrompt.tier[0]?.Name}
-            </h2>
-            <textarea
-              value={reviewContent}
-              onChange={(e) => setReviewContent(e.target.value)}
-              placeholder="Write your review here..."
-              style={{
-                width: "100%",
-                height: "100px",
-                marginBottom: "10px",
-                padding: "10px",
-                borderRadius: "4px",
-                border: "1px solid #ddd",
-              }}
-            />
-            <div style={{ marginBottom: "10px" }}>
-              <label>Rating: </label>
-              <select
-                value={reviewRating}
-                onChange={(e) => setReviewRating(Number(e.target.value))}
-                style={{
-                  padding: "5px",
-                  borderRadius: "4px",
-                  border: "1px solid #ddd",
-                }}
-              >
-                {[1, 2, 3, 4, 5].map((rating) => (
-                  <option key={rating} value={rating}>
-                    {rating} ⭐
-                  </option>
-                ))}
-              </select>
-            </div>
-            <button
-              onClick={handleReviewSubmit}
-              style={{
-                backgroundColor: "#4CAF50",
-                color: "white",
-                padding: "10px 20px",
-                border: "none",
-                borderRadius: "4px",
-                cursor: "pointer",
-                marginRight: "10px",
-              }}
-            >
-              Submit
-            </button>
-            <button
-              onClick={() => setReviewPrompt(null)}
-              style={{
-                backgroundColor: "#f44336",
-                color: "white",
-                padding: "10px 20px",
-                border: "none",
-                borderRadius: "4px",
-                cursor: "pointer",
-              }}
-            >
-              Cancel
-            </button>
-          </div>
-        </div>
-      )}
+          ★
+        </span>
+      ))}
+    </div>
+    <button onClick={handleReviewSubmit} style={reviewSubmitButtonStyle}>
+      Submit
+    </button>
+    <button
+      onClick={() => setShowCancelConfirm(true)}
+      style={reviewCancelButtonStyle}
+    >
+      Cancel
+    </button>
+  </div>
+</div>
+
+)}
+      {/* Success Modal */}
+      {showSuccessModal && (
+  <div style={successModalOverlayStyle}>
+    <div style={successModalContentStyle}>
+      <h2 style={successModalHeaderStyle}>Review Submitted</h2>
+      <p style={{ marginBottom: "20px" }}>Thank you for your feedback!</p>
+      <button
+        onClick={() => setShowSuccessModal(false)}
+        style={successModalCloseButtonStyle}
+      >
+        Close
+      </button>
+    </div>
+  </div>
+)}
+
+       {/* Cancel Confirmation Modal */}
+       {showCancelConfirm && (
+  <div style={reviewModalOverlayStyle}>
+    <div style={reviewModalContentStyle}>
+      <h2 style={reviewModalHeaderStyle}>Are you sure?</h2>
+      <p>Cancelling will remove your sign-up.</p>
+      <button onClick={handleCancelReview} style={reviewSubmitButtonStyle}>
+        Yes, Remove
+      </button>
+      <button
+        onClick={() => setShowCancelConfirm(false)}
+        style={reviewCancelButtonStyle}
+      >
+        No, Keep It
+      </button>
+    </div>
+  </div>
+)}
         </div>
       </div>
     </div>
   );
+
+  
 }
+
+const cancelModalOverlayStyle = {
+  position: "fixed",
+  top: 0,
+  left: 0,
+  width: "100%",
+  height: "100%",
+  backgroundColor: "rgba(0, 0, 0, 0.5)", // Dimmed background
+  display: "flex",
+  justifyContent: "center",
+  alignItems: "center",
+};
+
+const cancelModalContentStyle = {
+  backgroundColor: "white",
+  padding: "25px",
+  borderRadius: "10px",
+  maxWidth: "400px",
+  width: "90%",
+  textAlign: "center",
+  boxShadow: "0px 6px 12px rgba(0, 0, 0, 0.2)",
+  border: "3px solid #FFC107", // Gold Border
+};
+
+
+
+const successModalOverlayStyle = {
+  position: "fixed",
+  top: 0,
+  left: 0,
+  width: "100%",
+  height: "100%",
+  backgroundColor: "rgba(0, 0, 0, 0.5)", // Dimmed background
+  display: "flex",
+  justifyContent: "center",
+  alignItems: "center",
+};
+
+const successModalContentStyle = {
+  backgroundColor: "white",
+  padding: "25px",
+  borderRadius: "10px",
+  maxWidth: "400px",
+  width: "90%",
+  textAlign: "center",
+  boxShadow: "0px 6px 12px rgba(0, 0, 0, 0.2)",
+  border: "#FFC107", // Blue Border
+};
+
+const successModalHeaderStyle = {
+  marginBottom: "15px",
+  fontSize: "22px",
+  fontWeight: "bold",
+  color: "3px solid #FFC107", // Bootstrap Green for Success
+};
+
+const successModalCloseButtonStyle = {
+  backgroundColor: " #FFC107", // Bootstrap Green
+  color: "black",
+  padding: "12px 20px",
+  border: "none",
+  cursor: "pointer",
+  borderRadius: "6px",
+  fontSize: "16px",
+  fontWeight: "bold",
+  transition: "background-color 0.3s ease",
+};
+const reviewModalOverlayStyle = {
+  position: "fixed",
+  top: 0,
+  left: 0,
+  width: "100%",
+  height: "100%",
+  backgroundColor: "rgba(0, 0, 0, 0.5)", // Dimmed background
+  display: "flex",
+  justifyContent: "center",
+  alignItems: "center",
+  zIndex: 1000,
+};
+
+const reviewModalContentStyle = {
+  backgroundColor: "white",
+  padding: "25px",
+  borderRadius: "10px",
+  maxWidth: "500px",
+  width: "90%",
+  textAlign: "center",
+  boxShadow: "0px 6px 12px rgba(0, 0, 0, 0.2)", // Smooth shadow
+  border: "3px solid #FFC107", // Gold Border
+};
+
+const reviewModalHeaderStyle = {
+  marginBottom: "15px",
+  fontSize: "22px",
+  fontWeight: "bold",
+  color: "#0D6EFD", // Blue Header Text
+};
+
+const reviewTextareaStyle = {
+  width: "100%",
+  height: "120px",
+  padding: "12px",
+  borderRadius: "6px",
+  border: "2px solid black", // Black border for input
+  marginBottom: "15px",
+  fontSize: "16px",
+  outline: "none",
+};
+
+const starContainerStyle = {
+  display: "flex",
+  justifyContent: "center",
+  marginBottom: "15px",
+};
+
+const starStyle = (isActive) => ({
+  fontSize: "24px",
+  cursor: "pointer",
+  color: isActive ? "#FFC107" : "#CCCCCC", // Gold for active stars, Gray for inactive
+});
+
+const reviewSubmitButtonStyle = {
+  backgroundColor: "#FFC107", // Gold for Submit Button
+  color: "black",
+  padding: "12px 20px",
+  border: "none",
+  cursor: "pointer",
+  borderRadius: "6px",
+  fontSize: "16px",
+  fontWeight: "bold",
+  marginRight: "10px",
+  transition: "background-color 0.3s ease",
+};
+
+const reviewCancelButtonStyle = {
+  backgroundColor: "#DC3545", // Red for Cancel Button
+  color: "white",
+  padding: "12px 20px",
+  border: "none",
+  cursor: "pointer",
+  borderRadius: "6px",
+  fontSize: "16px",
+  fontWeight: "bold",
+  transition: "background-color 0.3s ease",
+};
+
+
 
 export default Dashboard;

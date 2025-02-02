@@ -30,6 +30,24 @@ class Program {
     );
   }
 
+  static async getProgramByTier(tierID) {
+    const connection = await mysql.createConnection(dbConfig);
+
+    const sqlQuery = `
+        SELECT ProgramID FROM ProgramTier 
+        WHERE TierID = ?;
+    `;
+
+    const [rows] = await connection.execute(sqlQuery, [tierID]);
+    connection.end();
+
+    if (rows.length === 0) {
+      return null; // Return null if no program found for this TierID
+    }
+
+    return rows.map((row) => row.ProgramID); // Return list of ProgramIDs
+  }
+
   static async getProgramBySignUp(AccountID) {
     const connection = await mysql.createConnection(dbConfig);
     const sqlQuery = `
@@ -176,69 +194,7 @@ class Program {
     connection.end();
   }
 
-  static async getProgramByTierID(TierID) {
-    const connection = await mysql.createConnection(dbConfig);
-    const sqlQuery = `
-        SELECT p.ProgramID, p.ProgramName, p.ProgramDesc, p.TypeID 
-        FROM Program p
-        JOIN ProgramTier pt ON p.ProgramID = pt.ProgramID
-        WHERE pt.TierID = ?;
-    `;
 
-    try {
-      const [rows] = await connection.execute(sqlQuery, [TierID]);
-      connection.end();
-
-      if (rows.length === 0) {
-        return null; // No program found for the given TierID
-      }
-
-      return rows.map(
-        (row) =>
-          new Program(
-            row.ProgramID,
-            row.ProgramName,
-            row.ProgramDesc,
-            row.TypeID
-          )
-      );
-    } catch (error) {
-      console.error("Database query error in getProgramByTierID:", error);
-      throw error;
-    }
-  }
-
-  static async getProgramBySessionID(SessionID) {
-    const connection = await mysql.createConnection(dbConfig);
-    const sqlQuery = `
-        SELECT p.ProgramID, p.ProgramName, p.ProgramDesc, p.TypeID 
-        FROM Program p
-        JOIN ProgramTier pt ON p.ProgramID = pt.ProgramID
-        JOIN Session s ON pt.TierID = s.TierID
-        WHERE s.SessionID = ?;
-    `;
-
-    try {
-      const [rows] = await connection.execute(sqlQuery, [SessionID]);
-      connection.end();
-
-      if (rows.length === 0) {
-        return null; // No program found for the given SessionID
-      }
-
-      return rows.map(
-        (row) =>
-          new Program(
-            row.ProgramID,
-            row.ProgramName,
-            row.ProgramDesc,
-            row.TypeID
-          )
-      );
-    } catch (error) {
-      console.error("Database query error in getProgramBySessionID:", error);
-      throw error;
-    }
   }
 }
 

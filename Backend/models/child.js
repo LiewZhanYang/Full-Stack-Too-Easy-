@@ -50,45 +50,32 @@ class Child {
 
   static async postChild(childDetails) {
     const connection = await mysql.createConnection(dbConfig);
-
-    // Format the DOB to remove time and timezone
-    const formattedDOB = new Date(childDetails.DOB).toISOString().slice(0, 10); // Extracts YYYY-MM-DD
+    const formattedDOB = new Date(childDetails.DOB).toISOString().slice(0, 10); 
 
     const sqlQuery = `
-            INSERT INTO child (Name, Strength, DOB, Age, AccountID, DietaryRestrictions)
-            VALUES (?, ?, ?, ?, ?,?)`;
+        INSERT INTO child (Name, Strength, DOB, Age, AccountID, DietaryRestrictions, SpecialLearningNeeds)
+        VALUES (?, ?, ?, ?, ?, ?, ?)`;
 
     const values = [
       childDetails.Name,
       childDetails.Strength,
-      formattedDOB, // Use the formatted date
+      formattedDOB, 
       childDetails.Age,
       childDetails.AccountID,
       childDetails.DietaryRestrictions,
+      childDetails.SpecialLearningNeeds,
     ];
 
     try {
-      console.log("Attempting to insert child with details:", values); // Log the values being inserted
+      console.log("Attempting to insert child with details:", values);
       const [result] = await connection.execute(sqlQuery, values);
-      console.log("Child inserted successfully with ID:", result.insertId); // Log success message
+      console.log("Child inserted successfully with ID:", result.insertId);
 
       connection.end();
-      return { id: result.insertId }; // Return inserted ID for confirmation
+      return { id: result.insertId };
     } catch (error) {
       console.error("Error inserting child into database. Details:", error);
-
-      if (error.code === "ER_NO_REFERENCED_ROW_2") {
-        console.error(
-          "Foreign key constraint failed: Ensure AccountID exists in the referenced table."
-        );
-      } else if (error.code === "ER_TRUNCATED_WRONG_VALUE") {
-        console.error(
-          "Data type mismatch: Check that DOB, Age, and AccountID are correctly formatted."
-        );
-      } else {
-        console.error("Unknown error occurred while inserting child.");
-      }
-      throw error; // Re-throw error after logging
+      throw error;
     } finally {
       if (connection) connection.end();
     }
@@ -132,10 +119,7 @@ class Child {
         SET Notes = ?
         WHERE childID = ?`;
 
-    const values = [
-      notes.notes,
-      id
-    ];
+    const values = [notes.notes, id];
 
     const [result] = await connection.execute(sqlQuery, values);
     connection.end();

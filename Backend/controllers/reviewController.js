@@ -1,5 +1,21 @@
 const Review = require("../models/review");
-const reviewController = require("../controllers/reviewController");
+
+
+const getProgramIDFromReview = async (req, res) => {
+    try {
+        const accountID = req.params.accountID;
+        const programData = await Review.getProgramIDFromReview(accountID);
+
+        if (!programData) {
+            return res.status(404).json({ message: "No review found for this user" });
+        }
+
+        res.json(programData);
+    } catch (error) {
+        console.error("Error retrieving ProgramID from reviews:", error);
+        res.status(500).json({ message: "Internal server error" });
+    }
+};
 
 const getReviewsByProgram = async (req, res) => {
     const id = req.params.id;
@@ -27,5 +43,6 @@ const postReview = async (req, res) => {
 
 module.exports = {
     getReviewsByProgram,
-    postReview
+    postReview,
+    getProgramIDFromReview,
 }

@@ -22,6 +22,34 @@ class Session {
     this.TierID = TierID;
   }
 
+
+  static async getSessionsByProgramAndTier(programId, tierName) {
+    const connection = await mysql.createConnection(dbConfig);
+
+    const sqlQuery = `
+        SELECT s.* 
+        FROM Session s
+        JOIN Tier t ON s.TierID = t.TierID
+        JOIN ProgramTier pt ON t.TierID = pt.TierID
+        WHERE pt.ProgramID = ? AND t.Name = ?
+        AND s.StartDate > CURDATE() -- Ensure only upcoming sessions are shown
+    `;
+
+    try {
+        console.log(`Executing query for Program ID: ${programId}, Tier: ${tierName}`);
+        const [result] = await connection.execute(sqlQuery, [programId, tierName]);
+        console.log(`Query result:`, result);
+        return result;
+    } catch (error) {
+        console.error("Error fetching sessions:", error);
+        throw error;
+    } finally {
+        connection.end();
+    }
+}
+
+ 
+
   static async getSessionsByTierID(TierID) {
     const connection = await mysql.createConnection(dbConfig);
     console.log(`Executing query for TierID: ${TierID}`);
@@ -46,45 +74,50 @@ class Session {
   }
 
   static async postSession(sessionDetails) {
-    const connection = await mysql.createConnection(dbConfig);
-
-    // Validate input
-    if (
-      !sessionDetails.StartDate ||
-      !sessionDetails.EndDate ||
-      !sessionDetails.Time ||
-      !sessionDetails.Location ||
-      !sessionDetails.Vacancy ||
-      !sessionDetails.TierID
-    ) {
-      throw new Error("Missing required session details");
+    const { StartDate, EndDate, Time, Location, Vacancy, TierID, ProgramID } = sessionDetails;
+  
+    console.log("Received session details:", sessionDetails); // Debugging line
+  
+    if (!StartDate || !EndDate || !Time || !Location || !Vacancy || !TierID || !ProgramID) {
+      console.error("Error: Missing required fields!", sessionDetails);
+      return { error: "All fields are required." };
     }
-
-    const sqlQuery = `
-        INSERT INTO session (StartDate, EndDate, Time, Location, Vacancy, TierID)
-        VALUES (?, ?, ?, ?, ?, ?)
-    `;
-
-    const values = [
-      sessionDetails.StartDate,
-      sessionDetails.EndDate,
-      sessionDetails.Time,
-      sessionDetails.Location,
-      sessionDetails.Vacancy,
-      sessionDetails.TierID,
-    ];
-
+  
+    const connection = await mysql.createConnection(dbConfig);
+  
     try {
+      const [tierExists] = await connection.execute("SELECT TierID FROM Tier WHERE TierID = ?", [TierID]);
+      if (tierExists.length === 0) {
+        console.error("Error: Invalid TierID", TierID);
+        return { error: "Invalid TierID. No such tier exists." };
+      }
+  
+      const [programExists] = await connection.execute("SELECT ProgramID FROM Program WHERE ProgramID = ?", [ProgramID]);
+      if (programExists.length === 0) {
+        console.error("Error: Invalid ProgramID", ProgramID);
+        return { error: "Invalid ProgramID. No such program exists." };
+      }
+  
+      console.log("Executing SQL Insert with values:", StartDate, EndDate, Time, Location, Vacancy, TierID, ProgramID);
+  
+      const sqlQuery = `
+        INSERT INTO Session (StartDate, EndDate, Time, Location, Vacancy, Status, TierID, ProgramID)
+        VALUES (?, ?, ?, ?, ?, 'Active', ?, ?)
+      `;
+      const values = [StartDate, EndDate, Time, Location, Vacancy, TierID, ProgramID];
+  
       const [result] = await connection.execute(sqlQuery, values);
       connection.end();
-      return result;
+  
+      return { message: "Session created successfully", sessionID: result.insertId };
     } catch (error) {
-      console.error("Error executing query:", error);
+      console.error("Error inserting session:", error);
       connection.end();
-      throw error;
+      throw new Error("Error creating session");
     }
   }
-
+  
+  
   static async updateSession(SessionID, SessionDetails) {
     const connection = await mysql.createConnection(dbConfig);
 

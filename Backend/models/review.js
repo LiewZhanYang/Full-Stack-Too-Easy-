@@ -17,7 +17,32 @@ class Review {
         this.AccountID = AccountID;
         this.ProgramID = ProgramID;
     }
+    static async getProgramIDFromReview(accountID) {
+        const connection = await mysql.createConnection(dbConfig);
+        try {
+            const sqlQuery = `
+                SELECT r.ReviewID, r.Content, r.Star, r.Date, r.AccountID, p.ProgramID
+                FROM Review r
+                JOIN Program p ON r.ProgramID = p.ProgramID
+                WHERE r.AccountID = ?
+                ORDER BY r.Date DESC
+                LIMIT 1; -- Get the latest review
+            `;
 
+            const [result] = await connection.execute(sqlQuery, [accountID]);
+            connection.end();
+
+            if (result.length === 0) {
+                return null; // No review found
+            }
+
+            return result[0]; // Return the latest review with ProgramID
+        } catch (error) {
+            console.error("Error fetching ProgramID from reviews:", error);
+            throw error;
+        }
+    }
+    
     static async getReviewsByProgram(ID) {
         const connection = await mysql.createConnection(dbConfig);
     

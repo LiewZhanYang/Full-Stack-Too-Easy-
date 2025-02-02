@@ -12,19 +12,17 @@ const getAllSignUps = async (req, res) => {
 };
 
 const getSignUpById = async (req, res) => {
-  try {
-    const { id } = req.params; // AccountID
-    console.log("Fetching signup for AccountID:", id); // Debug log
-    const signup = await SignUp.getSignUpById(id);
+  const { id } = req.params;
 
-    if (signup && signup.length > 0) {
-      res.status(200).json(signup); // If multiple signups, return the array
-    } else {
-      res.status(404).json({ message: "No signup found for this AccountID." });
+  try {
+    const signups = await SignUp.getSignUpById(id); // Ensure the model method matches the new naming
+    if (!signups.length) {
+      return res.status(404).json({ message: "No signups found for this account." });
     }
+    res.status(200).json(signups);
   } catch (error) {
-    console.error("Error retrieving signup:", error);
-    res.status(500).json({ error: "Failed to retrieve signup" });
+    console.error("Error fetching signups:", error);
+    res.status(500).json({ error: "Failed to fetch signups." });
   }
 };
 

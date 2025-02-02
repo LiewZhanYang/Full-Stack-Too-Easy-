@@ -34,17 +34,18 @@ function Login() {
         });
 
         const { token, user } = response.data;
-        
-
+        //localStorage.setItem("userId", user.id);
         // Store the token in localStorage or sessionStorage
         localStorage.setItem("token", token);
-        localStorage.setItem("userId", user.id); // Store user.id in localStorage
+        //localStorage.setItem("adminId", user.id);
 
-        // Navigate to the appropriate dashboard
+        // Store either adminId or userId based on the user type
         if (user.userType === "admin") {
           navigate("/AdminHome");
+          localStorage.setItem("adminId", user.id);
         } else {
           navigate("/dashboard");
+          localStorage.setItem("userId", user.id);
         }
       } catch (error) {
         console.error("Login error:", error);
@@ -53,17 +54,14 @@ function Login() {
     } else {
       // Handle user signup logic (if implemented)
       try {
-        const response = await axios.post(
-          "http://localhost:8000/customer",
-          {
-            Name: `${formData.firstName} ${formData.lastName}`,
-            EmailAddr: formData.email,
-            ContactNo: formData.phoneNumber,
-            Password: formData.password,
-            MemberStatus: "active", // Default status
-            PfpPath: "", // Profile path
-          }
-        );
+        const response = await axios.post("http://localhost:8000/customer", {
+          Name: `${formData.firstName} ${formData.lastName}`,
+          EmailAddr: formData.email,
+          ContactNo: formData.phoneNumber,
+          Password: formData.password,
+          MemberStatus: "active", // Default status
+          PfpPath: "", // Profile path
+        });
 
         if (response.status === 201) {
           alert("Signup successful! You can now log in.");

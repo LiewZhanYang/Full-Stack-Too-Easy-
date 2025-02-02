@@ -79,17 +79,20 @@ CREATE TABLE Webinar (
 );
 
 CREATE TABLE Session (
-	SessionID INT PRIMARY KEY AUTO_INCREMENT,
+    SessionID INT PRIMARY KEY AUTO_INCREMENT,
     StartDate DATE NOT NULL,
     EndDate DATE NOT NULL,
     Time TIME NOT NULL,
     Location VARCHAR(100) NOT NULL,
-	Vacancy INT NOT NULL DEFAULT 0,
+    Vacancy INT NOT NULL DEFAULT 0,
     Status ENUM('Active', 'Cancelled') NOT NULL DEFAULT 'Active',
-    TierID INT, 
+    TierID INT NOT NULL,
+    ProgramID INT NOT NULL,  -- 
     
-    FOREIGN KEY (TierID) REFERENCES Tier(TierID)
+    FOREIGN KEY (TierID) REFERENCES Tier(TierID),
+    FOREIGN KEY (ProgramID) REFERENCES Program(ProgramID)
 );
+
 
 CREATE TABLE Lunch (
 	LunchOptionID INT PRIMARY KEY AUTO_INCREMENT, 
@@ -221,20 +224,40 @@ VALUES
 (3, 'Bob Johnson', 'bobjohnson@example.com', '78901234', TRUE, '2025-06-30', NULL, 'password789'),
 (4, 'Alice Brown', 'alicebrown@example.com', '56789012', FALSE, NULL, NULL, 'password012'),
 (5, 'Mike Davis', 'ikedavis@example.com', '34567890', TRUE, '2024-03-31', NULL, 'password345'),
-(6, 'Caden Toh', 'example@example.com', '10006000', FALSE, NULL, NULL, 'password123');
+(6, 'Caden Toh', 'example@example.com', '10006000', FALSE, NULL, NULL, 'password123'),
+(7, 'Sarah Lee', 'sarahlee@example.com', '98765432', TRUE, '2025-09-15', NULL, 'password567'),
+(8, 'David Kim', 'davidkim@example.com', '87654321', FALSE, NULL, NULL, 'password678'),
+(9, 'Emma Wilson', 'emmawilson@example.com', '76543210', TRUE, '2026-01-20', NULL, 'password789'),
+(10, 'James Tan', 'jamestan@example.com', '65432109', FALSE, NULL, NULL, 'password890'),
+(11, 'Olivia Chen', 'oliviachen@example.com', '54321098', TRUE, '2025-07-05', NULL, 'password901'),
+(12, 'Ethan Wright', 'ethanwright@example.com', '43210987', FALSE, NULL, NULL, 'password012'),
+(13, 'Charlotte Lim', 'charlottelim@example.com', '32109876', TRUE, '2024-11-22', NULL, 'password123'),
+(14, 'Liam Koh', 'liamkoh@example.com', '21098765', TRUE, '2025-04-10', NULL, 'password234'),
+(15, 'Sophia Ng', 'sophiang@example.com', '10987654', FALSE, NULL, NULL, 'password345'),
+(16, 'Daniel Ong', 'danielong@example.com', '19876543', TRUE, '2026-02-28', NULL, 'password456');
 
 INSERT INTO Admin (AdminID, Username, Password)
 VALUES
 (1, 'admin1', 'adminpassword1'),
 (2, 'admin2', 'adminpassword2');
 
-INSERT INTO Child (ChildID, Name, Strength, DOB, Age, AccountID)
+INSERT INTO Child (ChildID, Name, Strength, DOB, Age, AccountID, SpecialLearningNeeds, DietaryRestrictions, Notes)
 VALUES
-(1, 'Emily Doe', 'Swimming', '2012-08-15', 12,  1),
-(2, 'Max Doe', 'Basketball', '2015-02-20', 9,  1),
-(3, 'Sophia Smith', 'Tennis', '2010-11-01', 14,  2),
-(4, 'Oliver Johnson', 'Soccer', '2013-04-10', 11,  2),
-(5, 'Ava Brown', 'Dancing', '2011-06-25', 13,  1);
+(1, 'Emily Doe', 'Swimming', '2012-08-15', 12, 1, 'Dyslexia', 'None', 'Emily is very enthusiastic about swimming. Needs additional support with reading instructions.'),
+(2, 'Max Doe', 'Basketball', '2015-02-20', 9, 1, NULL, 'Peanut Allergy', 'Carries an EpiPen. Ensure no exposure to peanuts during events.'),
+(3, 'Sophia Smith', 'Tennis', '2010-11-01', 14, 2, NULL, 'Vegetarian', 'Prefers not to eat meat. Ensure meal options are available.'),
+(4, 'Oliver Johnson', 'Soccer', '2013-04-10', 11, 2, 'ADHD', NULL, 'Very energetic and needs frequent breaks. Responds well to structured activities.'),
+(5, 'Ava Brown', 'Dancing', '2011-06-25', 13, 1, NULL, 'Lactose Intolerant', 'Avoid dairy products. Provide alternative milk if needed.'),
+(6, 'Lucas Kim', 'Martial Arts', '2014-09-12', 10, 8, 'Mild Autism', 'None', 'Prefers a quiet environment. Ensure instructors give clear and direct instructions.'),
+(7, 'Mia Wilson', 'Painting', '2016-05-30', 8, 9, NULL, 'Nut Allergy', 'Check all snacks for nut content. Keep emergency contacts updated.'),
+(8, 'Noah Tan', 'Football', '2013-07-21', 11, 10, NULL, NULL, 'Shows great teamwork skills but needs encouragement in social interactions.'),
+(9, 'Lily Chen', 'Gymnastics', '2015-02-17', 9, 11, 'Dyspraxia', NULL, 'May struggle with coordination but is eager to improve. Provide extra practice time.'),
+(10, 'Benjamin Wright', 'Chess', '2012-12-09', 12, 12, NULL, 'Gluten-Free Diet', 'Ensure all meals and snacks meet dietary requirements.'),
+(11, 'Zoe Lim', 'Ballet', '2014-03-22', 10, 13, 'Speech Delay', NULL, 'Prefers non-verbal communication. Encourage participation through gestures.'),
+(12, 'Nathan Koh', 'Running', '2011-10-18', 13, 14, NULL, NULL, 'Very competitive but gets discouraged easily. Needs positive reinforcement.'),
+(13, 'Ella Ng', 'Singing', '2016-07-05', 8, 15, 'Mild Anxiety', 'None', 'May get nervous in large groups. Allow extra time to settle in before activities.'),
+(14, 'Ryan Ong', 'Cycling', '2013-08-29', 11, 16, NULL, 'Shellfish Allergy', 'Avoid any seafood exposure. Parents provided emergency medication.'),
+(15, 'Hannah Ong', 'Piano', '2015-11-15', 9, 16, 'Dyslexia', 'None', 'Struggles with reading sheet music but has excellent musical memory. Provide extra verbal instructions.');
 
 INSERT INTO ProgramType (TypeID, TypeDesc)
 VALUES
@@ -272,12 +295,18 @@ VALUES
 ('AI and Machine Learning', 'Explore the world of artificial intelligence and machine learning', 'https://www.machinelearningmastery.com/', '2024-12-04', '14:00:00', '16:00:00', 'Ms. AI'),
 ('Cybersecurity Basics', 'Learn how to protect your digital assets', 'https://www.cybersecurityventures.com/', '2024-12-11', '11:00:00', '13:00:00', 'Captain Cyber');
 
-INSERT INTO Session (SessionID, StartDate, EndDate, Time, Location, Vacancy, TierID)
-VALUES
-(1, '2025-01-04', '2025-01-05', '10:00:00', 'Auditorium A', 15, 1),
-(2, '2025-07-11', '2025-07-12', '14:00:00', 'Classroom B', 15, 1),
-(3, '2025-07-18', '2025-07-19', '10:00:00', 'Auditorium C', 15, 1),
-(4, '2025-07-25', '2025-07-26', '14:00:00', 'Classroom B', 15, 1);
+INSERT INTO Session (StartDate, EndDate, Time, Location, Vacancy, Status, TierID, ProgramID) VALUES
+('2025-02-10', '2025-02-11', '10:00:00', 'Auditorium A', 15, 'Active', 1, 1),  -- Beginner - Public Speaking Workshop
+('2025-02-15', '2025-02-16', '14:00:00', 'Classroom B', 15, 'Active', 1, 1),
+('2025-02-20', '2025-02-21', '10:00:00', 'Auditorium C', 10, 'Active', 2, 1),  -- Intermediate - Public Speaking Workshop
+('2025-02-25', '2025-02-26', '14:00:00', 'Classroom D', 10, 'Active', 2, 1),
+('2025-03-01', '2025-03-02', '10:00:00', 'Auditorium E', 10, 'Active', 3, 1),  -- Advanced - Public Speaking Workshop
+('2025-03-05', '2025-03-06', '14:00:00', 'Classroom F', 10, 'Active', 3, 1),
+('2025-03-10', '2025-03-11', '10:00:00', 'Auditorium G', 15, 'Active', 4, 2),  -- PSLE Power Up - PSLE Camp
+('2025-03-15', '2025-03-16', '14:00:00', 'Classroom H', 15, 'Active', 4, 2),
+('2025-03-20', '2025-03-21', '10:00:00', 'Auditorium I', 10, 'Active', 5, 2),  -- PSLE Chinese Oral Booster - PSLE Camp
+('2025-03-25', '2025-03-26', '14:00:00', 'Classroom J', 10, 'Active', 5, 2);
+
 
 INSERT INTO Lunch (LunchOptionID, LunchDesc)
 VALUES
@@ -289,10 +318,27 @@ VALUES
 
 INSERT INTO SignUp (SignUpID, AccountID, SessionID, LunchOptionID, ChildID)
 VALUES
-(1, 1, 1, 1, 1),  -- John Doe, Public Speaking Workshop - Beginner, Veggie Wrap
-(2, 2, 2, 2, 3),  -- Jane Smith, Public Speaking Workshop - Intermediate, Chicken Sandwich
-(3, 3, 3, 3, 4),  -- Bob Johnson, Public Speaking Workshop - Advanced, Fruit Salad
-(4, 4, 4, 4, 2);  -- Alice Brown, PSLE Power Up Camp - PSLE Power Up, Turkey Burger
+(1, 1, 1, 1, 1),
+(2, 1, 2, 2, 2),
+(3, 2, 2, 3, 3),
+(4, 2, 3, 4, 4),
+(5, 1, 4, 1, 5),
+(6, 8, 5, 2, 6),
+(7, 9, 6, 1, 7),
+(8, 10, 1, 5, 8),
+(9, 11, 2, 3, 9),
+(10, 12, 3, 4, 10),
+(11, 13, 4, 3, 11),
+(12, 14, 5, 2, 12),
+(13, 15, 6, 1, 13),
+(14, 16, 1, 5, 14),
+(15, 16, 2, 1, 15),
+(16, 1, 8, 1, 1),
+(17, 1, 8, 1, 2),
+(18, 2, 8, 1, 3),
+(19, 2, 7, 1, 4),
+(20, 1, 7, 1, 5);
+
 
 INSERT INTO Booking (BookingID, StartTime, EndTime, Date, URL, AccountID)
 VALUES
@@ -305,23 +351,55 @@ VALUES
 INSERT INTO Payment (OrderID, InvoiceID, Amount, CreatedAt, Status, InvoicePath, SessionID, PaidBy, ApprovedBy, Reason)
 VALUES
 (1, 46382751, 788, '2024-10-02 12:00:00', 'Pending', 'path/to/invoice-46382751.pdf', 1, 1, NULL, NULL),
-(2, 93157026, 988, '2024-10-10 12:00:00', 'Pending', 'path/to/invoice-93157026.pdf', 2, 2, NULL, NULL),
-(3, 67491350, 1388, '2024-10-15 12:00:00', 'Approved', 'path/to/invoice-67491350.pdf', 3, 3, 1, 'Approved by Admin 1'),
-(4, 28653104, 388, '2024-10-20 12:00:00', 'Pending', 'path/to/invoice-28653104.pdf', 4, 4, NULL, NULL);
+(2, 93157026, 788, '2024-10-10 12:00:00', 'Pending', 'path/to/invoice-93157026.pdf', 2, 1, NULL, NULL),
+(3, 67491350, 788, '2024-10-15 12:00:00', 'Approved', 'path/to/invoice-67491350.pdf', 2, 2, 1, 'Approved by Admin 1'),
+(4, 28653104, 988, '2024-10-20 12:00:00', 'Pending', 'path/to/invoice-28653104.pdf', 3, 2, NULL, NULL),
+(5, 67491351, 988, '2024-10-15 12:00:00', 'Approved', 'path/to/invoice-67491351.pdf', 4, 1, 1, 'Approved by Admin 2'),
+(6, 93157027, 1388, '2024-10-10 12:00:00', 'Pending', 'path/to/invoice-93157027.pdf', 5, 8, NULL, NULL),
+(7, 28653105, 1388, '2024-10-20 12:00:00', 'Pending', 'path/to/invoice-28653105.pdf', 6, 9, NULL, NULL),
+(8, 67491352, 788, '2024-10-15 12:00:00', 'Approved', 'path/to/invoice-67491352.pdf', 1, 10, 1, 'Approved by Admin 3'),
+(9, 93157028, 788, '2024-10-10 12:00:00', 'Pending', 'path/to/invoice-93157028.pdf', 2, 11, NULL, NULL),
+(10, 28653106, 988, '2024-10-20 12:00:00', 'Pending', 'path/to/invoice-28653106.pdf', 3, 12, NULL, NULL),
+(11, 67491353, 988, '2024-10-15 12:00:00', 'Approved', 'path/to/invoice-67491353.pdf', 4, 13, 1, 'Approved by Admin 4'),
+(12, 93157029, 1388, '2024-10-10 12:00:00', 'Pending', 'path/to/invoice-93157029.pdf', 5, 14, NULL, NULL),
+(13, 28653107, 1388, '2024-10-20 12:00:00', 'Pending', 'path/to/invoice-28653107.pdf', 6, 15, NULL, NULL),
+(14, 67491354, 788, '2024-10-15 12:00:00', 'Approved', 'path/to/invoice-67491354.pdf', 1, 16, 1, 'Approved by Admin 5'),
+(15, 93157030, 788, '2024-10-10 12:00:00', 'Pending', 'path/to/invoice-93157030.pdf', 2, 16, NULL, NULL),
+(16, 93157030, 388, '2024-10-10 12:00:00', 'Pending', 'path/to/invoice-93157030.pdf', 8, 1, NULL, NULL),
+(17, 93157030, 388, '2024-10-10 12:00:00', 'Pending', 'path/to/invoice-93157030.pdf', 8, 1, NULL, NULL),
+(18, 93157030, 388, '2024-10-10 12:00:00', 'Pending', 'path/to/invoice-93157030.pdf', 8, 2, NULL, NULL),
+(19, 93157030, 388, '2024-10-10 12:00:00', 'Pending', 'path/to/invoice-93157030.pdf', 7, 2, NULL, NULL),
+(20, 93157030, 388, '2024-10-10 12:00:00', 'Pending', 'path/to/invoice-93157030.pdf', 7, 1, NULL, NULL);
 
-INSERT INTO Announcement (AnnouncementID, Title, Body, PostedDate) 
+INSERT INTO Announcement (AnnouncementID, Title, Body, PostedDate)
 VALUES 
-(1, 'Release of new programs', 'To all our dear and valued customers, we are excited to announce that with the upcoming holidays, new programs are to be released soon! So Stay tune!', '2024-11-11'),
-(2, 'New promotions', 'In lieu of certain events and happenings, new promotions are to be rolled out! Members can await for the arrival soon!', '2024-11-13'),
-(3, 'Christmas Promotion', 'New year new me! Enjoy upcoming promotions that are being pushed out in light of the New Year! Have a happy holidays!', '2023-11-13'),
-(4, 'Halloween Specials', 'Trick or treat! This year halloween is a very special one, for there are more programs that are to be enrolled on how you can spook your competitors!', '2024-10-13');
+(1, 'Happy New Year!', 'Wishing all our customers a fantastic New Year! Get ready for a fresh start with exciting new programs and promotions ahead!', '2025-01-01'),
+(2, 'Chinese New Year Promotions', 'Celebrate Chinese New Year with us! We are rolling out special discounts and packages for this festive season. Stay tuned for more details!', '2025-01-29'),
+(3, 'Exciting Programs for the Year Ahead', 'Start the year strong with our newly launched programs! Check out our updated lineup and enroll now for early-bird offers!', '2025-01-25'),
+(4, 'February Specials', 'This month’s specials are here! Take advantage of exclusive deals and discounts. Sign up today to enjoy special rates!', '2025-02-01');
+
 
 INSERT INTO Review (ReviewID, Content, Star, Date, AccountID, ProgramID)
 VALUES
-(1, 'This program is awesome! I love it so much!!!', 5, '2025-1-10', 1, 1),
-(2, 'Would enjoy if there were more content that was being taught!! However, overall I enjoyed the program a lot.', 4, '2025-1-10', 2, 1),
-(3, 'I loved this program! After going through it, I felt more confident in my writing and speaking skills!', 5, '2025-1-10', 3, 1),
-(4, 'My son said that he was better prepared for PSLE after going through it, turns out he got all As!!!!', 5, '2025-1-10', 4, 2);
+(1, 'This workshop was life-changing! I feel so much more confident speaking in front of others now.', 5, '2025-02-01', 1, 1),
+(2, 'Fantastic program! The tips and techniques were extremely useful and easy to apply.', 5, '2025-02-01', 2, 1),
+(3, 'I learned so much and improved my speaking skills drastically. Highly recommend to anyone looking to improve their communication!', 5, '2025-02-01', 3, 1),
+(4, 'A really well-organized workshop! The instructors were engaging, and I left with a lot of useful skills for public speaking.', 5, '2025-02-01', 4, 1),
+(5, 'This workshop helped me overcome my fear of public speaking. I’m now able to speak confidently in front of large groups!', 5, '2025-02-01', 5, 1),
+(6, 'Incredible value! I now feel more comfortable in presentations and group discussions.', 5, '2025-02-01', 6, 1),
+(7, 'I absolutely loved it! The exercises were practical and made a big difference in how I communicate.', 5, '2025-02-01', 7, 1),
+(8, 'Such a great experience! I can now speak with confidence in front of my colleagues. Definitely worth attending!', 5, '2025-02-01', 8, 1),
+(9, 'The public speaking techniques I learned were amazing. I feel so much more prepared for my next presentation!', 5, '2025-02-01', 9, 1),
+(10, 'I’m so grateful for this workshop. It helped me work through my nerves and deliver a powerful speech.', 5, '2025-02-01', 10, 1),
+(11, 'The feedback from the instructors was invaluable. I learned how to present my ideas clearly and confidently.', 5, '2025-02-01', 11, 1),
+(12, 'A truly transformational experience! My communication skills have improved exponentially.', 5, '2025-02-01', 12, 1),
+(13, 'The best public speaking workshop I’ve attended! I feel much more confident and prepared for future speaking engagements.', 5, '2025-02-01', 13, 1),
+(14, 'I never thought I could be this confident speaking in front of people. This workshop was a game-changer!', 5, '2025-02-01', 14, 1),
+(15, 'This program taught me so many useful techniques for engaging an audience. I can now deliver my speeches with ease!', 5, '2025-02-01', 15, 1),
+(16, 'Amazing experience! I’ve learned so much about structuring my speeches and keeping the audience engaged.', 5, '2025-02-01', 16, 1),
+(17, 'The PSLE camp was fantastic! It really helped my child with exam techniques and gave them the confidence to excel!', 5, '2025-01-15', 1, 2),
+(18, 'I saw a significant improvement in my child’s performance after attending the PSLE camp. The teachers were very supportive!', 5, '2025-01-16', 2, 2);
+
 
 INSERT INTO Ticketing (TicketID, AccountID, Category, Content, StartDate, Status)
 VALUES
@@ -351,18 +429,6 @@ INSERT INTO Forum (Topic) VALUES
 
 INSERT INTO Thread (Title, Body, CreatedOn, Likes, SentimentValue, PostedBy, Topic, ReplyTo) 
 VALUES
-    ('Workshop on Machine Learning', 'Hi all, what do those who have attended this workshop feel about it? Please comment under this thread and share with me thanks!', '2024-01-01', 10, 0.8, 1, 1, NULL),
-    (NULL, 'I think this workshop is wonderful and you will not regret signing up for it!', '2024-01-05', 5, 0.9, 2, 1, 1),
-    ('Enquiry on Public Speaking workshop', 'Im interested in the public speaking workshops. Could someone please share with me the how the experience was like?', '2024-01-10', 3, 0.7, 3, 1, NULL),
-    (NULL, 'I found the public speaking workshops to be incredibly helpful. I learned valuable techniques for structuring presentations, engaging the audience, and managing my nerves. The practical exercises and constructive feedback from the instructor were invaluable. Im already applying what I learned in my professional and personal life.', '2024-01-15', 8, 0.95, 4, 1, 3),
-    (NULL, 'The workshops significantly boosted my confidence in public speaking. I used to dread presenting, but now I feel much more comfortable and prepared. The supportive environment and encouraging feedback from the instructor and fellow participants made a huge difference. I highly recommend these workshops to anyone looking to improve their public speaking skills.', '2024-01-20', 7, 0.85, 5, 1, 3);
-
-INSERT INTO TransferRequest (SignUpID, NewSessionID, Reason, MCPath, Status)
-VALUES
-(1, 2, 'Medical Emergency', 'path/to/medical_certificate1.pdf', 'Pending'),
-(2, 3, 'Schedule Conflict', 'path/to/medical_certificate2.pdf', 'Confirmed'),
-(3, 4, 'Travel Issues', NULL, 'Pending'),
-(4, 1, 'Personal Reasons', 'path/to/medical_certificate3.pdf', 'Confirmed');
 
 Trigger
 

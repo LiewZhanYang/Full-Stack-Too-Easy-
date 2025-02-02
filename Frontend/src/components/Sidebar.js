@@ -160,14 +160,14 @@ function Sidebar() {
                       Workshop
                     </Link>
                     <Link
-                      to="/forum/camp"
+                      to="/campforum"
                       className="d-block py-1 text-dark text-decoration-none"
                       style={{ fontSize: "0.95rem" }}
                     >
                       Camp
                     </Link>
                     <Link
-                      to="/forum/lab"
+                      to="/labsforum"
                       className="d-block py-1 text-dark text-decoration-none"
                       style={{ fontSize: "0.95rem" }}
                     >

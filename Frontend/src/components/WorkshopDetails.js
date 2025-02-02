@@ -98,17 +98,18 @@ function WorkshopDetails() {
     const discountedPrice = isMemberActive
       ? parseFloat(tier.Cost) * 0.9
       : parseFloat(tier.Cost);
-
+  
     navigate("/payment", {
       state: {
-        programId: tier.ProgramID,
-        tier: tier.Name,
+        programId: id, //  Ensure programId is passed correctly
+        tier: tier.Name, //  Pass the tier name properly
         price: `$${discountedPrice.toFixed(2)}`,
         classSize: tier.ClassSize,
         duration: tier.Duration,
       },
     });
   };
+  
 
   const openTierModal = (tier) => {
     setSelectedTier(tier);

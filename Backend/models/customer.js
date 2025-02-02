@@ -239,6 +239,130 @@ class Customer {
       throw error;
     }
   }
+
+  static async getNewSignUpsToday() {
+    const connection = await mysql.createConnection(dbConfig);
+    const sqlQuery = `
+      SELECT COUNT(*) AS newSignUps
+      FROM Customer
+      WHERE DATE(DateJoined) = CURDATE();
+    `;
+    const [result] = await connection.execute(sqlQuery);
+    connection.end();
+    return result[0].newSignUps;
+  }
+
+  static async getTotalAmountSpent() {
+    const connection = await mysql.createConnection(dbConfig);
+
+    const sqlQuery = `
+      SELECT 
+          c.AccountID,
+          c.Name AS CustomerName,
+          COALESCE(SUM(
+              CASE 
+                  WHEN c.MemberStatus = TRUE THEN t.DiscountedCost
+                  ELSE t.Cost
+              END
+          ), 0) AS TotalSpent
+      FROM Customer c
+      LEFT JOIN SignUp s ON c.AccountID = s.AccountID
+      LEFT JOIN Session se ON s.SessionID = se.SessionID
+      LEFT JOIN Tier t ON se.TierID = t.TierID
+      GROUP BY c.AccountID, c.Name
+      ORDER BY TotalSpent DESC;
+    `;
+
+    try {
+      const [result] = await connection.execute(sqlQuery);
+      connection.end();
+      return result;
+    } catch (error) {
+      console.error("Error fetching total amount spent:", error);
+      connection.end();
+      throw error;
+    }
+  }
+
+  static async getHighestPayingCustomers(limit = 5) {
+    const connection = await mysql.createConnection(dbConfig);
+
+    // Dynamically include the `limit` value in the query string
+    const sqlQuery = `
+        SELECT 
+            c.AccountID,
+            c.Name AS CustomerName,
+            COALESCE(SUM(p.Amount), 0) AS TotalSpent,
+            COUNT(DISTINCT s.SessionID) AS SessionsBooked
+        FROM 
+            Customer c
+        LEFT JOIN 
+            Payment p ON c.AccountID = p.PaidBy AND p.Status = 'Approved'
+        LEFT JOIN 
+            Session s ON p.SessionID = s.SessionID
+        GROUP BY 
+            c.AccountID, c.Name
+        ORDER BY 
+            TotalSpent DESC
+        LIMIT ${mysql.escape(
+          limit
+        )}; -- Use mysql.escape to safely inject the limit value
+    `;
+
+    try {
+      const [result] = await connection.query(sqlQuery); // Use query instead of execute
+      connection.end();
+      return result;
+    } catch (error) {
+      console.error("Error fetching highest paying customers:", error);
+      connection.end();
+      throw error;
+    }
+  }
+  static async getCustomerDataTable() {
+    const connection = await mysql.createConnection(dbConfig);
+
+    const sqlQuery = `
+      SELECT 
+          c.AccountID,
+          c.Name AS CustomerName,
+          COALESCE(ts.TotalSpent, 0) AS PurchaseTotal,
+          COALESCE((SELECT COUNT(*) FROM Thread t WHERE t.PostedBy = c.AccountID), 0) AS ForumEngagement,
+          COALESCE(GROUP_CONCAT(DISTINCT ch.Notes ORDER BY ch.ChildID SEPARATOR ', '), 'No notes') AS Notes
+      FROM 
+          Customer c
+      LEFT JOIN 
+          (SELECT 
+              c.AccountID,
+              SUM(
+                  CASE 
+                      WHEN c.MemberStatus = TRUE THEN t.DiscountedCost
+                      ELSE t.Cost
+                  END
+              ) AS TotalSpent
+          FROM Customer c
+          LEFT JOIN SignUp s ON c.AccountID = s.AccountID
+          LEFT JOIN Session se ON s.SessionID = se.SessionID
+          LEFT JOIN Tier t ON se.TierID = t.TierID
+          GROUP BY c.AccountID) ts ON c.AccountID = ts.AccountID
+      LEFT JOIN 
+          Child ch ON c.AccountID = ch.AccountID
+      GROUP BY 
+          c.AccountID, c.Name, ts.TotalSpent
+      ORDER BY 
+          PurchaseTotal DESC;
+    `;
+
+    try {
+      const [result] = await connection.execute(sqlQuery);
+      connection.end();
+      return result;
+    } catch (error) {
+      console.error("Error fetching customer data table:", error);
+      connection.end();
+      throw error;
+    }
+  }
 }
 
 module.exports = Customer;

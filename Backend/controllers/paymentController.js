@@ -26,13 +26,6 @@ const formatDateForMySQL = (date) => {
 const postPayment = async (req, res) => {
   try {
     //console.log("Checking for req body", req.body);
-    const file = req.file;
-    //console.log("Received file:", file);
-    if (!file) {
-      return res
-        .status(400)
-        .json({ error: "No file uploaded. Please provide a file." });
-    }
 
     // Sanitize and prepare InvoiceID
     let invoiceID = req.body.InvoiceID;
@@ -66,12 +59,16 @@ const postPayment = async (req, res) => {
     }
 
     // Upload the file using uploadController
-    try {
-      await uploadController.uploadFile(file, `${result.OrderID}`);
-      paymentDetails.InvoicePath = `${result.OrderID}/${file.originalname}`;
-    } catch (uploadError) {
-      console.error("Error uploading file:", uploadError.message);
-      return res.status(500).json({ error: "Error uploading file to S3." });
+    const file = req.file;
+    //console.log("Received file:", file);
+    if (file) {
+      try {
+        await uploadController.uploadFile(file, `${result.OrderID}`);
+        paymentDetails.InvoicePath = `${result.OrderID}/${file.originalname}`;
+      } catch (uploadError) {
+        console.error("Error uploading file:", uploadError.message);
+        return res.status(500).json({ error: "Error uploading file to S3." });
+      }
     }
     const connection = await mysql.createConnection(dbConfig);
     const [userRows] = await connection.execute(
