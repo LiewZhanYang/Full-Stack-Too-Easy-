@@ -21,5 +21,8 @@ router.post("/", upload.single("file"), programController.postProgram);
 router.put("/id/:id", upload.single("file"), programController.updateProgram);
 
 router.delete("/:id", programController.deleteProgram);
+router.get("/tier/:tierID", programController.getProgramByTierID);
+router.get("/session/:sessionID", programController.getProgramBySessionID);
+router.get("/tier/:tie rid", programController.getProgramByTier);
 
 module.exports = router;

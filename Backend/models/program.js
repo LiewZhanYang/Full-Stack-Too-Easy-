@@ -9,6 +9,7 @@ class Program {
     this.TypeID = TypeID;
   }
 
+  // Get program by ID
   static async getProgramById(id) {
     const connection = await mysql.createConnection(dbConfig);
     const sqlQuery = `
@@ -30,14 +31,13 @@ class Program {
     );
   }
 
+  // Get program by Tier ID
   static async getProgramByTier(tierID) {
     const connection = await mysql.createConnection(dbConfig);
-
     const sqlQuery = `
         SELECT ProgramID FROM ProgramTier 
         WHERE TierID = ?;
     `;
-
     const [rows] = await connection.execute(sqlQuery, [tierID]);
     connection.end();
 
@@ -48,6 +48,7 @@ class Program {
     return rows.map((row) => row.ProgramID); // Return list of ProgramIDs
   }
 
+  // Get program by signup
   static async getProgramBySignUp(AccountID) {
     const connection = await mysql.createConnection(dbConfig);
     const sqlQuery = `
@@ -72,6 +73,7 @@ class Program {
     });
   }
 
+  // Get all programs
   static async getAllPrograms() {
     const connection = await mysql.createConnection(dbConfig);
 
@@ -91,6 +93,7 @@ class Program {
     });
   }
 
+  // Get programs by type
   static async getProgramsByType(typeID) {
     const connection = await mysql.createConnection(dbConfig);
     const sqlQuery = `
@@ -108,16 +111,12 @@ class Program {
         row.ProgramID,
         row.ProgramName,
         row.ProgramDesc,
-        row.Cost,
-        row.DiscountedCost,
-        row.LunchProvided,
-        row.Duration,
-        row.ClassSize,
         row.TypeID
       );
     });
   }
 
+  // Post a new program
   static async postProgram(programDetails) {
     let connection;
     try {
@@ -144,6 +143,7 @@ class Program {
     }
   }
 
+  // Update a program
   static async updateProgram(id, updateData) {
     let connection;
     try {
@@ -185,6 +185,7 @@ class Program {
     }
   }
 
+  // Delete a program
   static async deleteProgram(ProgramID) {
     const connection = await mysql.createConnection(dbConfig);
     const sqlQuery = `
@@ -194,8 +195,110 @@ class Program {
     connection.end();
   }
 
+  // Get program by TierID
+  static async getProgramByTierID(TierID) {
+    const connection = await mysql.createConnection(dbConfig);
+    const sqlQuery = `
+        SELECT p.ProgramID, p.ProgramName, p.ProgramDesc, p.TypeID 
+        FROM Program p
+        JOIN ProgramTier pt ON p.ProgramID = pt.ProgramID
+        WHERE pt.TierID = ?;
+    `;
+    const [rows] = await connection.execute(sqlQuery, [TierID]);
+    connection.end();
 
+    if (rows.length === 0) {
+      return null; // No program found for the given TierID
+    }
+
+    return rows.map(
+      (row) =>
+        new Program(row.ProgramID, row.ProgramName, row.ProgramDesc, row.TypeID)
+    );
   }
 
+  // Get program by SessionID
+  static async getProgramBySessionID(SessionID) {
+    const connection = await mysql.createConnection(dbConfig);
+    const sqlQuery = `
+        SELECT p.ProgramID, p.ProgramName, p.ProgramDesc, p.TypeID 
+        FROM Program p
+        JOIN ProgramTier pt ON p.ProgramID = pt.ProgramID
+        JOIN Session s ON pt.TierID = s.TierID
+        WHERE s.SessionID = ?;
+    `;
+    const [rows] = await connection.execute(sqlQuery, [SessionID]);
+    connection.end();
+
+    if (rows.length === 0) {
+      return null; // No program found for the given SessionID
+    }
+
+    return rows.map(
+      (row) =>
+        new Program(row.ProgramID, row.ProgramName, row.ProgramDesc, row.TypeID)
+    );
+  }
+
+  // Get top programs by signups
+  static async getTopPrograms() {
+    const connection = await mysql.createConnection(dbConfig);
+    const sqlQuery = `
+        SELECT 
+            p.ProgramName,
+            COUNT(su.SignUpID) AS TotalSignups
+        FROM 
+            SignUp su
+        JOIN 
+            Session s ON su.SessionID = s.SessionID
+        JOIN 
+            ProgramTier pt ON s.TierID = pt.TierID
+        JOIN 
+            Program p ON pt.ProgramID = p.ProgramID
+        GROUP BY 
+            p.ProgramID, p.ProgramName
+        ORDER BY 
+            TotalSignups DESC
+        LIMIT 3;
+    `;
+
+    const [result] = await connection.execute(sqlQuery);
+    return result; // Returns the top 3 programs
+  }
+
+  // Get programs by income
+  static async getProgramsByIncome() {
+    const connection = await mysql.createConnection(dbConfig);
+    const sqlQuery = `
+        SELECT 
+            p.ProgramName,
+            SUM(
+                CASE 
+                    WHEN c.MemberStatus = TRUE THEN t.DiscountedCost
+                    ELSE t.Cost
+                END
+            ) AS TotalIncome
+        FROM 
+            SignUp su
+        JOIN 
+            Session s ON su.SessionID = s.SessionID
+        JOIN 
+            ProgramTier pt ON s.TierID = pt.TierID
+        JOIN 
+            Program p ON pt.ProgramID = p.ProgramID
+        JOIN 
+            Tier t ON pt.TierID = t.TierID
+        JOIN 
+            Customer c ON su.AccountID = c.AccountID
+        GROUP BY 
+            p.ProgramID, p.ProgramName
+        ORDER BY 
+            TotalIncome DESC;
+    `;
+
+    const [result] = await connection.execute(sqlQuery);
+    return result;
+  }
+}
 
 module.exports = Program;
