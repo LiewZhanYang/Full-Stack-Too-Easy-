@@ -22,7 +22,6 @@ class Session {
     this.TierID = TierID;
   }
 
-
   static async getSessionsByProgramAndTier(programId, tierName) {
     const connection = await mysql.createConnection(dbConfig);
 
@@ -36,19 +35,22 @@ class Session {
     `;
 
     try {
-        console.log(`Executing query for Program ID: ${programId}, Tier: ${tierName}`);
-        const [result] = await connection.execute(sqlQuery, [programId, tierName]);
-        console.log(`Query result:`, result);
-        return result;
+      console.log(
+        `Executing query for Program ID: ${programId}, Tier: ${tierName}`
+      );
+      const [result] = await connection.execute(sqlQuery, [
+        programId,
+        tierName,
+      ]);
+      console.log(`Query result:`, result);
+      return result;
     } catch (error) {
-        console.error("Error fetching sessions:", error);
-        throw error;
+      console.error("Error fetching sessions:", error);
+      throw error;
     } finally {
-        connection.end();
+      connection.end();
     }
-}
-
- 
+  }
 
   static async getSessionsByTierID(TierID) {
     const connection = await mysql.createConnection(dbConfig);
@@ -74,50 +76,84 @@ class Session {
   }
 
   static async postSession(sessionDetails) {
-    const { StartDate, EndDate, Time, Location, Vacancy, TierID, ProgramID } = sessionDetails;
-  
+    const { StartDate, EndDate, Time, Location, Vacancy, TierID, ProgramID } =
+      sessionDetails;
+
     console.log("Received session details:", sessionDetails); // Debugging line
-  
-    if (!StartDate || !EndDate || !Time || !Location || !Vacancy || !TierID || !ProgramID) {
+
+    if (
+      !StartDate ||
+      !EndDate ||
+      !Time ||
+      !Location ||
+      !Vacancy ||
+      !TierID ||
+      !ProgramID
+    ) {
       console.error("Error: Missing required fields!", sessionDetails);
       return { error: "All fields are required." };
     }
-  
+
     const connection = await mysql.createConnection(dbConfig);
-  
+
     try {
-      const [tierExists] = await connection.execute("SELECT TierID FROM Tier WHERE TierID = ?", [TierID]);
+      const [tierExists] = await connection.execute(
+        "SELECT TierID FROM Tier WHERE TierID = ?",
+        [TierID]
+      );
       if (tierExists.length === 0) {
         console.error("Error: Invalid TierID", TierID);
         return { error: "Invalid TierID. No such tier exists." };
       }
-  
-      const [programExists] = await connection.execute("SELECT ProgramID FROM Program WHERE ProgramID = ?", [ProgramID]);
+
+      const [programExists] = await connection.execute(
+        "SELECT ProgramID FROM Program WHERE ProgramID = ?",
+        [ProgramID]
+      );
       if (programExists.length === 0) {
         console.error("Error: Invalid ProgramID", ProgramID);
         return { error: "Invalid ProgramID. No such program exists." };
       }
-  
-      console.log("Executing SQL Insert with values:", StartDate, EndDate, Time, Location, Vacancy, TierID, ProgramID);
-  
+
+      console.log(
+        "Executing SQL Insert with values:",
+        StartDate,
+        EndDate,
+        Time,
+        Location,
+        Vacancy,
+        TierID,
+        ProgramID
+      );
+
       const sqlQuery = `
         INSERT INTO Session (StartDate, EndDate, Time, Location, Vacancy, Status, TierID, ProgramID)
         VALUES (?, ?, ?, ?, ?, 'Active', ?, ?)
       `;
-      const values = [StartDate, EndDate, Time, Location, Vacancy, TierID, ProgramID];
-  
+      const values = [
+        StartDate,
+        EndDate,
+        Time,
+        Location,
+        Vacancy,
+        TierID,
+        ProgramID,
+      ];
+
       const [result] = await connection.execute(sqlQuery, values);
       connection.end();
-  
-      return { message: "Session created successfully", sessionID: result.insertId };
+
+      return {
+        message: "Session created successfully",
+        sessionID: result.insertId,
+      };
     } catch (error) {
       console.error("Error inserting session:", error);
       connection.end();
       throw new Error("Error creating session");
     }
   }
-  
-  
+
   static async updateSession(SessionID, SessionDetails) {
     const connection = await mysql.createConnection(dbConfig);
 
@@ -220,6 +256,21 @@ class Session {
       row.Status,
       row.TierID
     );
+  }
+
+  static async getAffectedCustomers(sessionID) {
+    const query = `
+      SELECT 
+        cust.Name AS parentName,
+        cust.ContactNo AS contactNumber,
+        c.Name AS childName
+      FROM SignUp su
+      JOIN Child c ON su.ChildID = c.ChildID
+      JOIN Customer cust ON su.AccountID = cust.AccountID
+      WHERE su.SessionID = ?;
+    `;
+    const [results] = await db.execute(query, [sessionID]);
+    return results;
   }
 }
 

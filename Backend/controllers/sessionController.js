@@ -88,11 +88,9 @@ const deleteSession = async (req, res) => {
   } catch (error) {
     console.error("Error deleting session:", error);
     if (error.message.includes("Payments are associated")) {
-      return res
-        .status(403)
-        .json({
-          message: "Cannot delete session as it has associated payments.",
-        });
+      return res.status(403).json({
+        message: "Cannot delete session as it has associated payments.",
+      });
     }
     res.status(500).json({ message: "Error deleting session" });
   }
@@ -115,19 +113,22 @@ const getSessionBySessionID = async (req, res) => {
   }
 };
 
-
 const getSessionsByProgramAndTier = async (req, res) => {
   const { programId } = req.params;
   const { tier } = req.query;
 
   if (!programId || !tier) {
-    return res.status(400).json({ error: "Missing required parameters: programId and tier." });
+    return res
+      .status(400)
+      .json({ error: "Missing required parameters: programId and tier." });
   }
 
   try {
     const sessions = await Session.getSessionsByProgramAndTier(programId, tier);
     if (sessions.length === 0) {
-      return res.status(404).json({ error: "No sessions found for the specified program and tier." });
+      return res.status(404).json({
+        error: "No sessions found for the specified program and tier.",
+      });
     }
     res.status(200).json(sessions);
   } catch (error) {
@@ -136,6 +137,17 @@ const getSessionsByProgramAndTier = async (req, res) => {
   }
 };
 
+const getAffectedCustomers = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const results = await Session.getAffectedCustomers(id);
+    res.json(results);
+  } catch (error) {
+    console.error("Error fetching affected customers:", error);
+    res.status(500).send("Error fetching affected customers");
+  }
+};
 
 module.exports = {
   getSessionsByTierID,
@@ -144,4 +156,5 @@ module.exports = {
   deleteSession,
   getSessionBySessionID,
   getSessionsByProgramAndTier,
+  getAffectedCustomers, // Add this import
 };
