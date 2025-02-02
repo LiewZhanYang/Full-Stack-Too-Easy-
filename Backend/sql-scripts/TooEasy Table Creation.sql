@@ -427,8 +427,31 @@ INSERT INTO Forum (Topic) VALUES
 ('Camp'), 
 ('Lab');
 
-INSERT INTO Thread (Title, Body, CreatedOn, Likes, SentimentValue, PostedBy, Topic, ReplyTo) 
+
+INSERT INTO Thread (Title, Body, CreatedOn, Likes, SentimentValue, PostedBy, Topic, ReplyTo)
 VALUES
+(NULL, 'I gained so many valuable insights and learned practical skills that I can apply immediately.', '2025-02-02', 7, 0.85, 4, 1, 1),
+(NULL, 'I agree, this workshop exceeded my expectations. The hands-on exercises really helped solidify the concepts.', '2025-02-02', 8, 0.9, 5, 1, 1),
+(NULL, 'Great to hear all the positive feedback! I’m definitely signing up for the next session.', '2025-02-02', 4, 0.8, 6, 1, 1),
+(NULL, 'I found the public speaking workshops to be incredibly helpful. I learned valuable techniques for structuring presentations, engaging the audience, and managing my nerves. The practical exercises and constructive feedback from the instructor were invaluable. Im already applying what I learned in my professional and personal life.', '2025-02-02', 8, 0.95, 8, 1, 1),
+(NULL, 'The workshops significantly boosted my confidence in public speaking. I used to dread presenting, but now I feel much more comfortable and prepared. The supportive environment and encouraging feedback from the instructor and fellow participants made a huge difference. I highly recommend these workshops to anyone looking to improve their public speaking skills.', '2025-02-02', 7, 0.85, 9, 1, 1),
+(NULL, 'I attended the camp last year, and it was an amazing experience! I gained so much confidence and learned a lot about public speaking and presentation skills.', '2025-02-03', 9, 0.95, 11, 2, 2),
+(NULL, 'I went last summer, and the camp provided a great balance of learning and fun activities. Highly recommend it!', '2025-02-03', 8, 0.9, 12, 2, 2),
+(NULL, 'The camp was fantastic! The facilitators were supportive, and I felt like I made huge progress in my speaking abilities. Will definitely attend again.', '2025-02-03', 10, 0.92, 13, 2, 2),
+(NULL, 'I had a great time at the Lab! The hands-on work was really insightful, and I learned a lot. Definitely worth it!', '2025-02-04', 7, 0.8, 15, 3, 3),
+(NULL, 'The Lab was an incredible experience. It helped me understand the theoretical concepts in a more practical way. Highly recommend!', '2025-02-04', 6, 0.85, 16, 3, 3),
+(NULL, 'I enrolled my child last year, and the camp was really beneficial! It gave them a lot of practice and boosted their confidence for the exams.', '2025-02-02', 7, 0.8, 11, 2, 4),
+(NULL, 'The PSLE camp was great! My child really enjoyed the interactive lessons and the mock exams. Highly recommend it for anyone preparing for PSLE!', '2025-02-03', 6, 0.85, 12, 2, 4);
+
+
+
+INSERT INTO TransferRequest (SignUpID, NewSessionID, Reason, MCPath, Status)
+VALUES
+(1, 2, 'Medical Emergency', 'path/to/medical_certificate1.pdf', 'Pending'),
+(2, 3, 'Schedule Conflict', 'path/to/medical_certificate2.pdf', 'Confirmed'),
+(3, 4, 'Travel Issues', NULL, 'Pending'),
+(4, 1, 'Personal Reasons', 'path/to/medical_certificate3.pdf', 'Confirmed');
+
 
 Trigger
 
