@@ -33,7 +33,7 @@ const AdminViewTransferRequest = () => {
 
   const handleCardClick = (transferID) => {
     // Navigate to the admin-confirm-mc page with TransferID as a route parameter
-    navigate(`/admin-confirm-mc`);
+    navigate(`/admin-confirm-mc/${transferID}`);
   };
 
   const renderTransfers = (transfers) => {

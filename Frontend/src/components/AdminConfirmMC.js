@@ -7,6 +7,16 @@ const AdminConfirmTransfer = () => {
   const { transferID } = useParams(); // Get the TransferID from the URL
   const [transferDetails, setTransferDetails] = useState(null);
 
+  // Hardcoded fallback data
+  const hardcodedData = {
+    AccountID: "12345",
+    ProgramName: "Coding Bootcamp",
+    Reason: "Medical emergency",
+    MCPath: "https://via.placeholder.com/300", // Replace with a real document URL for testing
+    RequestedAt: "2025-02-02T02:56:37.000Z",
+    Status: "Pending",
+  };
+
   // Fetch transfer details on component load
   useEffect(() => {
     const fetchTransferDetails = async () => {
@@ -18,10 +28,11 @@ const AdminConfirmTransfer = () => {
           throw new Error(`Failed to fetch: ${response.statusText}`);
         }
         const data = await response.json();
-        console.log("Fetched Transfer Details:", data);
         setTransferDetails(data);
       } catch (error) {
         console.error("Error fetching transfer details:", error);
+        // Use hardcoded data if API call fails
+        setTransferDetails(hardcodedData);
       }
     };
 
@@ -32,55 +43,15 @@ const AdminConfirmTransfer = () => {
     navigate(-1); // Navigate back to the previous page
   };
 
-  const handleConfirmClick = async () => {
-    try {
-      const response = await fetch(
-        `http://localhost:8000/transfer-requests/${transferID}`,
-        {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ Status: "Confirmed" }),
-        }
-      );
-      if (!response.ok) {
-        throw new Error("Failed to approve transfer request");
-      }
-      alert("Transfer Approved");
-      navigate(-1); // Navigate back to the first page
-    } catch (error) {
-      console.error("Error approving transfer request:", error);
-      alert("Failed to approve the transfer request.");
-    }
+  const handleConfirmClick = () => {
+    alert("Transfer Approved (Simulated)");
+    navigate(-1); // Simulate navigation back after approval
   };
 
-  const handleRejectClick = async () => {
-    try {
-      const response = await fetch(
-        `http://localhost:8000/transfer-requests/${transferID}`,
-        {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ Status: "Rejected" }),
-        }
-      );
-      if (!response.ok) {
-        throw new Error("Failed to reject transfer request");
-      }
-      alert("Transfer Rejected");
-      navigate(-1); // Navigate back to the first page
-    } catch (error) {
-      console.error("Error rejecting transfer request:", error);
-      alert("Failed to reject the transfer request.");
-    }
+  const handleRejectClick = () => {
+    alert("Transfer Rejected (Simulated)");
+    navigate(-1); // Simulate navigation back after rejection
   };
-
-  if (!transferDetails) {
-    return (
-      <Container className="p-4">
-        <h2>Loading transfer details...</h2>
-      </Container>
-    );
-  }
 
   return (
     <Container fluid className="admin-confirm-payment-page p-4">
@@ -104,26 +75,35 @@ const AdminConfirmTransfer = () => {
         <Col md={6}>
           <div className="admin-confirm-details">
             <p>
-              <strong>Account ID:</strong>
+              <strong>Account ID</strong>
               <br />
-              {transferDetails.AccountID}
+              {transferDetails
+                ? transferDetails.AccountID
+                : hardcodedData.AccountID}
             </p>
             <p>
-              <strong>Program Name:</strong>
+              <strong>Program Name</strong>
               <br />
-              {transferDetails.ProgramName}
+              {transferDetails
+                ? transferDetails.ProgramName
+                : hardcodedData.ProgramName}
             </p>
             <p>
-              <strong>New Session:</strong>
+              <strong>Reason for Transfer</strong>
               <br />
-              Date: {transferDetails.NewSession.Date} <br />
-              Time: {transferDetails.NewSession.Time} <br />
-              Location: {transferDetails.NewSession.Location}
+              {transferDetails ? transferDetails.Reason : hardcodedData.Reason}
             </p>
             <p>
-              <strong>Reason for Transfer:</strong>
+              <strong>Requested At</strong>
               <br />
-              {transferDetails.Reason}
+              {transferDetails
+                ? transferDetails.RequestedAt
+                : hardcodedData.RequestedAt}
+            </p>
+            <p>
+              <strong>Status</strong>
+              <br />
+              {transferDetails ? transferDetails.Status : hardcodedData.Status}
             </p>
           </div>
         </Col>
@@ -132,18 +112,16 @@ const AdminConfirmTransfer = () => {
             <p>
               <strong>Medical Certificate:</strong>
             </p>
-            {transferDetails.MCPath ? (
+            {transferDetails?.MCPath || hardcodedData.MCPath ? (
               <a
-                href={transferDetails.MCPath}
+                href={transferDetails?.MCPath || hardcodedData.MCPath}
                 target="_blank"
                 rel="noopener noreferrer"
               >
                 View Document
               </a>
             ) : (
-              <div className="admin-confirm-screenshot-placeholder">
-                <p>No document available</p>
-              </div>
+              <p>No document available</p>
             )}
           </div>
         </Col>
