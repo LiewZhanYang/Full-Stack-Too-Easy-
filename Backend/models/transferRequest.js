@@ -25,17 +25,20 @@ class TransferRequest {
 
     const sqlQuery = `
       SELECT 
-          tr.TransferID, 
-          tr.SignUpID, 
-          tr.NewSessionID, 
-          s1.StartDate AS CurrentSessionStart, 
-          s2.StartDate AS NewSessionStart, 
-          tr.Reason, 
-          tr.MCPath, 
-          tr.RequestedAt
-      FROM TransferRequest tr
-      JOIN Session s1 ON tr.SignUpID = s1.SessionID
-      JOIN Session s2 ON tr.NewSessionID = s2.SessionID;
+    tr.TransferID,
+    su.AccountID,
+    p.ProgramName,
+    tr.Reason,
+    tr.MCPath,
+    tr.RequestedAt,
+    tr.Status
+FROM 
+    TransferRequest tr
+JOIN 
+    SignUp su ON tr.SignUpID = su.SignUpID
+JOIN 
+    Program p ON su.SessionID = p.ProgramID;
+
     `;
     const [result] = await connection.execute(sqlQuery);
     return result;
