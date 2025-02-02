@@ -107,47 +107,67 @@ function Dashboard() {
               );
               console.log("Tier API Response:", tierResponse.data);
     
-              // Determine ProgramID
-              let programID = sessionResponse.data.ProgramIDs?.[0]; // From session
+              //  Step 1: Attempt to get ProgramID from the session response
+              let programID = sessionResponse.data?.ProgramIDs?.[0] || null;
               console.log("ProgramID from Session:", programID);
     
+              //  Step 2: If not found, try getting it from the tier response
               if (!programID) {
                 console.log("Attempting to fetch ProgramID from Tier data...");
-                programID = tierResponse.data?.ProgramID || null; // From tier
+                programID = tierResponse.data?.ProgramID || null;
                 console.log("ProgramID from Tier:", programID);
               }
     
+              //  Step 3: If still null, check the program mapping endpoint
               if (!programID && sessionResponse.data.TierID) {
                 console.log("Fetching ProgramID mapping for TierID:", sessionResponse.data.TierID);
                 const programMappingResponse = await axios.get(
                   `http://localhost:8000/program/tier/${sessionResponse.data.TierID}`
                 );
                 console.log("Program Mapping Response:", programMappingResponse.data);
-                programID = programMappingResponse.data?.ProgramIDs?.[0] || null;
+                if (!programID) {
+                  console.log("Fetching ProgramID mapping for TierID:", sessionResponse.data.TierID);
+                  const programMappingResponse = await axios.get(
+                    `http://localhost:8000/program/tier/${sessionResponse.data.TierID}`
+                  );
+                  console.log("Program Mapping Response:", programMappingResponse.data);
+                
+                  //  Fix: Extract ProgramID from array instead of expecting an object
+                  if (Array.isArray(programMappingResponse.data) && programMappingResponse.data.length > 0) {
+                    programID = programMappingResponse.data[0]?.ProgramID || null;
+                    console.log("Extracted ProgramID from Tier Mapping API:", programID);
+                  } else {
+                    console.log("⚠️ No ProgramID found in Tier Mapping API response");
+                  }
+                }
+                
                 console.log("ProgramID from Tier Mapping API:", programID);
               }
     
+              //  Step 4: Final fallback check for missing programID
               if (!programID) {
-                console.error("ProgramID could not be determined for session:", sessionResponse.data);
+                console.error("❌ ProgramID could not be determined for session:", sessionResponse.data);
               }
     
-              // Fetch program details if ProgramID is found
+              //  Step 5: Fetch program details if ProgramID is found
               let programName = null;
               if (programID) {
-                console.log("Fetching program details for ProgramID:", programID);
-                const programResponse = await axios.get(`http://localhost:8000/program/${programID}`);
-                console.log("Program API Response (Full):", programResponse.data);
-              
-                if (programResponse.data && typeof programResponse.data === "object") {
-                  console.log("Extracting program name...");
-                  programName = programResponse.data.ProgramName || "Unknown Program";
-                } else {
-                  console.error("Unexpected program response format:", programResponse.data);
+                try {
+                  console.log("Fetching program details for ProgramID:", programID);
+                  const programResponse = await axios.get(`http://localhost:8000/program/${programID}`);
+                  console.log("Program API Response (Full):", programResponse.data);
+                
+                  if (programResponse.data && typeof programResponse.data === "object") {
+                    programName = programResponse.data.ProgramName || "Unknown Program";
+                  } else {
+                    console.error("Unexpected program response format:", programResponse.data);
+                  }
+                } catch (error) {
+                  console.error("Error fetching program details:", error);
                 }
               }
-              
     
-              // Combine all details into one object
+              //  Step 6: Combine all details into one object
               return {
                 ...signup,
                 session: {
@@ -157,7 +177,7 @@ function Dashboard() {
                 tier: tierResponse.data,
                 program: {
                   id: programID,
-                  name: programName, // Include Program Name
+                  name: programName || "Unknown Program", // Include Program Name
                 },
               };
             }
@@ -165,8 +185,7 @@ function Dashboard() {
           })
         );
     
-        console.log("Sign-ups with session, tier & program details:", signUpsWithDetails);
-    
+        console.log(" Sign-ups with session, tier & program details:", signUpsWithDetails);
         setPrograms(signUpsWithDetails);
       } catch (err) {
         console.error("Error in fetchProgramsAndSessions:", err);
@@ -176,15 +195,10 @@ function Dashboard() {
         console.log("Finished fetching programs.");
       }
     };
-    
-    
   
-  
-  fetchProgramsAndSessions();
-  
-
     fetchProgramsAndSessions();
-}, [userAccountID]);
+  }, [userAccountID]);
+  
 
   
 
