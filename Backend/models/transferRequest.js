@@ -48,7 +48,22 @@ JOIN
   static async getTransferRequestById(transferID) {
     const connection = await mysql.createConnection(dbConfig);
 
-    const sqlQuery = `SELECT * FROM TransferRequest WHERE TransferID = ?;`;
+    const sqlQuery = ` SELECT 
+      tr.TransferID,
+      su.AccountID,
+      p.ProgramName,
+      tr.Reason,
+      tr.MCPath,
+      tr.RequestedAt,
+      tr.Status
+    FROM 
+      TransferRequest tr
+    JOIN 
+      SignUp su ON tr.SignUpID = su.SignUpID
+    JOIN 
+      Program p ON su.SessionID = p.ProgramID
+    WHERE 
+      tr.TransferID = ?;`;
     const [result] = await connection.execute(sqlQuery, [transferID]);
     return result[0] || null;
   }
