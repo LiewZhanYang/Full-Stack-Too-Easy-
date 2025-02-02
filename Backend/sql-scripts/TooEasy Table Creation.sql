@@ -79,17 +79,20 @@ CREATE TABLE Webinar (
 );
 
 CREATE TABLE Session (
-	SessionID INT PRIMARY KEY AUTO_INCREMENT,
+    SessionID INT PRIMARY KEY AUTO_INCREMENT,
     StartDate DATE NOT NULL,
     EndDate DATE NOT NULL,
     Time TIME NOT NULL,
     Location VARCHAR(100) NOT NULL,
-	Vacancy INT NOT NULL DEFAULT 0,
+    Vacancy INT NOT NULL DEFAULT 0,
     Status ENUM('Active', 'Cancelled') NOT NULL DEFAULT 'Active',
-    TierID INT, 
+    TierID INT NOT NULL,
+    ProgramID INT NOT NULL,  -- 
     
-    FOREIGN KEY (TierID) REFERENCES Tier(TierID)
+    FOREIGN KEY (TierID) REFERENCES Tier(TierID),
+    FOREIGN KEY (ProgramID) REFERENCES Program(ProgramID)
 );
+
 
 CREATE TABLE Lunch (
 	LunchOptionID INT PRIMARY KEY AUTO_INCREMENT, 
@@ -290,18 +293,18 @@ VALUES
 ('AI and Machine Learning', 'Explore the world of artificial intelligence and machine learning', 'https://www.machinelearningmastery.com/', '2024-12-04', '14:00:00', '16:00:00', 'Ms. AI'),
 ('Cybersecurity Basics', 'Learn how to protect your digital assets', 'https://www.cybersecurityventures.com/', '2024-12-11', '11:00:00', '13:00:00', 'Captain Cyber');
 
-INSERT INTO Session (SessionID, StartDate, EndDate, Time, Location, Vacancy, TierID)
-VALUES
-(1, '2025-02-10', '2025-02-11', '10:00:00', 'Auditorium A', 15, 1),
-(2, '2025-02-15', '2025-02-16', '14:00:00', 'Classroom B', 15, 1),
-(3, '2025-02-20', '2025-02-21', '10:00:00', 'Auditorium C', 15, 2),
-(4, '2025-02-25', '2025-02-26', '14:00:00', 'Classroom D', 15, 2),
-(5, '2025-03-01', '2025-03-02', '10:00:00', 'Auditorium E', 15, 3),
-(6, '2025-03-05', '2025-03-06', '14:00:00', 'Classroom F', 15, 3),
-(7, '2025-03-10', '2025-03-11', '10:00:00', 'Auditorium G', 15, 4),
-(8, '2025-03-15', '2025-03-16', '14:00:00', 'Classroom H', 15, 4),
-(9, '2025-03-20', '2025-03-21', '10:00:00', 'Auditorium I', 15, 5),
-(10, '2025-03-25', '2025-03-26', '14:00:00', 'Classroom J', 15, 5);
+INSERT INTO Session (StartDate, EndDate, Time, Location, Vacancy, Status, TierID, ProgramID) VALUES
+('2025-02-10', '2025-02-11', '10:00:00', 'Auditorium A', 15, 'Active', 1, 1),  -- Beginner - Public Speaking Workshop
+('2025-02-15', '2025-02-16', '14:00:00', 'Classroom B', 15, 'Active', 1, 1),
+('2025-02-20', '2025-02-21', '10:00:00', 'Auditorium C', 10, 'Active', 2, 1),  -- Intermediate - Public Speaking Workshop
+('2025-02-25', '2025-02-26', '14:00:00', 'Classroom D', 10, 'Active', 2, 1),
+('2025-03-01', '2025-03-02', '10:00:00', 'Auditorium E', 10, 'Active', 3, 1),  -- Advanced - Public Speaking Workshop
+('2025-03-05', '2025-03-06', '14:00:00', 'Classroom F', 10, 'Active', 3, 1),
+('2025-03-10', '2025-03-11', '10:00:00', 'Auditorium G', 15, 'Active', 4, 2),  -- PSLE Power Up - PSLE Camp
+('2025-03-15', '2025-03-16', '14:00:00', 'Classroom H', 15, 'Active', 4, 2),
+('2025-03-20', '2025-03-21', '10:00:00', 'Auditorium I', 10, 'Active', 5, 2),  -- PSLE Chinese Oral Booster - PSLE Camp
+('2025-03-25', '2025-03-26', '14:00:00', 'Classroom J', 10, 'Active', 5, 2);
+
 
 INSERT INTO Lunch (LunchOptionID, LunchDesc)
 VALUES
