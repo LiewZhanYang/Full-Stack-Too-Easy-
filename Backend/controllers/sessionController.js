@@ -65,16 +65,33 @@ const updateSession = async (req, res) => {
   console.log("Session Details:", sessionDetails);
 
   try {
+    // Update the session in the database
     const result = await Session.updateSession(sessionID, sessionDetails);
 
     if (!result) {
       return res.status(404).json({ message: "Session not found" });
     }
 
-    res.json({ message: "Session updated successfully" });
+    // If the session update was successful, prepare and send an announcement
+    const announcementDetails = {
+      Title: "Session Update Notification",
+      Body: `The session scheduled on ${StartDate} at ${Location} has been cancelled. Please select another session for the program.`,
+    };
+
+    // Call the announcement controller to send the announcement
+    await postAnnouncement(
+      { body: announcementDetails }, // Simulate a request object
+      res // Use the current response object to handle errors properly
+    );
+
+    res.json({
+      message: "Session updated successfully and announcement sent.",
+    });
   } catch (error) {
-    console.error("Error updating Session:", error);
-    res.status(500).json({ message: "Error updating Session" });
+    console.error("Error updating Session or sending announcement:", error);
+    res
+      .status(500)
+      .json({ message: "Error updating Session or sending announcement" });
   }
 };
 

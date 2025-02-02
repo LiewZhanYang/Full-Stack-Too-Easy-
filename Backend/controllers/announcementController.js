@@ -4,7 +4,7 @@ const axios = require("axios");
 
 const postAnnouncement = async (req, res) => {
   const announcementDetails = req.body;
-  const telegramToken = "7900727345:AAFC8gCTEfNwH_0vdUDu4jQbu_wkw0W-Ots";
+  const telegramToken = "7900727345:AAFC8gCTEfNwH_0vdUDu4jQbu_wkw0W-Ot";
   const telegramChatId = "@MindsphereTooEasy"; // Replace with your Telegram channel username or chat ID
 
   try {
