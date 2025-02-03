@@ -15,6 +15,7 @@ const AdminEditSession = () => {
   const [endDate, setEndDate] = useState("");
   const [time, setTime] = useState("");
   const [location, setLocation] = useState("");
+  const [Status, setStatus] = useState("");
   const [vacancy, setVacancy] = useState("");
   const [showSaveModal, setShowSaveModal] = useState(false); // State for save confirmation modal
   const [showSuccessModal, setShowSuccessModal] = useState(false); // State for success confirmation modal
@@ -39,6 +40,7 @@ const AdminEditSession = () => {
           setTime(session.Time);
           setLocation(session.Location);
           setVacancy(session.Vacancy);
+          setStatus(session.Status)
         } else {
           console.error("Session not found");
         }
@@ -65,6 +67,7 @@ const AdminEditSession = () => {
             Time: time,
             Location: location,
             Vacancy: vacancy,
+            Status: Status
           }),
         }
       );
