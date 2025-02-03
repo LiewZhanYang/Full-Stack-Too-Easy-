@@ -258,27 +258,6 @@ class Session {
     );
   }
 
-  static async updateSession(SessionID, SessionDetails) {
-    const connection = await mysql.createConnection(dbConfig);
-
-    const sqlQuery = `
-      UPDATE session 
-      SET Status = ?
-      WHERE SessionID = ?
-    `;
-
-    const values = [SessionDetails.Status, SessionID];
-
-    try {
-      const [result] = await connection.execute(sqlQuery, values);
-      return result.affectedRows > 0; // Return true if a session was updated
-    } catch (error) {
-      console.error("Error updating session:", error);
-      throw error;
-    } finally {
-      await connection.end();
-    }
-  }
 }
 
 module.exports = Session;

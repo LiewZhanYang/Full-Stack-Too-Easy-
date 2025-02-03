@@ -185,6 +185,27 @@ function Dashboard() {
           })
         );
     
+        console.log("🔍 Sign-ups with session & program details:", signUpsWithDetails);
+  
+        //  Find an ended program
+        const endedPrograms = signUpsWithDetails.find((program) => {
+            if (program.session && program.session.EndDate) {
+                const endDate = new Date(program.session.EndDate);
+                console.log(" Checking program end date:", endDate, "(Now:", new Date(), ")");
+                return endDate < new Date(); // Compare dates
+            }
+            return false;
+        });
+
+        if (endedPrograms) {
+            console.log(" Ended program for review:", endedPrograms);
+            if (endedPrograms.session?.ProgramID) {
+                setReviewPrompt(endedPrograms);
+            } else {
+                console.error(" Error: `ProgramID` is missing in endedPrograms.session", endedPrograms.session);
+            }
+        }
+        
         console.log(" Sign-ups with session, tier & program details:", signUpsWithDetails);
         setPrograms(signUpsWithDetails);
       } catch (err) {
